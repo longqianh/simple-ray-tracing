@@ -8,32 +8,47 @@ private:
 
 	double U;
 	double l;
-
-
-
-public:
-	Ray(){;}
-	~Ray(){;}
-
 	double i; // 入射角
 	double lh;
 
-	void help(){
+public:
+	Ray(double a,double b){
+		U=a;
+		l=b;
+	}
+	~Ray(){}
 
-		cout<<"输入顺序: 物距、入射孔径角"<<endl;
 
+
+
+	void set_U(double x){
+		U=x;
+	}
+	void set_l(double x){
+		l=x;
 	}
 
-	void set_para(double _U,double _l){
-		U=_U;
-		l=_l;
-	}
+	void cal_i(){
 
-	void print_para(){
-		cout<<"物距: "<<l<<" mm"<<endl;
-		cout<<"入射孔径角: "<<U<< "度"<<endl;
+	}
+	void cal_lh(){
+
+	}
 	
-
+	double get_U(){
+		return U;
 	}
+	double get_l(){
+		return l;
+	}
+	double get_i(){
+		return i;
+	}
+	double get_lh(){
+		return lh;
+	}
+
+
+	// void draw(){}
 	
 };
