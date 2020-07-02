@@ -1,9 +1,45 @@
 #include<iostream>
+#include "Lens.h"
 using namespace std;
+
+
+class OptSys
+{
+public:
+	void help(){
+		;
+	}
+	void show_structure(){
+		;
+		// add optical structures in the form of matrix optics
+	}
+
+	void get_lens_num(){
+		;
+	}
+
+	
+	Ray get_sysrayout(){
+		Ray sysrayout;
+		return sysrayout;
+	}
+
+};
+
+
+
+
+
+
 
 int main()
 {
-	cout<<"Hello world!"<<endl;
+	Ray rayin;
+	// rayin.help();
+	// rayin.ray_setting(20,-5,5.33);
+	// rayin.print_para();
+	// Lens len1;
+	// cout<<rayin.vd<<endl;
 	return 0;
 
 }
