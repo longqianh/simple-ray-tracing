@@ -2,6 +2,10 @@
 // #include "Ray.h"
 using namespace std;
 
+#ifndef inf
+#define inf 1e7
+#endif
+
 
 
 class Surface
@@ -21,6 +25,16 @@ public:
 	// 	nd=b;
 	// }
 	Surface(){}
+	Surface(double d,double r,double nd){
+		this->nd=nd;
+		this->d=d;
+		if(r>inf){
+			this->rho=0;
+		}
+		else{
+			this->rho=1/r;
+		}
+	}
 	~Surface(){}
 
 	void set_d(double d)
@@ -29,7 +43,7 @@ public:
 	}
 
 	void set_rho(double r){
-		if(r>1e5){
+		if(r>inf){
 			this->rho=0;
 		}
 		else{
@@ -73,128 +87,123 @@ public:
 		return nc;
 	}
 
-	// bool get_label(){
-	// 	return label;
-	// }
-
-	// void get_paras(){}
 
 };
 
 
 
-// 透镜类
-class Lens
-{
-private:
+// // 透镜类 : 设计失败
+// class Lens
+// {
+// private:
 
-	static int len_num;
-
-
-protected:
-	int sf_num;
-	double thick;
-	string name;
-
-public:
+// 	static int len_num;
 
 
+// protected:
+// 	int sf_num;
+// 	double thick;
+// 	string name;
 
-	Lens(string s="len "+to_string(len_num)){
-		len_num++;
-		name=s;
-	}
-	~Lens(){}
+// public:
+
+// 	Lens(){}
+// 	Lens(string s="len "+to_string(len_num)){
+// 		len_num++;
+// 		name=s;
+// 	}
+// 	~Lens(){}
 
 
-	string get_name(){
-		// cout<<name<<endl;
-		return name;
-	}
-	double get_thick(){
-		return thick;
-	}
+// 	string get_name(){
+// 		// cout<<name<<endl;
+// 		return name;
+// 	}
+// 	double get_thick(){
+// 		return thick;
+// 	}
 
-	int get_sfnum(){
-		return sf_num;
-	}
+// 	int get_sfnum(){
+// 		return sf_num;
+// 	}
 
-	// virtual Surface get_surface()=0;
+// 	// virtual Surface get_surface()=0;
 	
 
-};
+// };
 
 
-class SingleLen:public Lens
-{
-private:
-	Surface sf[2];
+// class SingleLen:public Lens
+// {
+// private:
+// 	Surface sf[2];
 
-public:
-	SingleLen(double* rho,double* nd,double t){
-		sf_num=2;
-		for(int i=0;i<sf_num;i++){
-			sf[i].set_rho(rho[i]);
-			sf[i].set_nd(nd[i]);
-		}
+// public:
+// 	SingleLen(double* rho,double* nd,double t){
+// 		sf_num=2;
+// 		for(int i=0;i<sf_num;i++){
+// 			sf[i].set_rho(rho[i]);
+// 			sf[i].set_nd(nd[i]);
+// 		}
 		
-		thick=t;
-	}
-	~SingleLen(){}
+// 		thick=t;
+// 	}
+// 	~SingleLen(){}
 
 
-	Surface get_sf(int index){
-		return sf[index];
-	}
+// 	Surface get_sf(int index){
+// 		return sf[index];
+// 	}
 	
-};
+// };
 
 
-class DoubleLen:public Lens
-{
-private:
-	Surface sf[3];
+// class DoubleLen:public Lens
+// {
+// private:
+// 	Surface sf[3];
 
-public:
-	DoubleLen(double* rho,double* nd,double t){
-		sf_num=3;
-		for(int i=0;i<sf_num;i++){
-			sf[i].set_rho(rho[i]);
-			sf[i].set_nd(nd[i]);
-		}
+// public:
+// 	DoubleLen(double* rho,double* nd,double t){
+// 		sf_num=3;
+// 		for(int i=0;i<sf_num;i++){
+// 			sf[i].set_rho(rho[i]);
+// 			sf[i].set_nd(nd[i]);
+// 		}
 		
-		thick=t;
-	}
-	~DoubleLen(){}
+// 		thick=t;
+// 	}
+// 	~DoubleLen(){}
 
 
-	Surface get_sf(int index){
-		return sf[index];
-	}
+// 	Surface get_sf(int index){
+// 		return sf[index];
+// 	}
 	
-};
+// };
 
 
-class TriLen:public Lens
-{
-private:
-	Surface sf[4];
+// class TriLen:public Lens
+// {
+// private:
+// 	Surface sf[4];
 
-public:
-	TriLen(double* rho,double* nd,double t){
-		sf_num=4;
-		for(int i=0;i<sf_num;i++){
-			sf[i].set_rho(rho[i]);
-			sf[i].set_nd(nd[i]);
-		}
+// public:
+// 	TriLen(double* rho,double* nd,double t){
+// 		sf_num=4;
+// 		for(int i=0;i<sf_num;i++){
+// 			sf[i].set_rho(rho[i]);
+// 			sf[i].set_nd(nd[i]);
+// 		}
 		
-		thick=t;
-	}
-	~TriLen(){}
+// 		thick=t;
+// 	}
+// 	~TriLen(){}
 
 
-	Surface get_sf(int index){
-		return sf[index];
-	}
+// 	Surface get_sf(int index){
+// 		return sf[index];
+// 	}
 	
-};
+// };
+// int Lens::len_num=1;
