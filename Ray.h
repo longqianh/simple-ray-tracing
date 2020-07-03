@@ -4,54 +4,62 @@ using namespace std;
 
 class Ray
 {
-private:
+protected:
 
 	double U;
 	double y;
-	
 	double l;
 	double i; // 入射角
-	double lh;
+	// double lh;
 
 
 public:
-	Ray(double a,double b){
-		U=a;
-		l=b;
+	Ray(){}
+	Ray(double U){
+		this->U=U;
 	}
 	~Ray(){}
 
 
-
-
-	void set_U(double x){
-		U=x;
+	void set_U(double U){
+		this->U=U;
 	}
-	void set_l(double x){
-		l=x;
+	void set_l(double l){
+		this->l=l;
 	}
-
-	void cal_i(){
-
-	}
-	void cal_lh(){
-
+	void set_i(double i){
+		this->i=i;
 	}
 
-	double get_U(){
+
+
+	double get_U() const
+	{
 		return U;
 	}
-	double get_l(){
+	double get_l() const
+	{
 		return l;
 	}
-	double get_i(){
+	double get_i() const
+	{
 		return i;
 	}
-	double get_lh(){
-		return lh;
+
+	void show_rayinfo(){
+		cout<<"U: "<<U<<endl;
+		cout<<"l: "<<l<<endl;
 	}
-
-
 	// void draw(){}
+	
+};
+
+
+class FAL: public Ray
+{
+public:
+	FAL(){}
+	FAL(double U): Ray(U) {}
+	~FAL(){}
 	
 };
