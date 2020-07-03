@@ -6,7 +6,12 @@
 #include "Lens.h"
 using namespace std;
 
-int Lens::len_num=1;
+#ifndef PI
+#define PI 3.1415926535898
+#endif
+#ifndef INF
+#define INF 1e7
+#endif
 
 class OptErr
 {
@@ -22,25 +27,23 @@ class OptSys
 {
 private:
 	int	nsf;
-	// Surface sf[nsf];
-	// Surface * sf=new Surface [nsf];
-	// Surface *sf[nsf];
+	int a; // 入瞳直径
 	
-
-	// vector<int> dist;
-	// vector<Lens> lens;
-
 
 public:
 
 	Surface *sf;
+	OptSys(){}
+	OptSys(int a,int nsf,double *dists,double * rs,double *nds){
+		
+		this->a=a;
+		this->nsf=nsf;
 
-	OptSys(int sf_num,double *dists,double * rs){
-		nsf=sf_num;
 		sf=new Surface[nsf];
 		for(int i=0;i<nsf;i++){
 			sf[i].set_d(dists[i]);
 			sf[i].set_rho(rs[i]);
+			sf[i].set_nd(nds[i]);
 		}
 
 
@@ -50,20 +53,9 @@ public:
 		delete [] sf;
 	}
 
-	// void init_sf(double * dists,double * rs){
-	// 	Surface sf1[nsf];
-
-	// 	for (int i = 0; i < nsf; i++)
-	// 	{
-	// 		sf1[i].set_rho(rs[i]);
-	// 		sf1[i].set_d(dists[i]);
-	// 	}
-	// 	sf=sf1;
-	// }
+	void show_syspara(){}
 
 	void show_sflist(){
-		// cout<<'#'<<sf[0].get_rho()<<endl;
-
 
 		for(int i=0;i<nsf;i++){
 			cout<<i+1<<" th surface: ";
@@ -78,46 +70,70 @@ public:
 
 		}
 	}
-	// void init_dist(double * dists){
-		
-	// 	for(int i=1;i<dists[int(dists[0])];i++){
-	// 		dist.push_back(dists[i]);
-	// 	}
-	// }
-
-	// void init_lens(double paras[][2],int n){
-	// 	for(int i=0;i<n;i++){
-	// 		Lens len;
-
-	// 		lens.push_back(tmp);
-	// 	}
-
-	// }
 
 
-	// void set_para(double *sys_paras,double len_paras[][2]){		
-	// 	init_dist(sys_paras);
-	// 	// init_lens()
-	// }
 
-	// int get_lens_num(){
-	// 	return lens.size();
-	// }
 
-	
+	// 利用多态
+	Ray ray_tracing(FAL rayin){
+		Ray rayout;
+		// u1:u, u2:u'
+		double u1=rayin.get_U();
+		double u2;
+		double l1,l2;
+		double i;
+		double n2,n1=1;// n2:n', n1:n
 
-	// Ray get_sysrayout(Ray rayin){
-	// 	Ray sysrayout;
-	// 	return sysrayout;
-	// }
-	double cal_f(Ray rayin){
-		double U=rayin.get_U();
-		double l=rayin.get_l();
-		if(l>1e7){
-			;
+		// u1=sin(u1*PI/180); // u1较大时 会影响tan
+		// cout<<"# u1 # "<<u1<<endl;
+		l1=-a/tan(u1*PI/180);
+		// cout<<"# l1 # "<<l1<<endl;
+		rayin.set_l(l1);
+		// cout<<"# l1 # "<<l1<<endl;
+
+		for(int k=0;k<nsf;k++){
+			double d=sf[k].get_d(); //cout<<"# "<<d<<endl;
+			double rho;
+			// cout<<"# l1 # "<<l1<<endl;
+			if(k==0&&l1<-INF){
+					i=a*sf[0].get_rho(); 
+					rayin.set_i(i);	
+				
+			}
+			else{
+				// cout<<"# l1 # "<<l1<<endl;
+				rho=sf[k].get_rho();
+				// cout<<"# rho # "<<rho<<endl;
+				// cout<<"# l1 # "<<l1<<endl;
+				// cout<<"# u1 # "<<u1<<endl;
+				i=(rho*l1-1)*u1; //cout<<"# i # "<<i<<endl;
+				if(k==0){rayin.set_i(i);}
+				
+			}
+
+			n2=sf[k].get_nd();
+			u2=(n2-n1)/n2*i+u1;
+
+			l2=(i+u1)/(u2*rho);
+
+			
+			l1=l2-d;
+			n1=n2; // n1是n2前面的折射率
+			u1=u2;
+			cout<<l1<<endl;
+
 		}
-		return 0;
+
+		// cout<<"#"<<u2*180/PI<<endl;
+		double u2_angle=u2*180/PI-360*int((u2*180/PI)/360);
+		rayout.set_U(u2_angle);
+		rayout.set_l(l2);
+
+		// 判断ray类型
+
+		return rayout;
 	}
+
 
 	void cal_opt_errs(){
 		;
@@ -137,13 +153,24 @@ public:
 int main()
 {
 	int nsf=3;
+	double a=20;
+
 	// double *dists=new double [nsf];
 	// for()
 	// double dists[nsf];
+
 	double dists[]={4,2.5,60};
 	double rs[]={62.5,-43.65,-124.35};
-	OptSys sys(nsf,dists,rs);
-	sys.show_sflist();
+	double nds[]={1.5,1.4,1};
+	OptSys sys(a,nsf,dists,rs,nds);
+	// sys.show_sflist();
+
+	FAL rayin(30);
+	Ray rayout=sys.ray_tracing(rayin);
+	rayout.show_rayinfo()
+;
+
+
 	
 	// cout<<&sys.sf[1]<<endl;
 	// printf("%lf\n",sys.sf[2].get_rho() );
