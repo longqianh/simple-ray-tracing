@@ -7,7 +7,7 @@
 using namespace std;
 
 #ifndef PI
-#define PI 3.1415926535898
+#define PI 3.14159265358979323846264338
 #endif
 #ifndef INF
 #define INF 1e7
@@ -83,9 +83,8 @@ public:
 		double l1,l2;
 		double i;
 		double n2,n1=1;// n2:n', n1:n
-
 		// u1=sin(u1*PI/180); // u1较大时 会影响tan
-		// cout<<"# u1 # "<<u1<<endl;
+		
 		l1=-a/tan(u1*PI/180);
 		// cout<<"# l1 # "<<l1<<endl;
 		rayin.set_l(l1);
@@ -120,7 +119,6 @@ public:
 			l1=l2-d;
 			n1=n2; // n1是n2前面的折射率
 			u1=u2;
-			cout<<l1<<endl;
 
 		}
 
@@ -165,7 +163,7 @@ int main()
 	OptSys sys(a,nsf,dists,rs,nds);
 	// sys.show_sflist();
 
-	FAL rayin(30);
+	FAL rayin(0.5); // 近轴的孔径范围？
 	Ray rayout=sys.ray_tracing(rayin);
 	rayout.show_rayinfo()
 ;
