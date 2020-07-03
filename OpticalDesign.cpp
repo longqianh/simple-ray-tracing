@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string.h>
+#include <math.h>
 #include "Ray.h"
 #include "Lens.h"
 using namespace std;
@@ -10,28 +11,79 @@ int Lens::len_num=1;
 class OptErr
 {
 public:
-	OptErr();
-	~OptErr();
+	OptErr(){}
+	~OptErr(){
+	}
 		
 };
-
 
 
 class OptSys
 {
 private:
-	vector<int> dist;
+	int	nsf;
+	// Surface sf[nsf];
+	// Surface * sf=new Surface [nsf];
+	// Surface *sf[nsf];
+	
+
+	// vector<int> dist;
 	// vector<Lens> lens;
 
 
 public:
 
-	void init_dist(double * dists){
-		
-		for(int i=1;i<dists[int(dists[0])];i++){
-			dist.push_back(dists[i]);
+	Surface *sf;
+
+	OptSys(int sf_num,double *dists,double * rs){
+		nsf=sf_num;
+		sf=new Surface[nsf];
+		for(int i=0;i<nsf;i++){
+			sf[i].set_d(dists[i]);
+			sf[i].set_rho(rs[i]);
+		}
+
+
+	}
+	~OptSys()
+	{
+		delete [] sf;
+	}
+
+	// void init_sf(double * dists,double * rs){
+	// 	Surface sf1[nsf];
+
+	// 	for (int i = 0; i < nsf; i++)
+	// 	{
+	// 		sf1[i].set_rho(rs[i]);
+	// 		sf1[i].set_d(dists[i]);
+	// 	}
+	// 	sf=sf1;
+	// }
+
+	void show_sflist(){
+		// cout<<'#'<<sf[0].get_rho()<<endl;
+
+
+		for(int i=0;i<nsf;i++){
+			cout<<i+1<<" th surface: ";
+			double rho=sf[i].get_rho();
+			double thick=sf[i].get_d();
+			if(rho==0){
+				cout<<"radius--"<<"∞"<<" , distance to the next surface--"<<thick<<endl;				
+			}
+			else{
+				cout<<"radius--"<<1/rho<<" , distance to the next surface--"<<thick<<endl;
+			}
+
 		}
 	}
+	// void init_dist(double * dists){
+		
+	// 	for(int i=1;i<dists[int(dists[0])];i++){
+	// 		dist.push_back(dists[i]);
+	// 	}
+	// }
 
 	// void init_lens(double paras[][2],int n){
 	// 	for(int i=0;i<n;i++){
@@ -43,10 +95,10 @@ public:
 	// }
 
 
-	void set_para(double *sys_paras,double len_paras[][2]){		
-		init_dist(sys_paras);
-		// init_lens()
-	}
+	// void set_para(double *sys_paras,double len_paras[][2]){		
+	// 	init_dist(sys_paras);
+	// 	// init_lens()
+	// }
 
 	// int get_lens_num(){
 	// 	return lens.size();
@@ -58,6 +110,14 @@ public:
 	// 	Ray sysrayout;
 	// 	return sysrayout;
 	// }
+	double cal_f(Ray rayin){
+		double U=rayin.get_U();
+		double l=rayin.get_l();
+		if(l>1e7){
+			;
+		}
+		return 0;
+	}
 
 	void cal_opt_errs(){
 		;
@@ -73,13 +133,34 @@ public:
 
 
 
+
 int main()
 {
+	int nsf=3;
+	// double *dists=new double [nsf];
+	// for()
+	// double dists[nsf];
+	double dists[]={4,2.5,60};
+	double rs[]={62.5,-43.65,-124.35};
+	OptSys sys(nsf,dists,rs);
+	sys.show_sflist();
+	
+	// cout<<&sys.sf[1]<<endl;
+	// printf("%lf\n",sys.sf[2].get_rho() );
+	// sys.init_sf(dists,rs);
+	
+	// cout<<sys.sf[1].get_rho()<<endl;
+	// cout<<sys.sf[2].get_rho()<<endl;
+
+	// sys.show_sflist();
+	// Ray rayin(1,2);
+	// double f=sys.cal_f(rayin);
+
+
+
+
 	// double U=10,l=-10;
 
-
-	// double sys_paras[2]={1,10};// dist_num, dists
-	// double len_paras[2][2];
 
 	// Ray rayin;
 	// rayin.set_para(U,l);
@@ -102,17 +183,17 @@ int main()
 	// Lens len2;
 	// len1.get_name();
 	// len2.get_name();
-	double rhos[]={1,4,2,3};
-	double nds[]={1.1,1.3,1.5,3};
+	// double rhos[]={1,4,2,3};
+	// double nds[]={1.1,1.3,1.5,3};
 
 	// SingleLen sglen(rhos,nds,4);
 	// cout<<sglen.get_sfnum()<<endl;
 	// Ray myray(1,3);
 	// DoubleLen dblen(rhos,nds,4);
 	// cout<<dblen.get_sfnum()<<endl;
-	TriLen trilen(rhos,nds,4);
-	Surface sf1=trilen.get_sf(2);
-	cout<<sf1.get_rho()<<endl;
+	// TriLen trilen(rhos,nds,4);
+	// Surface sf1=trilen.get_sf(2);
+	// cout<<sf1.get_rho()<<endl;
 	return 0;
 
 }
