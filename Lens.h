@@ -2,7 +2,7 @@
 // #include "Ray.h"
 using namespace std;
 
-// 光学元件类
+
 
 class Surface
 {
@@ -11,50 +11,79 @@ private:
 	double nd; // 与下一个面之间的主色光折射率
 	double nf,nc; // 与下一个面之间的F光和C光折射率
 	double vd; // 与下一个面之间的阿贝常数
+	double d; // 到下一个面的距离
+	// bool label; // true：最后一面
 
 
 public:
-	Surface(double a=0,double b=1.0){ 
-		rho=a;
-		nd=b;
-	}
+	// Surface(double a=0,double b=1.0){ 
+	// 	rho=a;
+	// 	nd=b;
+	// }
+	Surface(){}
 	~Surface(){}
 
-	double get_rho(){
+	void set_d(double d)
+	{
+		this->d=d;
+	}
+
+	void set_rho(double r){
+		if(r>1e5){
+			this->rho=0;
+		}
+		else{
+			this->rho=1/r;
+		}
+	}
+	void set_nd(double nd){
+		this->nd=nd;
+	}
+	void set_nf(double nf){
+		this->nf=nf;
+	}
+	void set_nc(double nc){
+		this->nc=nc;
+	}
+
+	// void set_label(bool x){
+	// 	label=x;
+	// }
+
+	double get_d() const
+	{
+		return d;
+	}
+
+	double get_rho() const
+ 	{
 		return rho;
 	}
-	double get_nd(){
+	double get_nd() const
+	{
 		return nd;
 	}
 
-	double get_nf(){
+	double get_nf() const
+	{
 		return nf;
 	}
-	double get_nc(){
+	double get_nc() const
+	{
 		return nc;
 	}
 
-	void set_rho(double x){
-		rho=x;
-	}
-	void set_nd(double x){
-		nd=x;
-	}
-	void set_nf(double x){
-		nf=x;
-	}
-	void set_nc(double x){
-		nc=x;
-	}
+	// bool get_label(){
+	// 	return label;
+	// }
 
-
-	void get_paras(){}
+	// void get_paras(){}
 
 };
 
 
 
-
+// 透镜类
 class Lens
 {
 private:
