@@ -7,9 +7,12 @@ class Ray
 private:
 
 	double U;
+	double y;
+	
 	double l;
 	double i; // 入射角
 	double lh;
+
 
 public:
 	Ray(double a,double b){
@@ -34,7 +37,7 @@ public:
 	void cal_lh(){
 
 	}
-	
+
 	double get_U(){
 		return U;
 	}
