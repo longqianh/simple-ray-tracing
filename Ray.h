@@ -1,5 +1,6 @@
 #pragma once
 #include<iostream>
+#include<math.h>
 #include "utils.h"
 using namespace std;
 #ifndef PI
@@ -16,17 +17,21 @@ protected:
 
 	double U; //弧度
 	// double W; //弧度
-	// double y;
+	double t,s;
+	double y;
 	double l; // 物距
 	double i; // 入射角 弧度
-	string label;
+	string raytype;
 	// double lh;
 
 
 public:
-	Ray(){label="GR"; } // general ray
+	Ray(){raytype="GR";t=0;s=0; } // general ray
 	~Ray(){}
 
+	void set_y(double y){
+		this->y=y;
+	}
 
 	void set_U(double U){
 		this->U=U;
@@ -39,9 +44,24 @@ public:
 		this->i=i;
 	}
 
-	string get_label() const
+	void set_t(double t)
 	{
-		return label;
+		this->t=t;
+	}
+
+	void set_s(double s)
+	{
+		this->s=s;
+	}
+
+	string get_raytype() const
+	{
+		return raytype;
+	}
+
+	double get_y() const
+	{
+		return y;
 	}
 
 	double get_U() const
@@ -58,10 +78,26 @@ public:
 		return i;
 	}
 
-	void show_rayinfo(){
-		cout<<"Ray type: "<<label<<endl;
+	double get_t() const
+	{
+		return t;
+	}
+
+	double get_s() const
+	{
+		return s;
+	}
+
+	void show_rayinfo(int flag=0){
+		cout<<"Ray type: "<<raytype<<endl;
 		cout<<"U: "<<Arc2Angle(U)<<endl;
-		if(abs(l)>0.01)cout<<"l: "<<l<<endl;
+		if(l>0.01||l<-0.01)cout<<"l: "<<l<<endl;
+		if(flag==1)
+		{
+			cout<<"t: "<<t<<endl;
+		 	cout<<"s: "<<t<<endl;
+		 }
+
 	}
 	// void draw(){}
 	
@@ -75,11 +111,14 @@ private:
 	double l1;
 public:
 	FPR(){
-		label="FPR"; 
+		y=0;
+		raytype="FPR"; 
+		
 	}
 	FPR(double U){
 		this->U=U;
-		label="FPR"; 
+		y=0;
+		raytype="FPR"; 
 	}
 	~FPR(){}
 
@@ -92,16 +131,16 @@ class SPR: public Ray
 {
 private:
 	double l1; // 对应的物距
-	double y; // 对应的物高
+	// double y; // 对应的物高
 	double W; // 物方视场角 弧度
 
 public:
 	SPR(){
-		label="SPR"; 
+		raytype="SPR"; 
 		// l=0;
 	}
 	SPR(double W){
-		label="SPR"; 
+		raytype="SPR"; 
 		// l=0;
 		this->W=W;
 	}
@@ -117,9 +156,9 @@ public:
 		this->l1=l1;
 	}
 
-	void set_y(double y){
-		this->y=y;
-	}
+	// void set_y(double y){
+	// 	this->y=y;
+	// }
 
 	double get_W() const
 	{
@@ -131,10 +170,10 @@ public:
 	
 	}
 
-	double get_y() const
-	{
-		return y;
-	}
+	// double get_y() const
+	// {
+	// 	return y;
+	// }
 
 };
 
@@ -142,7 +181,10 @@ public:
 class FAR : public Ray  
 {
 public:
-	FAR(){label="FAR";}
+	FAR(){
+		raytype="FAR";
+		y=0;
+	}
 
 	~FAR(){}
 
@@ -154,13 +196,52 @@ public:
 // Second Actural Ray 
 class SAR : public Ray  
 {
-public:
-	SAR(){label="SAR";}
+private:
+	double l1;
+	double W;
+	string label;
 
+public:
+	SAR(){
+		raytype="SAR";
+	}
+	SAR(string label){
+		raytype="SAR";
+		this->label=label;
+	}
 	~SAR(){}
 
+	void set_label(string label)
+	{
+		this->label=label;
+	}
 
-		
+	void set_l1(double l1)
+	{
+		this->l1=l1;
+	}
 
+
+
+	void set_W(double W)
+	{
+		this->W=W;
+	}
+
+	double get_l1() const
+	{
+		return l1;
+	}
+
+
+
+	double get_W() const
+	{
+		return W;
+	}
+	string get_label() const
+	{
+		return label;
+	}
 	
 };
