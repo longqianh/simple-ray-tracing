@@ -1,0 +1,4 @@
+﻿  Ray_TracingDlg.cpp
+E:\Desktop\Ray_Tracing\Ray_TracingDlg.cpp(254,11): warning C4018: “<”: 有符号/无符号不匹配
+E:\Desktop\Ray_Tracing\Ray_TracingDlg.cpp(384,16): warning C4018: “<”: 有符号/无符号不匹配
+  Ray_Tracing.vcxproj -> E:\Desktop\Ray_Tracing\Debug\Ray_Tracing.exe
