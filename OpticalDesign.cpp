@@ -17,25 +17,12 @@ using namespace std;
 
 
 
-// double ku=1,kw=1,flag=0;
-// double y;
-
 string raytype;
 
 
 
-class OptErr
-{
-public:
-	OptErr(){}
-	~OptErr(){
-	}
-		
-};
-
-
-
 void cal_test(){
+	// double ku=1,kw=1;
 	int nsf=3;
 	double a=20;
 	bool isINF;
@@ -56,7 +43,7 @@ void cal_test(){
 		
 		isINF=true;
 		cout<<"Ray output for the ray incident from infinity:"<<endl;
-		rayin1.set_U(0);
+		
 		rayout=sys.ray_tracing(rayin1,isINF);
 
 		rayout.show_rayinfo();
@@ -66,7 +53,7 @@ void cal_test(){
 		cout<<"Ray output for the ray incident from a limited distance:"<<endl;
 		double l=-500;
 		rayin2.set_l(l);
-		rayin2.set_U(atan(a/l));
+		
 		rayout=sys.ray_tracing(rayin2,isINF);
 		rayout.show_rayinfo();
 	}
@@ -105,7 +92,7 @@ void cal_test(){
 		isINF=true;
 		cout<<"Ray output for the actual ray incident from infinity:"<<endl;
 		
-		rayin1.set_U(0);
+		
 		rayout=sys.ray_tracing(rayin1,isINF);
 		rayout.show_rayinfo();
 
@@ -114,7 +101,7 @@ void cal_test(){
 		isINF=false;
 		double l=-500;
 		rayin2.set_l(l);
-		rayin2.set_U(asin(ku*sin(atan((a/2)/l))));
+		// rayin2.set_U(asin(ku*sin(atan((a/2)/l))));
 		rayout=sys.ray_tracing(rayin2,isINF);
 		rayout.show_rayinfo();
 
@@ -122,11 +109,53 @@ void cal_test(){
 
 	cout<<endl;
 	raytype="SAR";
-	// if(raytype=="SAR"){
-	// 	cout<<"Second Actual Ray:"<<endl;
+	// string label;
+	cout<<"Second Off-Axis Ray"<<endl;
 		
-	// 	SAR rayin1;
-	// 	isINF=true;
+	SAR rayin_up("up"),rayin_cf("cf"),rayin_dn("dn");
+	Ray rayout_up,rayout_cf,rayout_dn;
+	cout<<"incident from infinity"<<endl;
+	
+	isINF=true;
+	double W=3;
+	rayin_up.set_W(Angle2Arc(W));
+	rayin_cf.set_W(Angle2Arc(W));
+	rayin_dn.set_W(Angle2Arc(W));
+	rayout_up=sys.ray_tracing(rayin_up,isINF);
+	rayout_cf=sys.ray_tracing(rayin_cf,isINF);
+	rayout_dn=sys.ray_tracing(rayin_dn,isINF);
+	rayout_up.show_rayinfo();
+	rayout_cf.show_rayinfo(1);
+	rayout_dn.show_rayinfo();
+	cout<<endl;
+	cout<<"incident form limited length"<<endl;
+	isINF=false;
+	double y=26;
+	double l=-500;
+	rayin_up.set_y(y);
+	rayin_cf.set_y(y);
+	rayin_dn.set_y(y);
+	// rayin_up.set_l(0);
+	// rayin_cf.set_l(0);
+	rayin_up.set_l1(l);
+	rayin_cf.set_l1(l);
+	rayin_dn.set_l1(l);
+	// rayin_dn.set_l(0);
+	rayout_up=sys.ray_tracing(rayin_up,isINF);
+	rayout_cf=sys.ray_tracing(rayin_cf,isINF);
+	rayout_dn=sys.ray_tracing(rayin_dn,isINF);
+	rayout_up.show_rayinfo();
+	rayout_cf.show_rayinfo(1);
+	rayout_dn.show_rayinfo();
+
+	// OptAber abers = sys.cal_aber(rayin_up,rayin_cf,rayin_dn);
+	
+	// rayin1.set_t(INF);	
+	// rayin1.set_s(INF);
+	// // W=3;
+	// rayin1.set_W(Angle2Arc());
+
+
 	// 	cout<<"Ray output for the actual ray incident from infinity:"<<endl;
 		
 	// 	// rayin1.set_U(0);
@@ -178,3 +207,4 @@ int main()
 // H开头：环保
 // 
 // MFC高
+
