@@ -2,6 +2,12 @@
 #include<iostream>
 #include "utils.h"
 using namespace std;
+#ifndef PI
+#define PI 3.14159265358979323846264338
+#endif
+#ifndef INF
+#define INF 1e15
+#endif
 
 
 class Ray
@@ -61,26 +67,28 @@ public:
 	
 };
 
+// First Paraxial Ray
 
-class FPL: public Ray
+class FPR: public Ray
 {
 private:
 	double l1;
 public:
-	FPL(){
-		label="FPL"; // First Paraxial Light
+	FPR(){
+		label="FPR"; 
 	}
-	FPL(double U){
+	FPR(double U){
 		this->U=U;
-		label="FPL"; 
+		label="FPR"; 
 	}
-	~FPL(){}
-	
+	~FPR(){}
+
 
 
 };
 
-class SPL: public Ray
+// Second Paraxial Ray
+class SPR: public Ray
 {
 private:
 	double l1; // 对应的物距
@@ -88,16 +96,16 @@ private:
 	double W; // 物方视场角 弧度
 
 public:
-	SPL(){
-		label="SPL"; // Second Paraxial Light
-		l=0;
+	SPR(){
+		label="SPR"; 
+		// l=0;
 	}
-	SPL(double W){
-		label="SPL"; 
-		l=0;
+	SPR(double W){
+		label="SPR"; 
+		// l=0;
 		this->W=W;
 	}
-	~SPL(){}
+	~SPR(){}
 
 
 	void set_W(double W){
@@ -128,4 +136,31 @@ public:
 		return y;
 	}
 
+};
+
+// First Actural Ray or meridian actual ray
+class FAR : public Ray  
+{
+public:
+	FAR(){label="FAR";}
+
+	~FAR(){}
+
+
+
+	
+};
+
+// Second Actural Ray 
+class SAR : public Ray  
+{
+public:
+	SAR(){label="SAR";}
+
+	~SAR(){}
+
+
+		
+
+	
 };
