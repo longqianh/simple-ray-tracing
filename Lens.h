@@ -19,6 +19,8 @@ private:
 	double nf,nc; // 与下一个面之间的F光和C光折射率
 	double vd; // 与下一个面之间的阿贝常数
 	double d; // 到下一个面的距离
+	double X; // 
+	double PA; 
 	// bool label; // true：最后一面
 
 
@@ -63,9 +65,13 @@ public:
 		this->nc=nc;
 	}
 
-	// void set_label(bool x){
-	// 	label=x;
-	// }
+
+	void set_PA(double PA){
+		this->PA=PA;
+		X=PA*PA*rho/2;
+		// cout<<"PA set -- "<<PA<<endl;
+		// cout<<"X set -- "<<X<<endl;
+	}
 
 	double get_d() const
 	{
@@ -90,7 +96,15 @@ public:
 		return nc;
 	}
 
+	double get_X() const
+	{
+		return X;
+	}
 
+	double get_PA() const
+	{
+		return PA;
+	}
 };
 
 
