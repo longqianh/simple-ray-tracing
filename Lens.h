@@ -2,8 +2,11 @@
 #include<iostream>
 using namespace std;
 
-#ifndef inf
-#define inf 1e7
+#ifndef PI
+#define PI 3.14159265358979323846264338
+#endif
+#ifndef INF
+#define INF 1e15
 #endif
 
 
@@ -28,7 +31,7 @@ public:
 	Surface(double d,double r,double nd){
 		this->nd=nd;
 		this->d=d;
-		if(r>inf){
+		if(r>INF){
 			this->rho=0;
 		}
 		else{
@@ -43,7 +46,7 @@ public:
 	}
 
 	void set_rho(double r){
-		if(r>inf){
+		if(r>INF){
 			this->rho=0;
 		}
 		else{
