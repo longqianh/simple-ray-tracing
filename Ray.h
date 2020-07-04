@@ -60,7 +60,7 @@ public:
 	void show_rayinfo(){
 		cout<<"Ray type: "<<label<<endl;
 		cout<<"U: "<<Arc2Angle(U)<<endl;
-		cout<<"l: "<<l<<endl;
+		if(l>0.01)cout<<"l: "<<l<<endl;
 	}
 	// void draw(){}
 	
@@ -87,7 +87,8 @@ public:
 class SPL: public Ray
 {
 private:
-	double l1;
+	double l1; // 对应的物距
+	double y; // 对应的物高
 	double W;
 
 public:
@@ -103,14 +104,24 @@ public:
 	~SPL(){}
 
 	// a:入瞳直径
-	void set_l1(double a,double u){
-		l1=a/tan(u);
+	void set_l1(double l1){
+		this->l1=l1;
+		cout<<l1<<endl;
+	}
+
+	void set_y(double y){
+		this->y=y;
 	}
 
 	double get_l1() const
 	{
 		return l1;
 	
+	}
+
+	double get_y() const
+	{
+		return y;
 	}
 
 };
