@@ -4,6 +4,7 @@
 #include <math.h>
 #include "Ray.h"
 #include "Lens.h"
+#include "utils.h"
 using namespace std;
 
 #ifndef PI
@@ -12,6 +13,15 @@ using namespace std;
 #ifndef INF
 #define INF 1e7
 #endif
+
+
+
+double ku=1,kw=1,flag=0;
+double y;
+bool isINF=false;
+string raytype;
+
+
 
 class OptErr
 {
@@ -28,6 +38,8 @@ class OptSys
 private:
 	int	nsf;
 	int a; // 入瞳直径
+	double f;
+	double lH;
 	
 
 public:
@@ -36,6 +48,7 @@ public:
 	OptSys(){}
 	OptSys(int a,int nsf,double *dists,double * rs,double *nds){
 		
+		this->set_f();
 		this->a=a;
 		this->nsf=nsf;
 
@@ -45,7 +58,6 @@ public:
 			sf[i].set_rho(rs[i]);
 			sf[i].set_nd(nds[i]);
 		}
-
 
 	}
 	~OptSys()
@@ -71,40 +83,110 @@ public:
 		}
 	}
 
+	void set_f(){
+		
+		;
+	}
 
+	double get_f() const 
+	{
+		return f;
+	}
 
 
 	// 利用多态
-	Ray ray_tracing(FAL rayin){
-		Ray rayout;
-		// u1:u, u2:u'
-		double u1=rayin.get_U();
-		double u2;
+	Ray ray_tracing(FPL rayin){
+		double u1,u2; // u1:u, u2:u'
 		double l1,l2;
 		double i;
 		double n2,n1=1;// n2:n', n1:n
-		// u1=sin(u1*PI/180); // u1较大时 会影响tan
+		// string label=rayin.get_label();
+		// cout<<"Rayin type: "<<label<<endl;
+		Ray rayout;
+		l1=rayin.get_l();
+		u1=rayin.get_U();
 		
-		l1=-a/tan(u1*PI/180);
-		// cout<<"# l1 # "<<l1<<endl;
-		rayin.set_l(l1);
-		// cout<<"# l1 # "<<l1<<endl;
+		// cout<<Arc2Angle(u1)<<endl;
+
+		// cout<<u1<<" "<<sin(u1)<<endl;
+		// l1=-(a/2)/tan(u1);
+		// cout<<l1<<endl;// 需要加个判断 支持l和U
+		// rayin.set_l(l1);
+
+		for(int k=0;k<nsf;k++){
+			cout<<"#"<<k;
+			double d=sf[k].get_d(); //cout<<"# "<<d<<endl;
+			double rho=sf[k].get_rho();;
+			
+			if(isINF&&k==0){
+				i=(a/2)*rho;
+			}
+			
+			else {i=(rho*l1-1)*u1; }
+			rayin.set_i(i);	
+			
+			n2=sf[k].get_nd();
+			u2=(n2-n1)/n2*i+u1;
+
+			l2=(i+u1)/(u2*rho);
+			cout<<" l1 "<<l1;
+			cout<<" l2 "<<l2;
+			l1=l2-d;
+			n1=n2; // n1是n2前面的折射率
+
+			cout<<" u1 "<<u1;
+			cout<<" u2 "<<u2<<endl;
+			u1=u2;
+			// cout<<"i"<<i<<endl;
+			// cout<<"l1 "<<l1<<endl;
+				
+		}
+		
+		rayout.set_U(u2);
+		rayout.set_l(l2);
+
+		return rayout;
+	}
+
+
+
+
+	Ray ray_tracing(SPL rayin){
+
+		double u1,u2;
+		double l1,l2;
+		double i;
+		double n2,n1=1;// n2:n', n1:n
+		string label=rayin.get_label();
+		// cout<<"Rayin type: "<<label<<endl;
+		Ray rayout;
+
+		l1=0;
+		double w=rayin.get_W();
+		cout<<w<<endl;
+		
+
+		if(isINF){			
+			u1=sin(kw*w);
+		}
+
+		else{
+			double L1=rayin.get_l1();
+			u1=sin(atan(kw*(-y)/L1));
+			// rayin.set_W(atan())
+		}
 
 		for(int k=0;k<nsf;k++){
 			double d=sf[k].get_d(); //cout<<"# "<<d<<endl;
 			double rho;
 			// cout<<"# l1 # "<<l1<<endl;
-			if(k==0&&l1<-INF){
-					i=a*sf[0].get_rho(); 
-					rayin.set_i(i);	
+			if(k==0&&isINF){
+				i=(a/2)*sf[0].get_rho(); 
+				rayin.set_i(i);	
 				
 			}
 			else{
-				// cout<<"# l1 # "<<l1<<endl;
 				rho=sf[k].get_rho();
-				// cout<<"# rho # "<<rho<<endl;
-				// cout<<"# l1 # "<<l1<<endl;
-				// cout<<"# u1 # "<<u1<<endl;
 				i=(rho*l1-1)*u1; //cout<<"# i # "<<i<<endl;
 				if(k==0){rayin.set_i(i);}
 				
@@ -115,16 +197,13 @@ public:
 
 			l2=(i+u1)/(u2*rho);
 
-			
 			l1=l2-d;
 			n1=n2; // n1是n2前面的折射率
 			u1=u2;
 
 		}
 
-		// cout<<"#"<<u2*180/PI<<endl;
-		double u2_angle=u2*180/PI-360*int((u2*180/PI)/360);
-		rayout.set_U(u2_angle);
+		rayout.set_U(u2);
 		rayout.set_l(l2);
 
 		// 判断ray类型
@@ -152,20 +231,63 @@ int main()
 {
 	int nsf=3;
 	double a=20;
-
-	// double *dists=new double [nsf];
-	// for()
-	// double dists[nsf];
-
+	isINF=false;
 	double dists[]={4,2.5,60};
 	double rs[]={62.5,-43.65,-124.35};
-	double nds[]={1.5,1.4,1};
+	double nds[]={1.51637,1.67268,1};
+
 	OptSys sys(a,nsf,dists,rs,nds);
 	// sys.show_sflist();
 
-	FAL rayin(0.5); // 近轴的孔径范围？
-	Ray rayout=sys.ray_tracing(rayin);
-	rayout.show_rayinfo()
+	raytype="FPL";
+	if(raytype=="FPL"){
+		isINF=false;
+		Ray rayout;
+		if(isINF){
+			FPL rayin(Angle2Arc(3)); // 近轴的孔径范围？
+			rayin.set_U(0);
+			rayout=sys.ray_tracing(rayin);
+		}
+		else{
+			double l=-500;
+			FPL rayin;
+			rayin.set_l(l);
+			rayin.set_U(atan(a/l));
+			// FPL rayin(Angle2Arc(1.1457628)); // 近轴的孔径范围？
+			rayout=sys.ray_tracing(rayin);
+		}
+		
+		rayout.show_rayinfo();
+	}
+	
+
+	// FPL raytest(1);
+	// isINF=true;
+	raytype="SPL";
+	if(raytype=="SPL"){
+		isINF=false;
+		if(isINF){
+			// W=cin.get();
+			// y=cin.get();
+			double W=3;
+			W=Angle2Arc(W);
+			SPL rayin(W);
+		}
+		else{
+			// U=cin.get();
+			double U=1.1457628;
+			U=Angle2Arc(U);
+			y=26;
+			SPL rayin;
+			rayin.set_U(U);
+			rayin.set_l1(a,U);
+			rayin.show_rayinfo();
+		}
+	}
+	
+	
+	// cout<<"#"<<raytest.get_label()<<endl;
+	// raytest.show_rayinfo();
 ;
 
 
