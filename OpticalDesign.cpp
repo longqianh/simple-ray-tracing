@@ -11,7 +11,7 @@ using namespace std;
 #define PI 3.14159265358979323846264338
 #endif
 #ifndef INF
-#define INF 1e7
+#define INF 1e15
 #endif
 
 
@@ -126,7 +126,7 @@ public:
 
 
 	// 利用多态
-	Ray ray_tracing(FPL rayin,bool isINF){
+	Ray ray_tracing(FPR rayin,bool isINF){
 		double u1,u2; // u1:u, u2:u'
 		double l1,l2;
 		double i;
@@ -135,7 +135,7 @@ public:
 		// cout<<"Rayin type: "<<label<<endl;
 		Ray rayout;
 
-		if(isINF) l1=-1e15;
+		if(isINF) l1=-INF;
 		else l1=rayin.get_l();
 		
 		u1=rayin.get_U();
@@ -183,7 +183,7 @@ public:
 
 
 
-	Ray ray_tracing(SPL rayin,bool isINF){
+	Ray ray_tracing(SPR rayin,bool isINF){
 
 		double u1,u2;
 		double l1=0,l2;
@@ -230,11 +230,66 @@ public:
 
 		rayout.set_U(u2);
 		rayout.set_l(l2);
-		// cout<<l2<<endl;
 
-		// 判断ray类型
 
 		return rayout;
+	}
+
+	Ray ray_tracing(FAR rayin,bool isINF){
+
+		double U1,U2;
+		double l1,l2;
+		double I1,I2;
+		double n2,n1=1;// n2:n', n1:n
+		Ray rayout;
+
+		if(isINF) l1=-INF;
+		else l1=rayin.get_l();
+		
+		U1=rayin.get_U();
+		
+		for(int k=0;k<nsf;k++){
+			double d=sf[k].get_d(); 
+			double rho=sf[k].get_rho();
+			n2=sf[k].get_nd();
+
+			if(isINF&&k==0){
+				U1=0;
+				I1=asin(ku*(a/2)*rho);
+				I2=asin(n2/n1*(a/2)*ku*rho);
+			}
+
+			else if(!isINF&&k==0){
+				U2=asin(ku*sin(atan((a/2)/l)))
+				I1=asin((l1-1)*sin(U1)
+			}
+			// else if (!isINF&&k==0) I=(rho*l1-1)*u1;
+
+
+			rayin.set_i(i);	
+			
+			
+			u2=(n2-n1)/n2*i+u1;
+
+			l2=(i+u1)/(u2*rho);
+			// cout<<" l1 "<<l1;
+			// cout<<" l2 "<<l2;
+			l1=l2-d;
+			n1=n2; // n1是n2前面的折射率
+
+			// cout<<" u1 "<<u1;
+			// cout<<" u2 "<<u2<<endl;
+			u1=u2;
+			// cout<<"i"<<i<<endl;
+			// cout<<"l1 "<<l1<<endl;
+				
+		}
+		
+		rayout.set_U(u2);
+		rayout.set_l(l2);
+
+		return rayout;
+	
 	}
 
 
@@ -260,15 +315,15 @@ void cal_test(){
 	sys.show_sysinfo();
 	cout<<endl;
 
-	raytype="FPL";
+	raytype="FPR";
 
-	if(raytype=="FPL"){
+	if(raytype=="FPR"){
 
-		cout<<"First Paraxial Light:"<<endl;
-		FPL rayin;
+		cout<<"First Paraxial Ray:"<<endl;
+		FPR rayin;
 		
 		isINF=true;
-		cout<<"Ray output for light incident from infinity:"<<endl;
+		cout<<"Ray output for the ray incident from infinity:"<<endl;
 		rayin.set_U(0);
 		rayout=sys.ray_tracing(rayin,isINF);
 
@@ -276,7 +331,7 @@ void cal_test(){
 
 		
 		isINF=false;
-		cout<<"Ray output for light incident from a limited distance:"<<endl;
+		cout<<"Ray output for the ray incident from a limited distance:"<<endl;
 		double l=-500;
 		rayin.set_l(l);
 		rayin.set_U(atan(a/l));
@@ -285,21 +340,21 @@ void cal_test(){
 	}
 	
 	cout<<endl;
-	raytype="SPL";
-	if(raytype=="SPL"){
-		cout<<"Second Paraxial Light:"<<endl;
-		SPL rayin1;
+	raytype="SPR";
+	if(raytype=="SPR"){
+		cout<<"Second Paraxial Ray:"<<endl;
+		SPR rayin1;
 		isINF=true;
-		cout<<"Ray output for light incident from infinity:"<<endl;
+		cout<<"Ray output for the ray incident from infinity:"<<endl;
 		double W=3;
 		rayin1.set_W(Angle2Arc(W));
 		rayout=sys.ray_tracing(rayin1,isINF);
 		rayout.show_rayinfo();
 	
 		isINF=false;
-		cout<<"Ray output for light incident from a limited distance:"<<endl;
+		cout<<"Ray output for the ray incident from a limited distance:"<<endl;
 
-		SPL rayin2;
+		SPR rayin2;
 		double l=-500;
 		double y=26;
 		rayin2.set_l1(l);
@@ -322,6 +377,10 @@ int main()
 	return 0;
 
 }
+// 备忘
+// 输入正l 然后l=-l
+// ku作为参数 而不是全局变量 避免干扰
+
 
 // 软件基本功能模块划分
 // I/O：键盘输入、文件输入、屏幕输出、文件输出
