@@ -9,8 +9,8 @@ class Ray
 protected:
 
 	double U; //弧度
-	double W; //弧度
-	double y;
+	// double W; //弧度
+	// double y;
 	double l; // 物距
 	double i; // 入射角 弧度
 	string label;
@@ -25,9 +25,7 @@ public:
 	void set_U(double U){
 		this->U=U;
 	}
-	void set_W(double W){
-		this->W=W;
-	}
+	
 	void set_l(double l){
 		this->l=l;
 	}
@@ -44,10 +42,7 @@ public:
 	{
 		return U;
 	}
-	double get_W() const
-	{
-		return W;
-	}
+	
 	double get_l() const
 	{
 		return l;
@@ -60,7 +55,7 @@ public:
 	void show_rayinfo(){
 		cout<<"Ray type: "<<label<<endl;
 		cout<<"U: "<<Arc2Angle(U)<<endl;
-		if(l>0.01)cout<<"l: "<<l<<endl;
+		if(abs(l)>0.01)cout<<"l: "<<l<<endl;
 	}
 	// void draw(){}
 	
@@ -80,6 +75,7 @@ public:
 		label="FPL"; 
 	}
 	~FPL(){}
+	
 
 
 };
@@ -89,7 +85,7 @@ class SPL: public Ray
 private:
 	double l1; // 对应的物距
 	double y; // 对应的物高
-	double W;
+	double W; // 物方视场角 弧度
 
 public:
 	SPL(){
@@ -103,16 +99,24 @@ public:
 	}
 	~SPL(){}
 
-	// a:入瞳直径
+
+	void set_W(double W){
+		this->W=W;
+	}
+	
+	
 	void set_l1(double l1){
 		this->l1=l1;
-		cout<<l1<<endl;
 	}
 
 	void set_y(double y){
 		this->y=y;
 	}
 
+	double get_W() const
+	{
+		return W;
+	}
 	double get_l1() const
 	{
 		return l1;
