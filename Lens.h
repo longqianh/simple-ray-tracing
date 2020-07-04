@@ -1,5 +1,5 @@
+#pragma once
 #include<iostream>
-// #include "Ray.h"
 using namespace std;
 
 #ifndef inf
