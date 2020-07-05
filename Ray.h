@@ -46,12 +46,12 @@ public:
 	// 	this->i=i;
 	// }
 
-	void set_raytype(string rayinfo)
+	void set_rayinfo(string rayinfo)
 	{
 		this->rayinfo=rayinfo;
 	}
 
-	string get_raytype() const
+	string get_rayinfo() const
 	{
 		return rayinfo;
 	}
@@ -66,30 +66,23 @@ public:
 	{
 		return l;
 	}
-	// double get_i() const
-	// {
-	// 	return i;
-	// }
-
-
-	// virtual void show_rayinfo(string label=""){
-	// 	cout<<"Ray Types: "<<rayinfo<<endl;
-	// 	cout<<"U: "<<Arc2Angle(U)<<endl;
-	// 	if(l>0.01||l<-0.01)cout<<"l: "<<l<<endl;
-	// 	if(label=="cf")
-	// 	{
-	// 		cout<<"t: "<<t<<endl;
-	// 	 	cout<<"s: "<<s<<endl;
-	// 	 }
-
-	// }
-
-
 
 	virtual void show_rayinfo()
 	{
-		cout<<"General Ray Type"<<endl;
-		cout<<"l -- "<<l<<endl;
+		cout<<"Ray Information : "<<rayinfo<<endl;
+		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
+		cout<<"Distance l -- ";
+		if(l<=-INF)
+		{
+			cout<<"-INF"<<endl;
+		}
+		else if(l>INF)
+		{
+			cout<<"INF"<<endl;
+		}
+		else{
+			cout<<l<<endl;
+		}
 	}
 	
 };
@@ -117,9 +110,9 @@ public:
 
 	void show_rayinfo()
 	{
-		cout<<"Ray Information -- "<<rayinfo<<endl;
+		cout<<"Ray Information : "<<rayinfo<<endl;
 		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
-		cout<<"Distance -- ";
+		cout<<"Distance l -- ";
 		if(l<=-INF)
 		{
 			cout<<"-INF"<<endl;
@@ -155,7 +148,7 @@ public:
 		else{
 			y=y_or_W;
 		}
-		this->L=l;
+		L=l;
 		l=0; // 注：若孔径光阑不在第一面，这里的l需重新设置
 	}
 
@@ -170,7 +163,7 @@ public:
 		else{
 			y=y_or_W;
 		}
-		this->L=l;
+		L=l;
 		l=0; 
 	}
 
@@ -206,9 +199,9 @@ public:
 
 	void show_rayinfo()
 	{
-		cout<<"Ray Information -- "<<rayinfo<<endl;
+		cout<<"Ray Information : "<<rayinfo<<endl;
 		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
-		cout<<"Distance -- ";
+		cout<<"Distance l -- ";
 		if(l<=-INF)
 		{
 			cout<<"-INF"<<endl;
@@ -242,7 +235,7 @@ public:
 
 	void show_rayinfo()
 	{
-		cout<<"Ray Information -- "<<rayinfo<<endl;
+		cout<<"Ray Information : "<<rayinfo<<endl;
 		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
 		cout<<"Distance -- ";
 		if(l<=-INF)
@@ -272,11 +265,12 @@ private:
 	string label; // 区分主、上、下光线
 
 public:
+	SAR(){ rayinfo="SAR"; }
 	SAR(double l,double y_or_W):Ray(l)
 	{
 		if(l==-INF||l==INF)
 		{
-			W=y_or_W;
+			W=-Angle2Arc(y_or_W);
 			L=-INF;
 		}
 		else { y=y_or_W; }
@@ -386,10 +380,10 @@ public:
 
 	void show_rayinfo()
 	{
-		cout<<"Ray Information -- "<<rayinfo<<endl;
+		cout<<"Ray Information : "<<rayinfo<<endl;
 		cout<<"Ray label -- "<<label<<endl;
 		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
-		cout<<"Distance -- ";
+		cout<<"Distance l -- ";
 		if(l<=-INF)
 		{
 			cout<<"-INF"<<endl;

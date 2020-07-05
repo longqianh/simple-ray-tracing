@@ -94,15 +94,15 @@ void cal_test(){
 		rayout1=sys.ray_tracing(rayin1,1,1,"FAR,rayout,inf ");
 		rayout1.show_rayinfo();
 
-		rayout1_U=sys.ray_tracing(rayin1,1,0.7,"FAR,rayout,inf,0.7U ");
+		rayout1_U=sys.ray_tracing(rayin1,0.7,1,"FAR,rayout,inf,0.7U ");
 		rayout1_U.show_rayinfo();
 
 		FAR rayin2(l);
 		Ray rayout2,rayout2_U;
 
-		rayout2=sys.ray_tracing(rayin2,1,0.7,"FAR,rayout,finite ");
+		rayout2=sys.ray_tracing(rayin2,1,1,"FAR,rayout,finite ");
 		rayout2.show_rayinfo();
-		rayout2_U=sys.ray_tracing(rayin2,1,0.7,"FAR,rayout,finite,0.7U ");
+		rayout2_U=sys.ray_tracing(rayin2,0.7,1,"FAR,rayout,finite,0.7U ");
 		rayout2_U.show_rayinfo();
 	}
 
@@ -136,35 +136,93 @@ void cal_test(){
 	}
 
 	cout<<endl;
+	OptSys sys_f(a,nsf,dists,rs,nfs);
+	OptSys sys_c(a,nsf,dists,rs,ncs);
 	cout<<"Exit Ray :"<<endl;
-	cout<<"Ideal image height -- inf -- "<<sys.cal_y0(-INF,3,1,1)<<endl;
-	cout<<"Ideal image height -- inf -- 0.7W --  "<<sys.cal_y0(-INF,3,1,0.7)<<endl;
+	cout<<"Ideal image height -- inf -- nd -- "<<sys.cal_y0(-INF,3,1,1)<<endl;
+	cout<<"Ideal image height -- inf -- nd -- 0.7W --  "<<sys.cal_y0(-INF,3,1,0.7)<<endl;
+	
+	cout<<"Ideal image height -- inf -- nf -- "<<sys_f.cal_y0(-INF,3,1,1)<<endl;
+	cout<<"Ideal image height -- inf -- nf -- 0.7W --  "<<sys_f.cal_y0(-INF,3,1,0.7)<<endl;
+	
+	cout<<"Ideal image height -- inf -- nc -- "<<sys_c.cal_y0(-INF,3,1,1)<<endl;
+	cout<<"Ideal image height -- inf -- nc -- 0.7W -- "<<sys_c.cal_y0(-INF,3,1,0.7)<<endl;
 
-	cout<<"Ideal image height -- finite -- "<<sys.cal_y0(l,y)<<endl;
-	cout<<"Ideal image height -- finite -- 0.7W -- "<<sys.cal_y0(l,y,1,0.7)<<endl;
-	// printf("%s %lf\n","Ideal image height -- ", sys.cal_y0(-INF,y,true,ku,kw,W));
-	cout<<"Actual image height -- finite -- "<<sys.cal_y(l,y,1,1)<<endl;
-	// cout<<"Actual image height -- finite -- 0.7 "<<sys.cal_y(l,y)<<endl;
+	cout<<"Ideal image height -- finite -- nd -- "<<sys.cal_y0(l,y,1,1)<<endl;
+	cout<<"Ideal image height -- finite -- nd -- 0.7W --  "<<sys.cal_y0(-INF,3,1,0.7)<<endl;
+	
+	cout<<"Ideal image height -- finite -- nf -- "<<sys_f.cal_y0(l,y,1,1)<<endl;
+	cout<<"Ideal image height -- finite -- nf -- 0.7W --  "<<sys_f.cal_y0(-INF,3,1,0.7)<<endl;
+	
+	cout<<"Ideal image height -- finite -- nc -- "<<sys_c.cal_y0(l,y,1,1)<<endl;
+	cout<<"Ideal image height -- finite -- nc -- 0.7W -- "<<sys_c.cal_y0(l,y,1,0.7)<<endl;
+
+	cout<<"Actual image height -- inf -- nd -- "<<sys.cal_y(-INF,3,1,1)<<endl;
+	cout<<"Actual image height -- inf -- nd -- 0.7W -- "<<sys.cal_y(-INF,3,1,0.7)<<endl;
+
+	cout<<"Actual image height -- inf -- nf -- "<<sys_f.cal_y(-INF,3,1,1)<<endl;
+	cout<<"Actual image height -- inf -- nf -- 0.7W -- "<<sys_f.cal_y(-INF,3,1,0.7)<<endl;
+
+	cout<<"Actual image height -- inf -- nc -- "<<sys_c.cal_y(-INF,3,1,1)<<endl;
+	cout<<"Actual image height -- inf -- nc -- 0.7W -- "<<sys_c.cal_y(-INF,3,1,0.7)<<endl;
+
+	cout<<"Actual image height -- finite -- nd -- "<<sys.cal_y(l,y,1,1)<<endl;
+	cout<<"Actual image height -- finite -- nd -- 0.7W -- "<<sys.cal_y(l,y,1,0.7)<<endl;
+
+	cout<<"Actual image height -- finite -- nf -- "<<sys_f.cal_y(l,y,1,1)<<endl;
+	cout<<"Actual image height -- finite -- nf -- 0.7W -- "<<sys_f.cal_y(l,y,1,0.7)<<endl;
+
+	cout<<"Actual image height -- finite -- nc -- "<<sys_c.cal_y(l,y,1,1)<<endl;
+	cout<<"Actual image height -- finite -- nc -- 0.7W -- "<<sys_c.cal_y(l,y,1,0.7)<<endl;
 
 	cout<<endl;
 	cout<<"Aberrations : "<<endl;
-	double *d;
-	d=sys.cal_Distortion(l,y);
-	// d=sys.cal_Distortion(l,y);
-	cout<<"Absolute Distortion -- "<<d[0]<<endl;
-	cout<<"Relative Distortion -- "<<d[1]<<endl;
+	double *d1,*d2;
+	d1=sys.cal_Distortion(-INF,3);
+	// cout<<&d1<<endl;
+	d2=sys.cal_Distortion(l,y);
+	// cout<<&d2<<endl;
+	cout<<"Absolute Distortion -- inf -- "<<d1[0]<<endl;
+	cout<<"Relative Distortion -- inf -- "<<d1[1]<<endl;
 
-	cout<<"Spheroical Aberration -- finite -- "<<sys.cal_SA(l,1,1)<<endl;
-	cout<<"Spheroical Aberration -- finite -- 0.7U -- "<<sys.cal_SA(l,1,0.7)<<endl;
-	cout<<"Spheroical Aberration -- inf -- "<<sys.cal_SA(-INF,1,1)<<endl;
-	cout<<"Spheroical Aberration -- inf -- 0.7U -- "<<sys.cal_SA(-INF,1,0.7)<<endl;
+	cout<<"Absolute Distortion -- finite -- "<<d2[0]<<endl;
+	cout<<"Relative Distortion -- finite -- "<<d2[1]<<endl;
 
-	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0)<<endl;
+
+	cout<<"Spheroical Aberration -- inf -- "<<sys.cal_SA(-INF,1)<<endl;
+	cout<<"Spheroical Aberration -- inf -- 0.7U -- "<<sys.cal_SA(-INF,0.7)<<endl;
+
+	cout<<"Spheroical Aberration -- finite -- "<<sys.cal_SA(l,1)<<endl;
+	cout<<"Spheroical Aberration -- finite -- 0.7U -- "<<sys.cal_SA(l,0.7)<<endl;
+
+
+	// cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0)<<endl;
 	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0.7)<<endl;
 	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAx(nfs,ncs,-INF,1)<<endl;
-	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,l,0)<<endl;
+	// cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,l,0)<<endl;
 	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAx(nfs,ncs,l,0.7)<<endl;
 	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAx(nfs,ncs,l,1)<<endl;
+
+	// cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,0)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,0.7)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,1)<<endl;
+	// cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAy(nfs,ncs,l,y,0)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAy(nfs,ncs,l,y,0.7)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAy(nfs,ncs,l,y,1)<<endl;
+
+	cout<<"Coma -- inf -- "<<sys.cal_Coma(-INF,W)<<endl;
+	cout<<"Coma -- finite -- "<<sys.cal_Coma(l,y)<<endl;
+
+	double *FC1,*FC2;
+
+	FC1=sys.cal_FCs(-INF,W);
+	FC2=sys.cal_FCs(l,y);
+
+	cout<<"Field Curvature -- inf -- "<<"t--"<<FC1[0]<<"s--"<<FC1[1]<<endl;
+	cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
+	
+	cout<<"Field Curvature -- finite -- "<<"t--"<<FC2[0]<<"s--"<<FC2[1]<<endl;
+	cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
 }
  
 
