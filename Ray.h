@@ -220,8 +220,7 @@ public:
 		this->l1=l1;
 	}
 
-	void set_W(double W)
-	{
+	void set_W(double W){
 		this->W=-Angle2Arc(W); // 根据符号规则转化
 	}
 
