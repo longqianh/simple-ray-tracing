@@ -99,22 +99,22 @@ void cal_test(){
 		cout<<"First Actual Ray:"<<endl;
 		FAR rayin1;
 		isINF=true;
-		Ray rayout1("FAR,rayout,inf ");
+		Ray rayout1;
 		// cout<<"Ray output for the actual ray incident from infinity:"<<endl;
 		
 		
-		rayout1=sys.ray_tracing(rayin1,isINF);
+		rayout1=sys.ray_tracing(rayin1,isINF,"FAR,rayout,inf ");
 		rayout1.show_rayinfo();
 		cout<<rayout1.get_raytype()<<endl;
 
 
 		FAR rayin2;
 		isINF=false;
-		Ray rayout2("FAR,rayout,finite length ");
+		Ray rayout2;
 		double l=-500;
 		rayin2.set_l(l);
 		// rayin2.set_U(asin(ku*sin(atan((a/2)/l))));
-		rayout2=sys.ray_tracing(rayin2,isINF);
+		rayout2=sys.ray_tracing(rayin2,isINF,"FAR,rayout,lim ");
 		rayout2.show_rayinfo();
 
 	}
@@ -129,20 +129,20 @@ void cal_test(){
 		// cout<<"incident from infinity"<<endl;
 		
 		isINF=true;
-		Ray rayout_up1("SAR,up-rayout,inf"),
-		rayout_cf1("SAR,chief-rayout,inf"),
-		rayout_dn1("SAR,down-rayout,inf");
+		Ray rayout_up1,
+		rayout_cf1,
+		rayout_dn1;
 
 		double W=Angle2Arc(3);
 		rayin_up.set_W(W);
 		rayin_cf.set_W(W);
 		rayin_dn.set_W(W);
-		rayout_up1=sys.ray_tracing(rayin_up,isINF);
-		rayout_cf1=sys.ray_tracing(rayin_cf,isINF);
-		rayout_dn1=sys.ray_tracing(rayin_dn,isINF);
+		rayout_up1=sys.ray_tracing(rayin_up,isINF,"SAR,up-rayout,inf");
+		rayout_cf1=sys.ray_tracing(rayin_cf,isINF,"SAR,chief-rayout,inf");
+		rayout_dn1=sys.ray_tracing(rayin_dn,isINF,"SAR,down-rayout,inf");
 		rayout_cf1.show_rayinfo("cf");
-		// rayout_cf.show_rayinfo(1);
-		// rayout_dn.show_rayinfo();
+		rayout_cf1.show_rayinfo();
+		rayout_dn1.show_rayinfo();
 		cout<<endl;
 		// cout<<"incident form limited length"<<endl;
 		isINF=false;
@@ -154,14 +154,12 @@ void cal_test(){
 		rayin_up.set_l1(l);
 		rayin_cf.set_l1(l);
 		rayin_dn.set_l1(l);
-		Ray rayout_up2("SAR,up-rayout,limited length"),
-		rayout_cf2("SAR,chief-rayout,limited length"),
-		rayout_dn2("SAR,down-rayout,limited length");
+		Ray rayout_up2,rayout_cf2,rayout_dn2;
 
 		// // rayin_dn.set_l(0);
-		rayout_up2=sys.ray_tracing(rayin_up,isINF);
-		rayout_cf2=sys.ray_tracing(rayin_cf,isINF);
-		rayout_dn2=sys.ray_tracing(rayin_dn,isINF);
+		rayout_up2=sys.ray_tracing(rayin_up,isINF,"SAR,up-rayout,limited length");
+		rayout_cf2=sys.ray_tracing(rayin_cf,isINF,"SAR,chief-rayout,limited length");
+		rayout_dn2=sys.ray_tracing(rayin_dn,isINF,"SAR,down-rayout,limited length");
 		rayout_up2.show_rayinfo();
 		rayout_cf2.show_rayinfo("cf");
 		rayout_dn2.show_rayinfo();
