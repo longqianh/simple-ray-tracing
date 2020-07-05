@@ -22,13 +22,16 @@ string raytype;
 
 
 void cal_test(){
-	// double ku=1,kw=1;
+	double ku=1,kw=1;
 	int nsf=3;
 	double a=20;
 	bool isINF;
 	double dists[]={4,2.5,60};
 	double rs[]={62.5,-43.65,-124.35};
 	double nds[]={1.5167969495,1.6727015725,1};
+	double l=-500; // 物距：用户输入 左负右正
+	double y=26; // 像高 ：上正下负
+	double W=3; // 物方视场角：用户输入
 	OptSys sys(a,nsf,dists,rs,nds);
 	sys.show_sysinfo();
 	cout<<endl;
@@ -43,7 +46,6 @@ void cal_test(){
 		
 		isINF=true;
 		Ray rayout1;
-		// cout<<"Ray output for the ray incident from infinity:"<<endl;
 		
 		rayout1=sys.ray_tracing(rayin1,isINF,"FPR,rayout,inf");
 
@@ -52,8 +54,6 @@ void cal_test(){
 		FPR rayin2;
 		isINF=false;
 		Ray rayout2;
-		// cout<<"Ray output for the ray incident from a limited distance:"<<endl;
-		double l=-500;
 		rayin2.set_l(l);
 		
 		rayout2=sys.ray_tracing(rayin2,isINF,"FPR,rayout,finite");
@@ -72,21 +72,17 @@ void cal_test(){
 		rayin1.set_W(W);
 		rayin1.set_l(0);
 		isINF=true;
-		// cout<<"Ray output for the paraxial ray incident from infinity:"<<endl;
 		
 		rayout1=sys.ray_tracing(rayin1,isINF,"SPR,rayout,inf ");
 		rayout1.show_rayinfo();
 	
 		isINF=false;
 		Ray rayout2("SPR,rayout,finite length ");
-		// cout<<"Ray output for the paraxial ray incident from a limited distance:"<<endl;
 
-		// SPR rayin2("SPR finite length");
 		SPR rayin2("SPR,inf");
 		rayin2.set_W(W);
 		rayin2.set_l(0);
-		double l=-500; // 物距
-		double y=26; // 物高
+
 		rayin2.set_l1(l);
 		rayin2.set_y(y);
 		rayout2=sys.ray_tracing(rayin2,isINF,"SPR,rayout,finite");
@@ -108,7 +104,6 @@ void cal_test(){
 		FAR rayin2;
 		isINF=false;
 		Ray rayout2;
-		double l=-500;
 		rayin2.set_l(l);
 		rayout2=sys.ray_tracing(rayin2,isINF,"FAR,rayout,finite ");
 		rayout2.show_rayinfo();
@@ -127,7 +122,6 @@ void cal_test(){
 		rayout_cf1,
 		rayout_dn1;
 
-		double W=3;
 		rayin_up.set_W(W);
 		rayin_cf.set_W(W);
 		rayin_dn.set_W(W);
@@ -142,8 +136,6 @@ void cal_test(){
 
 
 		isINF=false;
-		double y=26;
-		double l=-500;
 		rayin_up.set_y(y);
 		rayin_cf.set_y(y);
 		rayin_dn.set_y(y);
@@ -153,7 +145,6 @@ void cal_test(){
 
 		Ray rayout_up2,rayout_cf2,rayout_dn2;
 
-		// // rayin_dn.set_l(0);
 		rayout_up2=sys.ray_tracing(rayin_up,isINF,"SAR,up-rayout,finite ");
 		rayout_cf2=sys.ray_tracing(rayin_cf,isINF,"SAR,chief-rayout,finite ");
 		rayout_dn2=sys.ray_tracing(rayin_dn,isINF,"SAR,down-rayout,finite ");
@@ -161,39 +152,18 @@ void cal_test(){
 		rayout_cf2.show_rayinfo("cf");
 		rayout_dn2.show_rayinfo();
 	}
-	// string label;
-
-	cout<<sys.cal_y0(-500,26,false)<<endl;
-	cout<<sys.cal_y(-500,26,false)<<endl;
+	cout<<endl;
+	cout<<sys.cal_y0(l,y)<<endl;
+	cout<<sys.cal_y(l,y)<<endl;
 	
 
+	double *d;
+	d=sys.cal_Distortion(l,y);
+	// d=sys.cal_Distortion(l,y);
+	cout<<d[0]<<" "<< d[1]<<endl;
 
+	cout<<"SA "<<sys.cal_SA(l,false,0.7)<<endl;
 
-
-	// OptAber abers = sys.cal_aber(rayin_up,rayin_cf,rayin_dn);
-	
-	// rayin1.set_t(INF);	
-	// rayin1.set_s(INF);
-	// // W=3;
-	// rayin1.set_W(Angle2Arc());
-
-
-	// 	cout<<"Ray output for the actual ray incident from infinity:"<<endl;
-		
-	// 	// rayin1.set_U(0);
-		// rayout=sys.ray_tracing(rayin1,isINF);
-		// rayout.show_rayinfo();
-
-
-		// FAR rayin2;
-		// isINF=false;
-		// double l=-500;
-		// rayin2.set_l(l);
-		// rayin2.set_U(asin(ku*sin(atan((a/2)/l))));
-		// rayout=sys.ray_tracing(rayin2,isINF);
-		// rayout.show_rayinfo();
-
-	// }
 
 }
 
