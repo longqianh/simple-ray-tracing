@@ -69,16 +69,15 @@ public:
 
 	double cal_LCAy();
 
-	double cal_Distortion();
+	double* cal_Distortion(double l,double y,bool isINF=false,double ku=1,double kw=1);
 
 	double cal_Coma();
 
-	double cal_y0(double l=-INF,double y=0,bool isINF=true);
+	double cal_y0(double l,double y,bool isINF=false,double ku=1,double kw=1);
 
-	double cal_y(double l=-INF,double y=0,bool isINF=true);
+	double cal_y(double l,double y,bool isINF=false,double ku=1,double kw=1);
 
-	// double cal_yp();
-
+	double cal_SA(double l,bool isINF=false, double ku=1,double kw=1);
 };// get_nd nc nf
 
 
@@ -416,11 +415,7 @@ Ray OptSys::ray_tracing(SAR rayin,bool isINF,string label,double ku,double kw){
 					D=(d-X1+X2)/cos(U2tmp[k]);
 				}
 				
-				
 
-				
-				// cout<<" a "<<a<<endl;
-				// cout<<" t1 "<<t1<<endl;
 				t2=n2*tmp1*tmp1/(a+n1*tmp1*tmp1/t1);
 				s2=n2/(n1/s1+(n2*tmp2-n1*tmp1)*rho);
 				t1=t2-D;
@@ -441,7 +436,7 @@ Ray OptSys::ray_tracing(SAR rayin,bool isINF,string label,double ku,double kw){
 	return rayout;
 }
 
-double OptSys::cal_y0(double l,double y,bool isINF)
+double OptSys::cal_y0(double l,double y,bool isINF,double ku,double kw)
 {
 	FPR rayin1;
 	rayin1.set_l(l);
@@ -459,7 +454,7 @@ double OptSys::cal_y0(double l,double y,bool isINF)
 
 }
 
-double OptSys::cal_y(double l,double y,bool isINF)
+double OptSys::cal_y(double l,double y,bool isINF,double ku,double kw)
 {
 	FAR rayin1;
 	rayin1.set_l(l);
@@ -468,10 +463,35 @@ double OptSys::cal_y(double l,double y,bool isINF)
 	rayin2.set_y(y);
 
 	Ray rayout1,rayout2;
-	rayout1=ray_tracing(rayin1,isINF);
-	rayout2=ray_tracing(rayin2,isINF);
+	rayout1=ray_tracing(rayin1,isINF,"calculate actual image height--l1",ku,kw);
+	rayout2=ray_tracing(rayin2,isINF,"calculate actual image height--l2",ku,kw);
 
-	return (rayout2.get_l()-rayout1.get_l())*rayout2.get_U();
+	cout<<"###"<<rayout2.get_U()<<endl;
+	return (rayout2.get_l()-rayout1.get_l())*tan(rayout2.get_U());
 
 
+}
+
+
+double* OptSys::cal_Distortion(double l,double y,bool isINF,double ku,double kw)
+{
+	static double d[2]; 
+	double y1=cal_y(l,y,isINF,ku,kw);
+	double y0=cal_y0(l,y,isINF,ku,kw);
+	d[0]=y1-y0; // 绝对畸变
+	d[1]=abs(d[0]/y0); // 相对畸变
+	return d;
+}
+
+
+double OptSys::cal_SA(double l,bool isINF,double ku,double kw)
+{
+	FPR rayin1;
+	rayin1.set_l(l);
+	FAR rayin2;
+	rayin2.set_l(l);
+	Ray rayout1,rayout2;
+	rayout1=ray_tracing(rayin1,isINF,"cal_SA",ku,kw);
+	rayout2=ray_tracing(rayin2,isINF,"cal_SA",ku,kw);
+	return rayout2.get_l()-rayout1.get_l();
 }
