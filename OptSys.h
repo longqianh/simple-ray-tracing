@@ -9,27 +9,14 @@
 #define INF 1e15
 #endif
 
-
-class OptAber
-{
-public:
-	OptAber();
-	~OptAber();
-	
-};
-
-
-
-
-
-
 class OptSys
 {
 private:
-	int	nsf;
+	int	nsf; // 系统面数
 	int a; // 入瞳直径
-	double f;
-	double lH;
+	double f; // 系统焦距
+	double lH; // 像方主面距离
+	double lp; // 出瞳距
 	
 
 public:
@@ -47,345 +34,369 @@ public:
 			sf[i].set_rho(rs[i]);
 			sf[i].set_nd(nds[i]);
 		}
+
 		this->init_sys();
 
 
-
 	}
+
 	~OptSys()
 	{
 		delete [] sf;
 	}
 
-	void show_syspara(){}
+	double get_f() const { return f; }
 
-	void show_sflist(){
+	double get_lH() const { return lH; }
 
-		for(int i=0;i<nsf;i++){
-			cout<<i+1<<" th surface: ";
-			double rho=sf[i].get_rho();
-			double thick=sf[i].get_d();
-			if(rho==0){
-				cout<<"radius -- "<<"∞"<<" , distance to the next surface -- "<<thick<<endl;				
-			}
-			else{
-				cout<<"radius -- "<<1/rho<<" , distance to the next surface -- "<<thick<<endl;
-			}
+	double get_lp() const { return lp; }
 
-		}
-	}
+	void show_sysinfo();
 
-	void init_sys()
-	{
-		FPR rayin;
-		Ray rayout;
-		bool isINF=true;
-		rayin.set_U(0);
+	void init_sys();
 
-		// rayin.show_rayinfo();
-		rayout=this->ray_tracing(rayin,isINF);
-		double u2=rayout.get_U();
-		// cout<<u2<<endl;
-		// cout<<tan(u2);
-		f=(a/2)/abs(u2);
-		lH=rayout.get_l()-f;
-		// cout<<"Effective Focal Length -- "<<f<<endl;
-
-	}
-
-	void show_sysinfo()
-	{
-		cout<<"Optical System Parameters:"<<endl;
-		cout<<"Surface Parameters:"<<endl;
-		show_sflist();
-		cout<<"Effective Focal Length -- "<<f<<endl;
-		cout<<"Main Surface Distance -- "<<lH<<endl;
-
-	}
-
-	// double get_y0(){
-	// 	return y0;
-	// }
-
-
-	double get_f() const 
-	{
-		return f;
-	}
-
-	double get_lH() const 
-	{
-		return lH;
-	}
-
-
-	// 利用多态
-	Ray ray_tracing(FPR rayin,bool isINF=false,string label="FPR ray-tracing", double ku=1,double kw=1){
-		double u1,u2; // u1:u, u2:u'
-		double l1,l2;
-		double i;
-		double n2,n1=1; // n2:n', n1:n
-		// string label = rayin.get_label();
-		// cout<<"Rayin type: "<<label<<endl;
-		Ray rayout(label);
-
-		if(isINF)
-		{
-			l1=-INF;
-			rayin.set_U(0);	
-		} 
-		else
-		{
-			l1=rayin.get_l();
-			u1=atan(a/l1);
-			rayin.set_U(u1);
-		}
-			
+	void show_sflist();
 		
-		for(int k=0;k<nsf;k++){
-			double d=sf[k].get_d(); 
-			double rho=sf[k].get_rho();
-			
-			if(isINF&&k==0) i=(a/2)*rho;
-			else i=(rho*l1-1)*u1;				
+	Ray ray_tracing(SAR rayin,bool isINF=false,string label="SAR raytracing",double ku=1,double kw=1);
+	Ray ray_tracing(FPR rayin,bool isINF=false,string label="FPR ray-tracing", double ku=1,double kw=1);
+	Ray ray_tracing(SPR rayin,bool isINF=false,string label="SPR ray-tracing",double ku=1,double kw=1);
+	Ray ray_tracing(FAR rayin,bool isINF=false,string label="FAR ray-tracing", double ku=1,double kw=1);
 
-			if(k==0)rayin.set_i(i);	
-			
-			n2=sf[k].get_nd();
-			u2=(n2-n1)/n2*i+u1;
 
-			l2=(i+u1)/(u2*rho);
-			l1=l2-d;
-			n1=n2; // n1是n2前面的折射率			
-			u1=u2;
+	double cal_SA();
 
+	double cal_LCAx();
+
+	double cal_LCAy();
+
+	double cal_Distortion();
+
+	double cal_Coma();
+
+	double cal_y0(double l=-INF,double y=0,bool isINF=true);
+
+	double cal_y(double l=-INF,double y=0,bool isINF=true);
+
+	// double cal_yp();
+
+};// get_nd nc nf
+
+
+
+
+
+
+
+
+// double get_y0(){
+// 	return y0;
+// }
+void OptSys::show_sysinfo()
+{
+	cout<<"Optical System Parameters:"<<endl;
+	cout<<"Surface Parameters:"<<endl;
+	show_sflist();
+	cout<<"Effective Focal Length -- "<<f<<endl;
+	cout<<"Main Surface Distance -- "<<lH<<endl;
+
+}
+void OptSys::show_sflist(){
+
+	for(int i=0;i<nsf;i++){
+		cout<<i+1<<" th surface: ";
+		double rho=sf[i].get_rho();
+		double thick=sf[i].get_d();
+		if(rho==0){
+			cout<<"radius -- "<<"∞"<<" , distance to the next surface -- "<<thick<<endl;				
 		}
-		
-		rayout.set_U(u2);
-		rayout.set_l(l2);
-
-		return rayout;
-	}
-
-
-
-
-	Ray ray_tracing(SPR rayin, bool isINF=false,string label="SPR ray-tracing",double ku=1,double kw=1){
-
-		double u1,u2;
-		double l1=0,l2;
-		double i;
-		double n2,n1=1;
-		 // n2:n', n1:n
-		// string label=rayin.get_label();
-		// cout<<"Rayin type: "<<label<<endl;
-		Ray rayout(label);
-
-		
-		if(isINF){			
-			double w=rayin.get_W();
-			u1=sin(kw*w);
-			// cout<<u1<<endl;
-		}
-
 		else{
-			double y=rayin.get_y();
-			double L1=rayin.get_l1();
-			u1=sin(atan(kw*(-y)/L1));
-			// cout<<u1<<endl;
-			
+			cout<<"radius -- "<<1/rho<<" , distance to the next surface -- "<<thick<<endl;
 		}
 
-		for(int k=0;k<nsf;k++){
-			double d=sf[k].get_d(); //cout<<"# "<<d<<endl;
-			double rho=sf[k].get_rho();
-		
-			i=(rho*l1-1)*u1; //cout<<"# i # "<<i<<endl;
-			if(k==0){rayin.set_i(i);}
-			
-		
-			n2=sf[k].get_nd();
-			u2=(n2-n1)/n2*i+u1;
-			// cout<<u2<<endl;
-
-			l2=(i+u1)/(u2*rho);
-
-			l1=l2-d;
-			n1=n2; // n1是n2前面的折射率
-			u1=u2;
-		}
-
-		rayout.set_U(u2);
-		rayout.set_l(l2);
-
-
-		return rayout;
 	}
+}
 
-	Ray ray_tracing(FAR rayin,bool isINF=false,string label="FAR ray-tracing", double ku=1,double kw=1){
 
-		double U1,U2; // U,U'
-		double l1,l2; // l,l'
-		double I1,I2; // I,I'
-		double n1=1,n2; // n,n'
-		double d,rho;
-		Ray rayout(label);
+void OptSys::init_sys()
+{
+	FPR rayin1;
+	SPR rayin2;
+	Ray rayout1,rayout2;
+	bool isINF=true;
+	rayin1.set_U(0);
+	rayout1=ray_tracing(rayin1,isINF);
+	rayout2=ray_tracing(rayin2,isINF);
+	double u2=rayout1.get_U();
+	f=(a/2)/abs(u2); // ?
+	lH=rayout1.get_l()-f;
+	lp=rayout2.get_l();
 
-		if(isINF)
-		{
-			l1=-INF;
-			rayin.set_U(0);
-		}
+}
 
-		else
-		{
-			l1=rayin.get_l();
-			U1=asin(ku*sin(atan((a/2)/l1)));
-			rayin.set_U(U1);
-		} 
+// 利用多态
+Ray OptSys::ray_tracing(FPR rayin,bool isINF,string label, double ku,double kw){
+	double u1,u2; // u1:u, u2:u'
+	double l1,l2;
+	double i;
+	double n2,n1=1; // n2:n', n1:n
+
+	Ray rayout(label);
+
+	if(isINF)
+	{
+		l1=-INF;
+		rayin.set_U(0);	
+	} 
+	else
+	{
+		l1=rayin.get_l();
+		u1=atan(a/l1);
+		rayin.set_U(u1);
+	}
 		
-		
-		for(int k=0;k<nsf;k++){
-			d=sf[k].get_d(); 
-			rho=sf[k].get_rho();
-			n2=sf[k].get_nd();
-
-			if(isINF&&k==0){
-				
-				I1=asin(ku*(a/2)*rho);
-				I2=asin(n1/n2*(a/2)*ku*rho);
-			}
-
-			else{
-				I1=asin((l1*rho-1)*sin(U1));
-				I2=asin(n1/n2*(l1*rho-1)*sin(U1));
-			}
-			
-		
-			// else if (!isINF&&k==0) I=(rho*l1-1)*u1;
-			U2=U1+I1-I2;
-			l2=1/rho*(1+sin(I2)/sin(U2));
-			
-			l1=l2-d;
-			U1=U2;
-			n1=n2; // n1是n2前面的折射率
-				
-		}
-		
-		rayout.set_U(U2);
-		rayout.set_l(l2);
-
-		return rayout;
 	
+	for(int k=0;k<nsf;k++){
+		double d=sf[k].get_d(); 
+		double rho=sf[k].get_rho();
+		
+		if(isINF&&k==0) i=(a/2)*rho;
+		else i=(rho*l1-1)*u1;				
+
+		if(k==0)rayin.set_i(i);	
+		
+		n2=sf[k].get_nd();
+		u2=(n2-n1)/n2*i+u1;
+
+		l2=(i+u1)/(u2*rho);
+		l1=l2-d;
+		n1=n2; // n1是n2前面的折射率			
+		u1=u2;
+
+	}
+	
+	rayout.set_U(u2);
+	rayout.set_l(l2);
+
+	return rayout;
+}
+
+
+
+
+Ray OptSys::ray_tracing(SPR rayin, bool isINF,string label,double ku,double kw){
+
+	double u1,u2;
+	double l1=0,l2;
+	double i;
+	double n2,n1=1;
+
+	Ray rayout(label);
+
+	
+	if(isINF){			
+		double w=rayin.get_W();
+		u1=sin(kw*w);
+		// cout<<u1<<endl;
 	}
 
-	Ray ray_tracing(SAR rayin,bool isINF=false,string label="SAR raytracing",double ku=1,double kw=1){
+	else{
+		double y=rayin.get_y();
+		double L1=rayin.get_l1();
+		u1=sin(atan(kw*y/L1)); 
 
-		double U1,U2; // U,U'
-		double l1,l2; // l,l'
-		double I1,I2; // I,I'
-		double n1=1,n2; // n,n'
-		double L; // 物距
-		double d,rho;
-		double t1,t2,s1,s2; 
-		double y;
-		// double *U2tmp= new double[nsf];
-		double U2tmp[nsf],tmp1s[nsf],tmp2s[nsf];
+		
+	}
 
-		string rayin_label=rayin.get_raytype();
+	for(int k=0;k<nsf;k++){
+		double d=sf[k].get_d(); //cout<<"# "<<d<<endl;
+		double rho=sf[k].get_rho();
+	
+		i=(rho*l1-1)*u1; //cout<<"# i # "<<i<<endl;
+		if(k==0){rayin.set_i(i);}
+		
+	
+		n2=sf[k].get_nd();
+		u2=(n2-n1)/n2*i+u1;
+		// cout<<u2<<endl;
 
-		Ray rayout(label);
+		l2=(i+u1)/(u2*rho);
+
+		l1=l2-d;
+		n1=n2; // n1是n2前面的折射率
+		u1=u2;
+	}
+
+	rayout.set_U(u2);
+	rayout.set_l(l2);
 
 
-		if(isINF){
-			double W=rayin.get_W();
+	return rayout;
+}
 
-			U1=-kw*W; // 负号
+Ray OptSys::ray_tracing(FAR rayin,bool isINF,string label, double ku,double kw){
+
+	double U1,U2; // U,U'
+	double l1,l2; // l,l'
+	double I1,I2; // I,I'
+	double n1=1,n2; // n,n'
+	double d,rho;
+	Ray rayout(label);
+
+	if(isINF)
+	{
+		l1=-INF;
+		rayin.set_U(0);
+	}
+
+	else
+	{
+		l1=rayin.get_l();
+		U1=asin(ku*sin(atan((a/2)/l1)));
+		rayin.set_U(U1);
+	} 
+	
+	
+	for(int k=0;k<nsf;k++){
+		d=sf[k].get_d(); 
+		rho=sf[k].get_rho();
+		n2=sf[k].get_nd();
+
+		if(isINF&&k==0){
 			
-			if(rayin_label=="up"){
-				l1=ku*(a/2)/tan(U1);
-				// cout<<"UP "<<l1<<endl;
-			}
-			else if(rayin_label=="cf"){
-				l1=0;
-				t1=-INF;
-				s1=t1;
-				rayin.set_s(s1);
-				rayin.set_t(t1);
-			}
-			else if(rayin_label=="dn")
-			{
-				l1=-ku*(a/2)/tan(U1);
-				// cout<<"DN"<<l1<<endl;	
-			}
-			rayin.set_l(l1);
-		} 
+			I1=asin(ku*(a/2)*rho);
+			I2=asin(n1/n2*(a/2)*ku*rho);
+		}
 
 		else{
-			L=rayin.get_l1();	
-			y=rayin.get_y();
-			
-			if(rayin_label=="up")
-			{
-				U1=-atan((-y*kw+ku*a/2)/L);
-				l1=-ku*(a/2)/((-y*kw+ku*a/2)/L);
-			}
-			else if(rayin_label == "cf")
-			{
-				U1=-atan(-y*kw/L);
-				l1=0;
-				t1=-sqrt(y*y+L*L);
-				s1=t1;
-
-				rayin.set_s(s1);
-				rayin.set_t(t1);
-			}
-			else if(rayin_label=="dn"){
-				// cout<<"dn "<<(-y*kw-ku*a/2)/L<<endl;
-				U1=-atan((-y*kw-ku*a/2)/L);
-				l1=ku*(a/2)/((-y*kw-ku*a/2)/L);
-			}
-			rayin.set_U(U1);
-			rayin.set_l(l1);
-		} 
-		
-		
-		
-		for(int k=0;k<nsf;k++)
-		{
-			d=sf[k].get_d(); 
-			rho=sf[k].get_rho();
-			n2=sf[k].get_nd();
-
 			I1=asin((l1*rho-1)*sin(U1));
-			I2=asin((n1/n2)*sin(I1));
-			tmp1s[k]=cos(I1);
-			tmp2s[k]=cos(I2);
-
-			// cout<<" I1 "<<Arc2Angle(I1)<<endl;
-			// cout<<" I2 "<<Arc2Angle(I2)<<endl;
-
-			l2=1/rho*(1+sin(I2)/sin(U2));
-			U2=U1+I1-I2;
-			// cout<<" U2 "<<cos(U2)<<endl;
-			
-			// U2tmp[k]=U2;
-			l2=1/rho*(1+sin(I2)/sin(U2));
-			if(rayin_label=="cf"){
-				double PA=l1*sin(U1)/cos((I1-U1)/2);
-				// cout<<" PA "<<PA<<endl;
-				sf[k].set_PA(PA);
-
-			}
-			
-			l1=l2-d;
-			U1=U2;
-			n1=n2; // n1是n2前面的折射率		
+			I2=asin(n1/n2*(l1*rho-1)*sin(U1));
 		}
 		
-		rayout.set_U(U2);
-		rayout.set_l(l2);
-		n1=1;
+	
+		// else if (!isINF&&k==0) I=(rho*l1-1)*u1;
+		U2=U1+I1-I2;
+		l2=1/rho*(1+sin(I2)/sin(U2));
+		
+		l1=l2-d;
+		U1=U2;
+		n1=n2; // n1是n2前面的折射率
+			
+	}
+	
+	rayout.set_U(U2);
+	rayout.set_l(l2);
+
+	return rayout;
+
+}
+
+Ray OptSys::ray_tracing(SAR rayin,bool isINF,string label,double ku,double kw){
+
+	double U1,U2; // U,U'
+	double l1,l2; // l,l'
+	double I1,I2; // I,I'
+	double n1=1,n2; // n,n'
+	double L; // 物距
+	double d,rho;
+	double t1,t2,s1,s2; 
+	double y;
+	double U2tmp[nsf],tmp1s[nsf],tmp2s[nsf];
+
+	string rayin_label=rayin.get_raytype();
+
+	Ray rayout(label);
+
+
+	if(isINF){
+		double W=rayin.get_W();
+
+		U1=kw*W; // 负号
+		if(rayin_label=="up"){
+			l1=ku*(a/2)/tan(U1);
+		}
+
+		else if(rayin_label=="cf"){
+			l1=0;
+			t1=-INF;
+			s1=t1;
+			rayin.set_s(s1);
+			rayin.set_t(t1);
+		}
+		else if(rayin_label=="dn")
+		{
+			l1=-ku*(a/2)/tan(U1);
+		}
+		rayin.set_l(l1);
+	} 
+
+	else{
+		L=rayin.get_l1();	
+		y=rayin.get_y();
+		
+		if(rayin_label=="up")
+		{
+			U1=-atan((-y*kw+ku*a/2)/L);
+			l1=-ku*(a/2)/((-y*kw+ku*a/2)/L);
+		}
+		else if(rayin_label == "cf")
+		{
+			U1=-atan(-y*kw/L);
+			l1=0;
+			t1=-sqrt(y*y+L*L);
+			s1=t1;
+
+			rayin.set_s(s1);
+			rayin.set_t(t1);
+		}
+		else if(rayin_label=="dn"){
+			// cout<<"dn "<<(-y*kw-ku*a/2)/L<<endl;
+			U1=-atan((-y*kw-ku*a/2)/L);
+			l1=ku*(a/2)/((-y*kw-ku*a/2)/L);
+		}
+		rayin.set_U(U1);
+		rayin.set_l(l1);
+	} 
+	
+	
+	
+	for(int k=0;k<nsf;k++)
+	{
+		d=sf[k].get_d(); 
+		rho=sf[k].get_rho();
+		n2=sf[k].get_nd();
+
+		I1=asin((l1*rho-1)*sin(U1));
+		I2=asin((n1/n2)*sin(I1));
+		tmp1s[k]=cos(I1);
+		tmp2s[k]=cos(I2);
+
+		// cout<<" I1 "<<Arc2Angle(I1)<<endl;
+		// cout<<" I2 "<<Arc2Angle(I2)<<endl;
+
+		l2=1/rho*(1+sin(I2)/sin(U2));
+		U2=U1+I1-I2;
+		// cout<<" U2 "<<cos(U2)<<endl;
+		
+		// U2tmp[k]=U2;
+		l2=1/rho*(1+sin(I2)/sin(U2));
+		if(rayin_label=="cf"){
+			double PA=l1*sin(U1)/cos((I1-U1)/2);
+			// cout<<" PA "<<PA<<endl;
+			sf[k].set_PA(PA);
+
+		}
+		
+		l1=l2-d;
+		U1=U2;
+		n1=n2; // n1是n2前面的折射率		
+	}
+	
+	rayout.set_U(U2);
+	rayout.set_l(l2);
+	n1=1;
+
+	if(rayin_label=="cf")
+	{
 		for(int k=0;k<nsf;k++)
 		{		
 				double X1,X2,D;
@@ -424,20 +435,43 @@ public:
 		
 		rayout.set_t(t2);
 		rayout.set_s(s2);
-
-			
-		
-		// delete [] U2tmp;
-		
-		
-		return rayout;
-	
 	}
+	
 
-	// OptAber cal_aber(SAR rayin_up,SAR rayin_cf,SAR rayin_dn)
-	// {
-	// 	OptAber abers;
-	// 	return abers;
-	// }
+	return rayout;
+}
 
-};// get_nd nc nf
+double OptSys::cal_y0(double l,double y,bool isINF)
+{
+	FPR rayin1;
+	rayin1.set_l(l);
+	SPR rayin2;
+	rayin2.set_l1(l);
+	rayin2.set_y(y);
+
+	Ray rayout1,rayout2;
+	rayout1=ray_tracing(rayin1,isINF);
+	rayout2=ray_tracing(rayin2,isINF);
+
+
+	return (rayout2.get_l()-rayout1.get_l())*rayout2.get_U();
+
+
+}
+
+double OptSys::cal_y(double l,double y,bool isINF)
+{
+	FAR rayin1;
+	rayin1.set_l(l);
+	SAR rayin2("cf");
+	rayin2.set_l1(l);
+	rayin2.set_y(y);
+
+	Ray rayout1,rayout2;
+	rayout1=ray_tracing(rayin1,isINF);
+	rayout2=ray_tracing(rayin2,isINF);
+
+	return (rayout2.get_l()-rayout1.get_l())*rayout2.get_U();
+
+
+}
