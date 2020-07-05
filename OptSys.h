@@ -120,14 +120,14 @@ public:
 
 
 	// 利用多态
-	Ray ray_tracing(FPR rayin,bool isINF, double ku=1,double kw=1){
+	Ray ray_tracing(FPR rayin,bool isINF=false,string label="FPR ray-tracing", double ku=1,double kw=1){
 		double u1,u2; // u1:u, u2:u'
 		double l1,l2;
 		double i;
 		double n2,n1=1; // n2:n', n1:n
 		// string label = rayin.get_label();
 		// cout<<"Rayin type: "<<label<<endl;
-		Ray rayout;
+		Ray rayout(label);
 
 		if(isINF)
 		{
@@ -170,7 +170,7 @@ public:
 
 
 
-	Ray ray_tracing(SPR rayin,bool isINF,double ku=1,double kw=1){
+	Ray ray_tracing(SPR rayin, bool isINF=false,string label="SPR ray-tracing",double ku=1,double kw=1){
 
 		double u1,u2;
 		double l1=0,l2;
@@ -179,7 +179,7 @@ public:
 		 // n2:n', n1:n
 		// string label=rayin.get_label();
 		// cout<<"Rayin type: "<<label<<endl;
-		Ray rayout;
+		Ray rayout(label);
 
 		
 		if(isINF){			
@@ -222,14 +222,14 @@ public:
 		return rayout;
 	}
 
-	Ray ray_tracing(FAR rayin,bool isINF,double ku=1,double kw=1){
+	Ray ray_tracing(FAR rayin,bool isINF=false,string label="FAR ray-tracing", double ku=1,double kw=1){
 
 		double U1,U2; // U,U'
 		double l1,l2; // l,l'
 		double I1,I2; // I,I'
 		double n1=1,n2; // n,n'
 		double d,rho;
-		Ray rayout;
+		Ray rayout(label);
 
 		if(isINF)
 		{
@@ -279,7 +279,7 @@ public:
 	
 	}
 
-	Ray ray_tracing(SAR rayin,bool isINF,double ku=1,double kw=1){
+	Ray ray_tracing(SAR rayin,bool isINF=false,string label="SAR raytracing",double ku=1,double kw=1){
 
 		double U1,U2; // U,U'
 		double l1,l2; // l,l'
@@ -292,9 +292,9 @@ public:
 		// double *U2tmp= new double[nsf];
 		double U2tmp[nsf],tmp1s[nsf],tmp2s[nsf];
 
-		string label=rayin.get_raytype();
+		string rayin_label=rayin.get_raytype();
 
-		Ray rayout;
+		Ray rayout(label);
 
 
 		if(isINF){
@@ -302,18 +302,18 @@ public:
 
 			U1=-kw*W; // 负号
 			
-			if(label=="up"){
+			if(rayin_label=="up"){
 				l1=ku*(a/2)/tan(U1);
 				// cout<<"UP "<<l1<<endl;
 			}
-			else if(label=="cf"){
+			else if(rayin_label=="cf"){
 				l1=0;
 				t1=-INF;
 				s1=t1;
 				rayin.set_s(s1);
 				rayin.set_t(t1);
 			}
-			else if(label=="dn")
+			else if(rayin_label=="dn")
 			{
 				l1=-ku*(a/2)/tan(U1);
 				// cout<<"DN"<<l1<<endl;	
@@ -325,12 +325,12 @@ public:
 			L=rayin.get_l1();	
 			y=rayin.get_y();
 			
-			if(label=="up")
+			if(rayin_label=="up")
 			{
 				U1=-atan((-y*kw+ku*a/2)/L);
 				l1=-ku*(a/2)/((-y*kw+ku*a/2)/L);
 			}
-			else if(label == "cf")
+			else if(rayin_label == "cf")
 			{
 				U1=-atan(-y*kw/L);
 				l1=0;
@@ -340,7 +340,7 @@ public:
 				rayin.set_s(s1);
 				rayin.set_t(t1);
 			}
-			else if(label=="dn"){
+			else if(rayin_label=="dn"){
 				// cout<<"dn "<<(-y*kw-ku*a/2)/L<<endl;
 				U1=-atan((-y*kw-ku*a/2)/L);
 				l1=ku*(a/2)/((-y*kw-ku*a/2)/L);
@@ -371,7 +371,7 @@ public:
 			
 			// U2tmp[k]=U2;
 			l2=1/rho*(1+sin(I2)/sin(U2));
-			if(label=="cf"){
+			if(rayin_label=="cf"){
 				double PA=l1*sin(U1)/cos((I1-U1)/2);
 				// cout<<" PA "<<PA<<endl;
 				sf[k].set_PA(PA);
