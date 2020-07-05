@@ -2,10 +2,12 @@
 #include <vector>
 #include <string.h>
 #include <math.h>
+#include <iomanip>
 #include "Ray.h"
 #include "Lens.h"
 #include "utils.h"
 #include "OptSys.h"
+
 using namespace std;
 
 #ifndef PI
@@ -17,7 +19,7 @@ using namespace std;
 
 
 
-string raytype;
+
 
 
 
@@ -26,15 +28,21 @@ void cal_test(){
 	int nsf=3;
 	double a=20;
 	bool isINF;
+	string raytype;
 	double dists[]={4,2.5,60};
 	double rs[]={62.5,-43.65,-124.35};
+	double nfs[]={1.5223709191,1.6875154791,1};
 	double nds[]={1.5167969495,1.6727015725,1};
+	double ncs[]={1.5143226707,1.6666104143,1};
+	
 	double l=-500; // 物距：用户输入 左负右正
 	double y=26; // 像高 ：上正下负
 	double W=3; // 物方视场角：用户输入
 	OptSys sys(a,nsf,dists,rs,nds);
+
+
 	sys.show_sysinfo();
-	cout<<endl;
+	cout<<setprecision(7)<<endl; // 控制保留7位有效数字
 
 	raytype="FPR";
 
@@ -65,7 +73,7 @@ void cal_test(){
 	if(raytype=="SPR"){
 		cout<<"Second Paraxial Ray:"<<endl;
 		double W=3;
-		Ray rayout1;
+		Ray rayout1,rayout1_W;
 		
 		SPR rayin1("SPR,inf");
 
@@ -75,6 +83,9 @@ void cal_test(){
 		
 		rayout1=sys.ray_tracing(rayin1,isINF,"SPR,rayout,inf ");
 		rayout1.show_rayinfo();
+
+		rayout1_W=sys.ray_tracing(rayin1,isINF,"SPR,rayout,inf,0.7W ",1,0.7);
+		rayout1_W.show_rayinfo();
 	
 		isINF=false;
 		Ray rayout2("SPR,rayout,finite length ");
@@ -95,19 +106,22 @@ void cal_test(){
 		cout<<"First Actual Ray:"<<endl;
 		FAR rayin1;
 		isINF=true;
-		Ray rayout1;
+		Ray rayout1,rayout1_U;
 		
 		rayout1=sys.ray_tracing(rayin1,isINF,"FAR,rayout,inf ");
 		rayout1.show_rayinfo();
 
+		rayout1_U=sys.ray_tracing(rayin1,isINF,"FAR,rayout,inf,0.7U ",0.7);
+		rayout1_U.show_rayinfo();
 
 		FAR rayin2;
 		isINF=false;
-		Ray rayout2;
+		Ray rayout2,rayout2_U;
 		rayin2.set_l(l);
 		rayout2=sys.ray_tracing(rayin2,isINF,"FAR,rayout,finite ");
 		rayout2.show_rayinfo();
-
+		rayout2_U=sys.ray_tracing(rayin2,isINF,"FAR,rayout,finite,0.7U ",0.7);
+		rayout2_U.show_rayinfo();
 	}
 
 	cout<<endl;
@@ -152,19 +166,37 @@ void cal_test(){
 		rayout_cf2.show_rayinfo("cf");
 		rayout_dn2.show_rayinfo();
 	}
-	cout<<endl;
-	cout<<sys.cal_y0(l,y)<<endl;
-	cout<<sys.cal_y(l,y)<<endl;
-	
 
+	cout<<endl;
+	cout<<"Exit Ray :"<<endl;
+	cout<<"Ideal image height -- inf -- "<<sys.cal_y0(-INF,y,true,ku,kw,W)<<endl;
+	cout<<"Ideal image height -- inf -- 0.7W --  "<<sys.cal_y0(-INF,y,true,ku,0.7,W)<<endl;
+
+	cout<<"Ideal image height -- finite -- "<<sys.cal_y0(l,y)<<endl;
+	cout<<"Ideal image height -- finite -- 0.7W -- "<<sys.cal_y0(l,y,false,ku,0.7)<<endl;
+	// printf("%s %lf\n","Ideal image height -- ", sys.cal_y0(-INF,y,true,ku,kw,W));
+	cout<<"Actual image height -- finite -- "<<sys.cal_y(l,y)<<endl;
+	// cout<<"Actual image height -- finite -- 0.7 "<<sys.cal_y(l,y)<<endl;
+
+	cout<<endl;
+	cout<<"Aberrations : "<<endl;
 	double *d;
 	d=sys.cal_Distortion(l,y);
 	// d=sys.cal_Distortion(l,y);
-	cout<<d[0]<<" "<< d[1]<<endl;
+	cout<<"Absolute Distortion -- "<<d[0]<<endl;
+	cout<<"Relative Distortion -- "<<d[1]<<endl;
 
-	cout<<"SA "<<sys.cal_SA(l,false,0.7)<<endl;
+	cout<<"Spheroical Aberration -- finite -- "<<sys.cal_SA(l,false)<<endl;
+	cout<<"Spheroical Aberration -- finite -- 0.7U -- "<<sys.cal_SA(l,false,0.7)<<endl;
+	cout<<"Spheroical Aberration -- inf -- "<<sys.cal_SA(-INF,true)<<endl;
+	cout<<"Spheroical Aberration -- inf -- 0.7U -- "<<sys.cal_SA(-INF,true,0.7)<<endl;
 
-
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAx(-INF,true,0,nfs,ncs)<<endl;
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAx(-INF,true,0.7,nfs,ncs)<<endl;
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAx(-INF,true,1,nfs,ncs)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAx(l,false,0,nfs,ncs)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAx(l,false,0.7,nfs,ncs)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAx(l,false,1,nfs,ncs)<<endl;
 }
 
 
@@ -200,3 +232,4 @@ int main()
 // 
 // MFC高
 
+// 优化：去掉isINF
