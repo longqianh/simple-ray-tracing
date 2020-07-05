@@ -27,6 +27,10 @@ protected:
 
 public:
 	Ray(){raytype="GR";t=0;s=0; } // general ray
+	Ray(string raytype)
+	{
+		this->raytype=raytype;
+	}
 	~Ray(){}
 
 	void set_y(double y){
@@ -52,6 +56,11 @@ public:
 	void set_s(double s)
 	{
 		this->s=s;
+	}
+
+	void set_raytype(string raytype)
+	{
+		this->raytype=raytype;
 	}
 
 	string get_raytype() const
@@ -88,14 +97,14 @@ public:
 		return s;
 	}
 
-	void show_rayinfo(int flag=0){
-		cout<<"Ray type: "<<raytype<<endl;
+	void show_rayinfo(string label=""){
+		cout<<"Ray labels: "<<raytype<<endl;
 		cout<<"U: "<<Arc2Angle(U)<<endl;
 		if(l>0.01||l<-0.01)cout<<"l: "<<l<<endl;
-		if(flag==1)
+		if(label=="cf")
 		{
 			cout<<"t: "<<t<<endl;
-		 	cout<<"s: "<<t<<endl;
+		 	cout<<"s: "<<s<<endl;
 		 }
 
 	}
@@ -115,10 +124,9 @@ public:
 		raytype="FPR"; 
 		
 	}
-	FPR(double U){
-		this->U=U;
+	FPR(string raytype):Ray(raytype)
+	{
 		y=0;
-		raytype="FPR"; 
 	}
 	~FPR(){}
 
@@ -137,13 +145,9 @@ private:
 public:
 	SPR(){
 		raytype="SPR"; 
-		// l=0;
 	}
-	SPR(double W){
-		raytype="SPR"; 
-		// l=0;
-		this->W=W;
-	}
+	SPR(string raytype):Ray(raytype){}
+
 	~SPR(){}
 
 
@@ -185,6 +189,10 @@ public:
 		raytype="FAR";
 		y=0;
 	}
+	FAR(string raytype):Ray(raytype)
+	{
+		y=0;
+	}
 
 	~FAR(){}
 
@@ -199,22 +207,14 @@ class SAR : public Ray
 private:
 	double l1;
 	double W;
-	string label;
 
 public:
 	SAR(){
 		raytype="SAR";
 	}
-	SAR(string label){
-		raytype="SAR";
-		this->label=label;
-	}
+	SAR(string raytype):Ray(raytype){}
+	
 	~SAR(){}
-
-	void set_label(string label)
-	{
-		this->label=label;
-	}
 
 	void set_l1(double l1)
 	{
@@ -239,9 +239,6 @@ public:
 	{
 		return W;
 	}
-	string get_label() const
-	{
-		return label;
-	}
+
 	
 };
