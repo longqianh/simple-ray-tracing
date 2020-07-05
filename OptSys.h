@@ -17,11 +17,16 @@ private:
 	double f; // 系统焦距
 	double lH; // 像方主面距离
 	double lp; // 出瞳距
+
 	
 
 public:
 
 	Surface *sf;
+	double * dists;
+	double * rs;
+	double * nds;
+
 	OptSys(){}
 	OptSys(int a,int nsf,double *dists,double * rs,double *nds){
 		
@@ -29,10 +34,16 @@ public:
 		this->a=a;
 		this->nsf=nsf;
 		sf=new Surface[nsf];
+		this->dists=new double[nsf];
+		this->rs=new double[nsf];
+		this->nds=new double[nsf];
 		for(int i=0;i<nsf;i++){
 			sf[i].set_d(dists[i]);
 			sf[i].set_rho(rs[i]);
 			sf[i].set_nd(nds[i]);
+			this->dists[i]=dists[i];
+			this->rs[i]=rs[i];
+			this->nds[i]=nds[i];
 		}
 
 		this->init_sys();
@@ -43,6 +54,9 @@ public:
 	~OptSys()
 	{
 		delete [] sf;
+		delete [] dists;
+		delete [] rs;
+		delete [] nds;
 	}
 
 	double get_f() const { return f; }
@@ -63,21 +77,23 @@ public:
 	Ray ray_tracing(FAR rayin,bool isINF=false,string label="FAR ray-tracing", double ku=1,double kw=1);
 
 
-	double cal_SA();
+	double cal_y0(double l,double y,bool isINF=false,double ku=1,double kw=1,double W=0);
 
-	double cal_LCAx();
+	double cal_y(double l,double y,bool isINF=false,double ku=1,double kw=1);
 
-	double cal_LCAy();
+	double cal_SA(double l,bool isINF=false, double ku=1,double kw=1);
+
+	double cal_LCAx(double l,bool isINF, double ku,double *nfs,double *ncs); // Longitudinal Chromatic Aberration
+
+	double cal_LCAy(); // Lateral Chromatic Aberration
 
 	double* cal_Distortion(double l,double y,bool isINF=false,double ku=1,double kw=1);
 
 	double cal_Coma();
 
-	double cal_y0(double l,double y,bool isINF=false,double ku=1,double kw=1);
+	double cal_FC(); // Field Curvature
 
-	double cal_y(double l,double y,bool isINF=false,double ku=1,double kw=1);
-
-	double cal_SA(double l,bool isINF=false, double ku=1,double kw=1);
+	double cal_ATM(); // Astigmatism
 };// get_nd nc nf
 
 
@@ -97,6 +113,7 @@ void OptSys::show_sysinfo()
 	show_sflist();
 	cout<<"Effective Focal Length -- "<<f<<endl;
 	cout<<"Main Surface Distance -- "<<lH<<endl;
+	cout<<"Exit Pupil Distance -- "<<lp<<endl;
 
 }
 void OptSys::show_sflist(){
@@ -123,13 +140,14 @@ void OptSys::init_sys()
 	Ray rayout1,rayout2;
 	bool isINF=true;
 	rayin1.set_U(0);
+	rayin2.set_l(0);
+	rayin2.set_W(3); // W != 0 即可，出瞳距不变
 	rayout1=ray_tracing(rayin1,isINF);
 	rayout2=ray_tracing(rayin2,isINF);
 	double u2=rayout1.get_U();
-	f=(a/2)/abs(u2); // ?
+	f=(a/2)/abs(u2); 
 	lH=rayout1.get_l()-f;
 	lp=rayout2.get_l();
-
 }
 
 // 利用多态
@@ -149,7 +167,7 @@ Ray OptSys::ray_tracing(FPR rayin,bool isINF,string label, double ku,double kw){
 	else
 	{
 		l1=rayin.get_l();
-		u1=atan(a/l1);
+		u1=atan((a/2)/l1); // ?
 		rayin.set_U(u1);
 	}
 		
@@ -195,15 +213,16 @@ Ray OptSys::ray_tracing(SPR rayin, bool isINF,string label,double ku,double kw){
 	if(isINF){			
 		double w=rayin.get_W();
 		u1=sin(kw*w);
-		// cout<<u1<<endl;
 	}
 
 	else{
 		double y=rayin.get_y();
-		double L1=rayin.get_l1();
-		u1=sin(atan(kw*y/L1)); 
-
-		
+		double L=rayin.get_l1();
+		u1=sin(atan(kw*y/L)); // ?
+		rayin.set_l1(L);
+		rayin.set_U(u1);
+		 
+	
 	}
 
 	for(int k=0;k<nsf;k++){
@@ -213,7 +232,7 @@ Ray OptSys::ray_tracing(SPR rayin, bool isINF,string label,double ku,double kw){
 		i=(rho*l1-1)*u1; //cout<<"# i # "<<i<<endl;
 		if(k==0){rayin.set_i(i);}
 		
-	
+	      
 		n2=sf[k].get_nd();
 		u2=(n2-n1)/n2*i+u1;
 		// cout<<u2<<endl;
@@ -227,6 +246,7 @@ Ray OptSys::ray_tracing(SPR rayin, bool isINF,string label,double ku,double kw){
 
 	rayout.set_U(u2);
 	rayout.set_l(l2);
+	// cout<<"L2 "<<l2<<endl;
 
 
 	return rayout;
@@ -422,10 +442,6 @@ Ray OptSys::ray_tracing(SAR rayin,bool isINF,string label,double ku,double kw){
 				s1=s2-D;
 				n1=n2;
 				
-				// cout<<D<<endl;
-				// cout<<" t2 "<<t2<<endl;
-				// cout<<" s2 "<<s2<<endl;
-				
 		}
 		
 		rayout.set_t(t2);
@@ -436,8 +452,13 @@ Ray OptSys::ray_tracing(SAR rayin,bool isINF,string label,double ku,double kw){
 	return rayout;
 }
 
-double OptSys::cal_y0(double l,double y,bool isINF,double ku,double kw)
+double OptSys::cal_y0(double l,double y,bool isINF,double ku,double kw,double W)
 {
+	if(isINF){
+		W=Angle2Arc(3);
+		return f*tan(kw*W);
+	}
+
 	FPR rayin1;
 	rayin1.set_l(l);
 	SPR rayin2;
@@ -445,18 +466,18 @@ double OptSys::cal_y0(double l,double y,bool isINF,double ku,double kw)
 	rayin2.set_y(y);
 
 	Ray rayout1,rayout2;
-	rayout1=ray_tracing(rayin1,isINF);
-	rayout2=ray_tracing(rayin2,isINF);
+	rayout1=ray_tracing(rayin1,isINF,"calculate ideal image height--l1",ku,kw);
+	rayout2=ray_tracing(rayin2,isINF,"calculate ideal image height--l2",ku,kw);
 
 
-	return (rayout2.get_l()-rayout1.get_l())*rayout2.get_U();
+	return (rayout2.get_l()-rayout1.get_l())*tan(rayout2.get_U());
 
 
 }
 
 double OptSys::cal_y(double l,double y,bool isINF,double ku,double kw)
 {
-	FAR rayin1;
+	FPR rayin1;
 	rayin1.set_l(l);
 	SAR rayin2("cf");
 	rayin2.set_l1(l);
@@ -466,7 +487,11 @@ double OptSys::cal_y(double l,double y,bool isINF,double ku,double kw)
 	rayout1=ray_tracing(rayin1,isINF,"calculate actual image height--l1",ku,kw);
 	rayout2=ray_tracing(rayin2,isINF,"calculate actual image height--l2",ku,kw);
 
-	cout<<"###"<<rayout2.get_U()<<endl;
+	// cout<<endl;
+	// cout<<"RAY1 L "<<rayout1.get_l()<<endl;
+	// cout<<"RAY2 L "<<rayout2.get_l()<<endl;
+	// cout<<"RAY2 U "<<rayout2.get_U()<<endl;
+
 	return (rayout2.get_l()-rayout1.get_l())*tan(rayout2.get_U());
 
 
@@ -494,4 +519,34 @@ double OptSys::cal_SA(double l,bool isINF,double ku,double kw)
 	rayout1=ray_tracing(rayin1,isINF,"cal_SA",ku,kw);
 	rayout2=ray_tracing(rayin2,isINF,"cal_SA",ku,kw);
 	return rayout2.get_l()-rayout1.get_l();
+}
+
+double OptSys::cal_LCAx(double l,bool isINF, double ku,double *nfs,double *ncs)
+{	
+
+	OptSys sys_f(a,nsf,dists,rs,nfs);
+	OptSys sys_c(a,nsf,dists,rs,ncs);
+
+	if(ku==0)
+	{
+		FPR rayin1,rayin2;
+		Ray rayout1,rayout2;
+		rayin1.set_l(l);
+		rayin2.set_l(l);
+		rayout1=sys_f.ray_tracing(rayin1,isINF,"cal_LCAx");	
+		rayout2=sys_c.ray_tracing(rayin2,isINF,"cal_LCAx");
+		return rayout1.get_l()-rayout2.get_l();
+
+	}
+	else
+	{
+		FAR rayin1,rayin2;
+		Ray rayout1,rayout2;
+		rayin1.set_l(l);
+		rayin2.set_l(l);
+		rayout1=sys_f.ray_tracing(rayin1,isINF,"cal_LCAx",ku);	
+		rayout2=sys_c.ray_tracing(rayin2,isINF,"cal_LCAx",ku);
+
+		return rayout1.get_l()-rayout2.get_l();
+	}
 }
