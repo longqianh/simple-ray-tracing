@@ -27,10 +27,8 @@ protected:
 
 public:
 	//Ray(){raytype="GR";t=0;s=0; } // general ray
-	Ray(string raytype = "GR"):raytype(raytype),t(0),s(0)
-	{
-		//this->raytype=raytype;
-	}
+	Ray(string raytype = "GR"):raytype(raytype),t(0),s(0) {}
+
 	~Ray(){}
 
 	void set_y(double y){
@@ -128,6 +126,7 @@ public:
 	{
 		y=0;
 	}
+
 	~FPR(){}
 
 
@@ -143,16 +142,16 @@ private:
 	double W; // 物方视场角 弧度
 
 public:
-	// SPR(){
-	// 	raytype="SPR"; 
-	// }
+	SPR(){
+		raytype="SPR"; 
+	}
 	SPR(string raytype):Ray(raytype){}
 
 	~SPR(){}
 
 
 	void set_W(double W){
-		this->W=W;
+		this->W=-Angle2Arc(W); // 根据符号规则转化
 	}
 	
 	
@@ -221,11 +220,9 @@ public:
 		this->l1=l1;
 	}
 
-
-
 	void set_W(double W)
 	{
-		this->W=W;
+		this->W=-Angle2Arc(W); // 根据符号规则转化
 	}
 
 	double get_l1() const
