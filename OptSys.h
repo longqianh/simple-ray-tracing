@@ -287,11 +287,12 @@ public:
 		double n1=1,n2; // n,n'
 		double L; // 物距
 		double d,rho;
-		double s,t;
+		double t1,t2,s1,s2; 
 		double y;
-		double *U2tmp= new double[nsf];
+		// double *U2tmp= new double[nsf];
+		double U2tmp[nsf],tmp1s[nsf],tmp2s[nsf];
 
-		string label=rayin.get_label();
+		string label=rayin.get_raytype();
 
 		Ray rayout;
 
@@ -300,14 +301,17 @@ public:
 			double W=rayin.get_W();
 
 			U1=-kw*W; // 负号
-			t=-INF;
-			s=-INF;
+			
 			if(label=="up"){
 				l1=ku*(a/2)/tan(U1);
-				// cout<<"UP"<<l1<<endl;
+				// cout<<"UP "<<l1<<endl;
 			}
 			else if(label=="cf"){
 				l1=0;
+				t1=-INF;
+				s1=t1;
+				rayin.set_s(s1);
+				rayin.set_t(t1);
 			}
 			else if(label=="dn")
 			{
@@ -320,8 +324,7 @@ public:
 		else{
 			L=rayin.get_l1();	
 			y=rayin.get_y();
-			t=-sqrt(y*y+L*L);
-			s=t;
+			
 			if(label=="up")
 			{
 				U1=-atan((-y*kw+ku*a/2)/L);
@@ -331,39 +334,48 @@ public:
 			{
 				U1=-atan(-y*kw/L);
 				l1=0;
+				t1=-sqrt(y*y+L*L);
+				s1=t1;
+
+				rayin.set_s(s1);
+				rayin.set_t(t1);
 			}
 			else if(label=="dn"){
-				cout<<"dn "<<(-y*kw-ku*a/2)/L<<endl;
+				// cout<<"dn "<<(-y*kw-ku*a/2)/L<<endl;
 				U1=-atan((-y*kw-ku*a/2)/L);
 				l1=ku*(a/2)/((-y*kw-ku*a/2)/L);
 			}
 			rayin.set_U(U1);
 			rayin.set_l(l1);
 		} 
-		// cout<<"L1"<<l1<<endl;
-		if(label=="cf")
+		
+		
+		
+		for(int k=0;k<nsf;k++)
 		{
-			rayin.set_s(s);
-			rayin.set_t(t);
-		}
-		
-		
-		
-		for(int k=0;k<nsf;k++){
 			d=sf[k].get_d(); 
 			rho=sf[k].get_rho();
 			n2=sf[k].get_nd();
 
-			I1=asin((L*rho-1)*sin(U1));
-			I2=asin((n1/n2)*(L*rho-1)*sin(U1));
+			I1=asin((l1*rho-1)*sin(U1));
+			I2=asin((n1/n2)*sin(I1));
+			tmp1s[k]=cos(I1);
+			tmp2s[k]=cos(I2);
+
+			// cout<<" I1 "<<Arc2Angle(I1)<<endl;
+			// cout<<" I2 "<<Arc2Angle(I2)<<endl;
+
 			l2=1/rho*(1+sin(I2)/sin(U2));
 			U2=U1+I1-I2;
-			U2tmp[k]=U2;
+			// cout<<" U2 "<<cos(U2)<<endl;
+			
+			// U2tmp[k]=U2;
 			l2=1/rho*(1+sin(I2)/sin(U2));
 			if(label=="cf"){
 				double PA=l1*sin(U1)/cos((I1-U1)/2);
-				cout<<" PA "<<PA<<endl;
+				// cout<<" PA "<<PA<<endl;
 				sf[k].set_PA(PA);
+
 			}
 			
 			l1=l2-d;
@@ -373,24 +385,49 @@ public:
 		
 		rayout.set_U(U2);
 		rayout.set_l(l2);
+		n1=1;
+		for(int k=0;k<nsf;k++)
+		{		
+				double X1,X2,D;
+				double tmp1=tmp1s[k],tmp2=tmp2s[k];
+				
 
-		if(label=="cf")
-		{
-			for(int k=0;k<nsf-1;k++)
-			{
 				d=sf[k].get_d();
-				double X1=sf[k].get_X();
-				double X2=sf[k+1].get_X();
-				double D=(d-X1+X2)/cos(U2tmp[k]);
-				t-=D;
-				s-=D;
-			}
+				rho=sf[k].get_rho();
+				n2=sf[k].get_nd();
 
-			rayout.set_t(t);
-			rayout.set_s(s);
-			
+				double a=(n2*tmp2-n1*tmp1)*rho;
+
+				if(k<nsf-1)
+				{
+					X1=sf[k].get_X();					
+					X2=sf[k+1].get_X();
+					D=(d-X1+X2)/cos(U2tmp[k]);
+				}
+				
+				
+
+				
+				// cout<<" a "<<a<<endl;
+				// cout<<" t1 "<<t1<<endl;
+				t2=n2*tmp1*tmp1/(a+n1*tmp1*tmp1/t1);
+				s2=n2/(n1/s1+(n2*tmp2-n1*tmp1)*rho);
+				t1=t2-D;
+				s1=s2-D;
+				n1=n2;
+				
+				// cout<<D<<endl;
+				// cout<<" t2 "<<t2<<endl;
+				// cout<<" s2 "<<s2<<endl;
+				
 		}
-		delete [] U2tmp;
+		
+		rayout.set_t(t2);
+		rayout.set_s(s2);
+
+			
+		
+		// delete [] U2tmp;
 		
 		
 		return rayout;
@@ -403,4 +440,4 @@ public:
 	// 	return abers;
 	// }
 
-};
+};// get_nd nc nf
