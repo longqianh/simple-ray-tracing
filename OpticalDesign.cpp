@@ -48,55 +48,39 @@ void cal_test(){
 
 	if(raytype=="FPR"){
 
-
 		cout<<"First Paraxial Ray:"<<endl;
-		FPR rayin1;
-		
-		isINF=true;
+		FPR rayin1(-INF);
 		Ray rayout1;
-		
-		rayout1=sys.ray_tracing(rayin1,isINF,"FPR,rayout,inf");
-
+		rayout1=sys.ray_tracing(rayin1,1,1,"FPR,rayout,inf");
 		rayout1.show_rayinfo();
 
-		FPR rayin2;
-		isINF=false;
+		FPR rayin2(l);
 		Ray rayout2;
-		rayin2.set_l(l);
 		
-		rayout2=sys.ray_tracing(rayin2,isINF,"FPR,rayout,finite");
+		rayout2=sys.ray_tracing(rayin2,1,1,"FPR,rayout,finite");
 		rayout2.show_rayinfo();
 	}
 	
 	cout<<endl;
 	raytype="SPR";
-	if(raytype=="SPR"){
+	if(raytype=="SPR")
+	{
 		cout<<"Second Paraxial Ray:"<<endl;
-		double W=3;
 		Ray rayout1,rayout1_W;
 		
-		SPR rayin1("SPR,inf");
-
-		rayin1.set_W(W);
-		rayin1.set_l(0);
-		isINF=true;
+		SPR rayin1(-INF,3);
 		
-		rayout1=sys.ray_tracing(rayin1,isINF,"SPR,rayout,inf ");
+		rayout1=sys.ray_tracing(rayin1,1,1,"SPR,rayout,inf ");
 		rayout1.show_rayinfo();
 
-		rayout1_W=sys.ray_tracing(rayin1,isINF,"SPR,rayout,inf,0.7W ",1,0.7);
+		rayout1_W=sys.ray_tracing(rayin1,1,0.7,"SPR,rayout,inf,0.7W ");
 		rayout1_W.show_rayinfo();
 	
-		isINF=false;
-		Ray rayout2("SPR,rayout,finite length ");
+		Ray rayout2;
 
-		SPR rayin2("SPR,inf");
-		rayin2.set_W(W);
-		rayin2.set_l(0);
-
-		rayin2.set_l1(l);
-		rayin2.set_y(y);
-		rayout2=sys.ray_tracing(rayin2,isINF,"SPR,rayout,finite");
+		SPR rayin2(l,y);
+	
+		rayout2=sys.ray_tracing(rayin2,1,1,"SPR,rayout,finite");
 		rayout2.show_rayinfo();
 	}
 
@@ -104,23 +88,21 @@ void cal_test(){
 	raytype="FAR";
 	if(raytype=="FAR"){
 		cout<<"First Actual Ray:"<<endl;
-		FAR rayin1;
-		isINF=true;
+		FAR rayin1(-INF);
 		Ray rayout1,rayout1_U;
 		
-		rayout1=sys.ray_tracing(rayin1,isINF,"FAR,rayout,inf ");
+		rayout1=sys.ray_tracing(rayin1,1,1,"FAR,rayout,inf ");
 		rayout1.show_rayinfo();
 
-		rayout1_U=sys.ray_tracing(rayin1,isINF,"FAR,rayout,inf,0.7U ",0.7);
+		rayout1_U=sys.ray_tracing(rayin1,1,0.7,"FAR,rayout,inf,0.7U ");
 		rayout1_U.show_rayinfo();
 
-		FAR rayin2;
-		isINF=false;
+		FAR rayin2(l);
 		Ray rayout2,rayout2_U;
-		rayin2.set_l(l);
-		rayout2=sys.ray_tracing(rayin2,isINF,"FAR,rayout,finite ");
+
+		rayout2=sys.ray_tracing(rayin2,1,0.7,"FAR,rayout,finite ");
 		rayout2.show_rayinfo();
-		rayout2_U=sys.ray_tracing(rayin2,isINF,"FAR,rayout,finite,0.7U ",0.7);
+		rayout2_U=sys.ray_tracing(rayin2,1,0.7,"FAR,rayout,finite,0.7U ");
 		rayout2_U.show_rayinfo();
 	}
 
@@ -129,53 +111,39 @@ void cal_test(){
 	if(raytype=="SAR")
 	{
 		cout<<"Second Actual Ray"<<endl;
-		SAR rayin_up("up"),rayin_cf("cf"),rayin_dn("dn");
+		SAR rayin_up1(-INF,3,"up"),rayin_cf1(-INF,3,"cf"),rayin_dn1(-INF,3,"dn");
 		
-		isINF=true;
-		Ray rayout_up1,
-		rayout_cf1,
-		rayout_dn1;
+		Ray rayout_up1,rayout_cf1,rayout_dn1;
 
-		rayin_up.set_W(W);
-		rayin_cf.set_W(W);
-		rayin_dn.set_W(W);
-		rayout_up1=sys.ray_tracing(rayin_up,isINF,"SAR,up-rayout,inf");
-		rayout_cf1=sys.ray_tracing(rayin_cf,isINF,"SAR,chief-rayout,inf");
-		rayout_dn1=sys.ray_tracing(rayin_dn,isINF,"SAR,down-rayout,inf");
+		rayout_up1=sys.ray_tracing(rayin_up1,1,1,"SAR,up-rayout,inf");
+		rayout_cf1=sys.ray_tracing(rayin_cf1,1,1,"SAR,chief-rayout,inf");
+		rayout_dn1=sys.ray_tracing(rayin_dn1,1,1,"SAR,down-rayout,inf");
 		rayout_up1.show_rayinfo();
-		rayout_cf1.show_rayinfo("cf");
+		rayout_cf1.show_rayinfo();
 		rayout_dn1.show_rayinfo();
 
 		cout<<endl;
-
-
-		isINF=false;
-		rayin_up.set_y(y);
-		rayin_cf.set_y(y);
-		rayin_dn.set_y(y);
-		rayin_up.set_l1(l);
-		rayin_cf.set_l1(l);
-		rayin_dn.set_l1(l);
+		SAR rayin_up2(l,y,"up"),rayin_cf2(l,y,"cf"),rayin_dn2(l,y,"dn");
 
 		Ray rayout_up2,rayout_cf2,rayout_dn2;
 
-		rayout_up2=sys.ray_tracing(rayin_up,isINF,"SAR,up-rayout,finite ");
-		rayout_cf2=sys.ray_tracing(rayin_cf,isINF,"SAR,chief-rayout,finite ");
-		rayout_dn2=sys.ray_tracing(rayin_dn,isINF,"SAR,down-rayout,finite ");
+		rayout_up2=sys.ray_tracing(rayin_up2,1,1,"SAR,up-rayout,finite ");
+		rayout_cf2=sys.ray_tracing(rayin_cf2,1,1,"SAR,chief-rayout,finite ");
+		rayout_dn2=sys.ray_tracing(rayin_dn2,1,1,"SAR,down-rayout,finite ");
 		rayout_up2.show_rayinfo();
-		rayout_cf2.show_rayinfo("cf");
+		rayout_cf2.show_rayinfo();
 		rayout_dn2.show_rayinfo();
 	}
 
 	cout<<endl;
 	cout<<"Exit Ray :"<<endl;
-	cout<<"Ideal image height -- inf -- "<<sys.cal_y0(-INF,y,true,ku,kw,W)<<endl;
-	cout<<"Ideal image height -- inf -- 0.7W --  "<<sys.cal_y0(-INF,y,true,ku,0.7,W)<<endl;
+	cout<<"Ideal image height -- inf -- "<<sys.cal_y0(-INF,3,1,1)<<endl;
+	cout<<"Ideal image height -- inf -- 0.7W --  "<<sys.cal_y0(-INF,3,1,0.7)<<endl;
 
 	cout<<"Ideal image height -- finite -- "<<sys.cal_y0(l,y)<<endl;
-	cout<<"Ideal image height -- finite -- 0.7W -- "<<sys.cal_y0(l,y,false,ku,0.7)<<endl;
+	cout<<"Ideal image height -- finite -- 0.7W -- "<<sys.cal_y0(l,y,1,0.7)<<endl;
 	// printf("%s %lf\n","Ideal image height -- ", sys.cal_y0(-INF,y,true,ku,kw,W));
-	cout<<"Actual image height -- finite -- "<<sys.cal_y(l,y)<<endl;
+	cout<<"Actual image height -- finite -- "<<sys.cal_y(l,y,1,1)<<endl;
 	// cout<<"Actual image height -- finite -- 0.7 "<<sys.cal_y(l,y)<<endl;
 
 	cout<<endl;
@@ -186,19 +154,19 @@ void cal_test(){
 	cout<<"Absolute Distortion -- "<<d[0]<<endl;
 	cout<<"Relative Distortion -- "<<d[1]<<endl;
 
-	cout<<"Spheroical Aberration -- finite -- "<<sys.cal_SA(l,false)<<endl;
-	cout<<"Spheroical Aberration -- finite -- 0.7U -- "<<sys.cal_SA(l,false,0.7)<<endl;
-	cout<<"Spheroical Aberration -- inf -- "<<sys.cal_SA(-INF,true)<<endl;
-	cout<<"Spheroical Aberration -- inf -- 0.7U -- "<<sys.cal_SA(-INF,true,0.7)<<endl;
+	cout<<"Spheroical Aberration -- finite -- "<<sys.cal_SA(l,1,1)<<endl;
+	cout<<"Spheroical Aberration -- finite -- 0.7U -- "<<sys.cal_SA(l,1,0.7)<<endl;
+	cout<<"Spheroical Aberration -- inf -- "<<sys.cal_SA(-INF,1,1)<<endl;
+	cout<<"Spheroical Aberration -- inf -- 0.7U -- "<<sys.cal_SA(-INF,1,0.7)<<endl;
 
-	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAx(-INF,true,0,nfs,ncs)<<endl;
-	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAx(-INF,true,0.7,nfs,ncs)<<endl;
-	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAx(-INF,true,1,nfs,ncs)<<endl;
-	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAx(l,false,0,nfs,ncs)<<endl;
-	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAx(l,false,0.7,nfs,ncs)<<endl;
-	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAx(l,false,1,nfs,ncs)<<endl;
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0)<<endl;
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0.7)<<endl;
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAx(nfs,ncs,-INF,1)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,l,0)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAx(nfs,ncs,l,0.7)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAx(nfs,ncs,l,1)<<endl;
 }
-
+ 
 
 
 

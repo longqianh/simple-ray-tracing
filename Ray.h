@@ -16,24 +16,24 @@ class Ray
 protected:
 
 	double U; //弧度
-	// double W; //弧度
-	double t,s;
-	double y;
 	double l; // 物距
-	double i; // 入射角 弧度
-	string raytype;
-	// double lh;
-
+	// double i; // 入射角 弧度
+	string rayinfo; // 一些信息
 
 public:
-	//Ray(){raytype="GR";t=0;s=0; } // general ray
-	Ray(string raytype = "GR"):raytype(raytype),t(0),s(0) {}
 
+	Ray(){} 
+	Ray(double l)
+	{
+		this->l=l;
+	}
+	Ray(string rayinfo)
+	{
+		this->rayinfo=rayinfo;
+	}
+ 
 	~Ray(){}
 
-	void set_y(double y){
-		this->y=y;
-	}
 
 	void set_U(double U){
 		this->U=U;
@@ -42,9 +42,306 @@ public:
 	void set_l(double l){
 		this->l=l;
 	}
-	void set_i(double i){
-		this->i=i;
+	// void set_i(double i){
+	// 	this->i=i;
+	// }
+
+	void set_raytype(string rayinfo)
+	{
+		this->rayinfo=rayinfo;
 	}
+
+	string get_raytype() const
+	{
+		return rayinfo;
+	}
+
+	
+	double get_U() const
+	{
+		return U;
+	}
+	
+	double get_l() const
+	{
+		return l;
+	}
+	// double get_i() const
+	// {
+	// 	return i;
+	// }
+
+
+	// virtual void show_rayinfo(string label=""){
+	// 	cout<<"Ray Types: "<<rayinfo<<endl;
+	// 	cout<<"U: "<<Arc2Angle(U)<<endl;
+	// 	if(l>0.01||l<-0.01)cout<<"l: "<<l<<endl;
+	// 	if(label=="cf")
+	// 	{
+	// 		cout<<"t: "<<t<<endl;
+	// 	 	cout<<"s: "<<s<<endl;
+	// 	 }
+
+	// }
+
+
+
+	virtual void show_rayinfo()
+	{
+		cout<<"General Ray Type"<<endl;
+		cout<<"l -- "<<l<<endl;
+	}
+	
+};
+
+// First Paraxial Ray
+
+class FPR: public Ray
+{
+
+public:
+
+	FPR(double l):Ray(l)
+	{
+		rayinfo="FPR"; 
+		U=0;
+	}
+	FPR(double l,string rayinfo):Ray(l)
+	{
+		this->rayinfo=rayinfo;
+		U=0;
+	}
+
+	~FPR(){}
+
+
+	void show_rayinfo()
+	{
+		cout<<"Ray Information -- "<<rayinfo<<endl;
+		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
+		cout<<"Distance -- ";
+		if(l<=-INF)
+		{
+			cout<<"-INF"<<endl;
+		}
+		else if(l>INF)
+		{
+			cout<<"INF"<<endl;
+		}
+		else{
+			cout<<l<<endl;
+		}
+
+	}
+
+};
+
+// Second Paraxial Ray
+class SPR: public Ray
+{
+private:
+	double L; // 对应的物距
+	double y; // 对应的物高
+	double W; // 物方视场角 弧度
+
+public:
+	
+	SPR(double l,double y_or_W):Ray(l)
+	{
+		if(l==-INF||l==INF)
+		{
+			W=-Angle2Arc(y_or_W);// 根据符号规则转化
+		}
+		else{
+			y=y_or_W;
+		}
+		this->L=l;
+		l=0; // 注：若孔径光阑不在第一面，这里的l需重新设置
+	}
+
+	SPR(double l,double y_or_W,string rayinfo):Ray(l)
+	{
+		this->rayinfo=rayinfo;
+
+		if(l==-INF||l==INF)
+		{
+			W=-Angle2Arc(y_or_W);
+		}
+		else{
+			y=y_or_W;
+		}
+		this->L=l;
+		l=0; 
+	}
+
+	~SPR(){}
+
+
+	void set_W(double W){
+		this->W=W;
+	}
+	
+	void set_L(double L){
+		this->L=L;
+	}
+
+	void set_y(double y){
+		this->y=y;
+	}
+
+	double get_W() const
+	{
+		return W;
+	}
+	double get_L() const
+	{
+		return L;
+	
+	}
+
+	double get_y() const
+	{
+		return y;
+	}
+
+	void show_rayinfo()
+	{
+		cout<<"Ray Information -- "<<rayinfo<<endl;
+		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
+		cout<<"Distance -- ";
+		if(l<=-INF)
+		{
+			cout<<"-INF"<<endl;
+			cout<<"Angle of View W -- "<<W<<endl;
+		}
+		else if(l>=INF)
+		{
+			cout<<"INF"<<endl;
+		}
+		else{
+			cout<<l<<endl;
+			cout<<"Object Height y -- "<<y<<endl;
+		}
+	}
+};
+
+// First Actural Ray or meridian actual ray
+class FAR : public Ray  
+{
+public:
+	FAR(double l):Ray(l)
+	{
+		rayinfo="FAR";
+	}
+	FAR(double l,string rayinfo):Ray(l)
+	{
+		this->rayinfo=rayinfo;
+	}
+
+	~FAR(){}
+
+	void show_rayinfo()
+	{
+		cout<<"Ray Information -- "<<rayinfo<<endl;
+		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
+		cout<<"Distance -- ";
+		if(l<=-INF)
+		{
+			cout<<"-INF"<<endl;
+		}
+		else if(l>INF)
+		{
+			cout<<"INF"<<endl;
+		}
+		else{
+			cout<<l<<endl;
+		}
+	}
+
+	
+};
+
+// Second Actural Ray 
+class SAR : public Ray  
+{
+private:
+	double L;
+	double W;
+	double y;
+	double t,s;
+	string label; // 区分主、上、下光线
+
+public:
+	SAR(double l,double y_or_W):Ray(l)
+	{
+		if(l==-INF||l==INF)
+		{
+			W=y_or_W;
+			L=-INF;
+		}
+		else { y=y_or_W; }
+
+		L=l;
+
+		rayinfo="SAR";
+		
+		// 默认为主光线，可根据上下光线重新设置
+		label="cf";
+		l=0; 
+	}
+
+	SAR(double l,double y_or_W,string label):Ray(l)
+	{
+		this->rayinfo=rayinfo;
+
+		if(l==-INF||l==INF)
+		{
+			W=-Angle2Arc(y_or_W);
+		}
+		else { y=y_or_W; }
+
+		L=l;
+		this->label=label;
+		
+	}
+
+	SAR(double l,double y_or_W, string label, string rayinfo):Ray(l)
+	{
+		this->rayinfo=rayinfo;
+
+		if(l==-INF||l==INF)
+		{
+			W=-Angle2Arc(y_or_W);
+		}
+		else { y=y_or_W; }
+
+		L=l;
+		this->label=label;
+		this->rayinfo=rayinfo;
+		
+		
+	}
+	
+	~SAR(){}
+
+	void set_label(string label)
+	{
+		this->label=label;
+	}
+
+	void set_L(double L)
+	{
+		this->L=L;
+	}
+
+	void set_W(double W){
+		this->W=W; // 根据符号规则转化
+	}
+
+	void set_y(double y){
+		this->y=y;
+	}
+
 
 	void set_t(double t)
 	{
@@ -56,33 +353,20 @@ public:
 		this->s=s;
 	}
 
-	void set_raytype(string raytype)
+
+	double get_L() const
 	{
-		this->raytype=raytype;
+		return L;
 	}
 
-	string get_raytype() const
+	double get_W() const
 	{
-		return raytype;
+		return W;
 	}
 
 	double get_y() const
 	{
 		return y;
-	}
-
-	double get_U() const
-	{
-		return U;
-	}
-	
-	double get_l() const
-	{
-		return l;
-	}
-	double get_i() const
-	{
-		return i;
 	}
 
 	double get_t() const
@@ -95,146 +379,36 @@ public:
 		return s;
 	}
 
-	void show_rayinfo(string label=""){
-		cout<<"Ray labels: "<<raytype<<endl;
-		cout<<"U: "<<Arc2Angle(U)<<endl;
-		if(l>0.01||l<-0.01)cout<<"l: "<<l<<endl;
+	string get_label() const
+	{
+		return label;
+	}
+
+	void show_rayinfo()
+	{
+		cout<<"Ray Information -- "<<rayinfo<<endl;
+		cout<<"Ray label -- "<<label<<endl;
+		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
+		cout<<"Distance -- ";
+		if(l<=-INF)
+		{
+			cout<<"-INF"<<endl;
+			cout<<"Angle of View W -- "<<W<<endl;
+		}
+		else if(l>=INF)
+		{
+			cout<<"INF"<<endl;
+		}
+		else{
+			cout<<l<<endl;
+			cout<<"Object Height y -- "<<y<<endl;
+		}
+
 		if(label=="cf")
 		{
-			cout<<"t: "<<t<<endl;
-		 	cout<<"s: "<<s<<endl;
+			cout<<"Meridian Distance t -- "<<t<<endl;
+		 	cout<<"Sagittarius Distance s -- "<<s<<endl;
 		 }
 
 	}
-	// void draw(){}
-	
-};
-
-// First Paraxial Ray
-
-class FPR: public Ray
-{
-private:
-	double l1;
-public:
-	FPR(){
-		y=0;
-		raytype="FPR"; 
-		
-	}
-	FPR(string raytype):Ray(raytype)
-	{
-		y=0;
-	}
-
-	~FPR(){}
-
-
-
-};
-
-// Second Paraxial Ray
-class SPR: public Ray
-{
-private:
-	double l1; // 对应的物距
-	// double y; // 对应的物高
-	double W; // 物方视场角 弧度
-
-public:
-	SPR(){
-		raytype="SPR"; 
-	}
-	SPR(string raytype):Ray(raytype){}
-
-	~SPR(){}
-
-
-	void set_W(double W){
-		this->W=-Angle2Arc(W); // 根据符号规则转化
-	}
-	
-	
-	void set_l1(double l1){
-		this->l1=l1;
-	}
-
-	// void set_y(double y){
-	// 	this->y=y;
-	// }
-
-	double get_W() const
-	{
-		return W;
-	}
-	double get_l1() const
-	{
-		return l1;
-	
-	}
-
-	// double get_y() const
-	// {
-	// 	return y;
-	// }
-
-};
-
-// First Actural Ray or meridian actual ray
-class FAR : public Ray  
-{
-public:
-	FAR(){
-		raytype="FAR";
-		y=0;
-	}
-	FAR(string raytype):Ray(raytype)
-	{
-		y=0;
-	}
-
-	~FAR(){}
-
-
-
-	
-};
-
-// Second Actural Ray 
-class SAR : public Ray  
-{
-private:
-	double l1;
-	double W;
-
-public:
-	SAR(){
-		raytype="SAR";
-	}
-	SAR(string raytype):Ray(raytype){}
-	
-	~SAR(){}
-
-	void set_l1(double l1)
-	{
-		this->l1=l1;
-	}
-
-	void set_W(double W){
-		this->W=-Angle2Arc(W); // 根据符号规则转化
-	}
-
-	double get_l1() const
-	{
-		return l1;
-	}
-
-
-
-	double get_W() const
-	{
-		return W;
-	}
-
-	
 };
