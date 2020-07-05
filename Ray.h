@@ -26,10 +26,10 @@ protected:
 
 
 public:
-	Ray(){raytype="GR";t=0;s=0; } // general ray
-	Ray(string raytype)
+	//Ray(){raytype="GR";t=0;s=0; } // general ray
+	Ray(string raytype = "GR"):raytype(raytype),t(0),s(0)
 	{
-		this->raytype=raytype;
+		//this->raytype=raytype;
 	}
 	~Ray(){}
 
@@ -143,9 +143,9 @@ private:
 	double W; // 物方视场角 弧度
 
 public:
-	SPR(){
-		raytype="SPR"; 
-	}
+	// SPR(){
+	// 	raytype="SPR"; 
+	// }
 	SPR(string raytype):Ray(raytype){}
 
 	~SPR(){}
