@@ -1,1 +1,13 @@
-﻿  Ray_Tracing.vcxproj -> E:\Desktop\Ray_Tracing\Debug\Ray_Tracing.exe
+﻿  ComfirmCamOpen.cpp
+  ComfirmObjOpen.cpp
+  Ray_Tracing.cpp
+  Ray_TracingDlg.cpp
+E:\Desktop\Ray_Tracing\Ray_TracingDlg.cpp(253,10): warning C4102: “defalt”: 未引用的标签
+E:\Desktop\Ray_Tracing\Ray_TracingDlg.cpp(359,12): warning C4018: “<”: 有符号/无符号不匹配
+E:\Desktop\Ray_Tracing\Ray_TracingDlg.cpp(513,17): warning C4018: “<”: 有符号/无符号不匹配
+E:\Desktop\Ray_Tracing\Ray_TracingDlg.cpp(973,9): warning C4101: “W”: 未引用的局部变量
+E:\Desktop\Ray_Tracing\Ray_TracingDlg.cpp(972,9): warning C4101: “y”: 未引用的局部变量
+E:\Desktop\Ray_Tracing\Ray_TracingDlg.cpp(1428,14): warning C4018: “<”: 有符号/无符号不匹配
+E:\Desktop\Ray_Tracing\Ray_TracingDlg.cpp(1471,18): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+  正在生成代码...
+  Ray_Tracing.vcxproj -> E:\Desktop\Ray_Tracing\Debug\Ray_Tracing.exe

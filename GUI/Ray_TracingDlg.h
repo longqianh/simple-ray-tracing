@@ -4,11 +4,12 @@
 
 #pragma once
 #include <iostream>
+#define INF 1e15
 
 // CRayTracingDlg 对话框
 class CRayTracingDlg : public CDialogEx
 {
-// 构造
+	// 构造
 public:
 	CRayTracingDlg(CWnd* pParent = nullptr);	// 标准构造函数
 
@@ -17,7 +18,7 @@ public:
 	enum { IDD = IDD_RAY_TRACING_DIALOG };
 #endif
 	CMenu m_menu;
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
 
@@ -27,9 +28,6 @@ protected:
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
-	void CRayTracingDlg::CreateList1();
-	void CRayTracingDlg::CreateList2();
-	void CRayTracingDlg::CreateList3(int nlsub);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -91,8 +89,12 @@ public:
 	afx_msg void OnBgcSlightgreen();
 	afx_msg void OnBgcmacaron();
 	BOOL JudgeStringIsFloat(std::string x);
-	BOOL JudgeListIsCorrect(CListCtrl m_List);
-	void ListCorrectZero(CListCtrl m_List);
+	BOOL JudgeListIsCorrect(CListCtrl& m_List);
+	void ListCorrectZero(CListCtrl& m_List);
 	double TransStrToDouble(std::string x);
-	void ZeroDotCorrectFormat(CListCtrl m_List);
+	void ZeroDotCorrectFormat(CListCtrl& m_List);
+	void StoreLastList(CListCtrl& m_List);
+	void CRayTracingDlg::CreateList1();
+	void CRayTracingDlg::CreateList2();
+	void CRayTracingDlg::CreateList3(int nlsub);
 };
