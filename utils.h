@@ -11,3 +11,6 @@ double Arc2Angle(double arc){
 	return arc*180/PI;
 }
 
+double myabs(double x){
+	return x>0?x:-x;
+}

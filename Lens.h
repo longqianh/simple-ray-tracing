@@ -15,23 +15,17 @@ class Surface
 {
 private:
 	double rho;
-	double nd; // 与下一个面之间的主色光折射率
-	double nf,nc; // 与下一个面之间的F光和C光折射率
-	double vd; // 与下一个面之间的阿贝常数
+	double n; // 与下一个面之间的折射率
 	double d; // 到下一个面的距离
-	// bool label; // true：最后一面
-
+	double X; // 
+	double PA; 
 
 public:
-	// Surface(double a=0,double b=1.0){ 
-	// 	rho=a;
-	// 	nd=b;
-	// }
 	Surface(){}
-	Surface(double d,double r,double nd){
-		this->nd=nd;
+	Surface(double d,double r,double n){
+		this->n=n;
 		this->d=d;
-		if(r>INF){
+		if(r>INF||r>-INF){
 			this->rho=0;
 		}
 		else{
@@ -53,19 +47,15 @@ public:
 			this->rho=1/r;
 		}
 	}
-	void set_nd(double nd){
-		this->nd=nd;
-	}
-	void set_nf(double nf){
-		this->nf=nf;
-	}
-	void set_nc(double nc){
-		this->nc=nc;
+	void set_n(double n){
+		this->n=n;
 	}
 
-	// void set_label(bool x){
-	// 	label=x;
-	// }
+
+	void set_PA(double PA){
+		this->PA=PA;
+		X=PA*PA*rho/2;
+	}
 
 	double get_d() const
 	{
@@ -76,21 +66,20 @@ public:
  	{
 		return rho;
 	}
-	double get_nd() const
+	double get_n() const
 	{
-		return nd;
+		return n;
 	}
 
-	double get_nf() const
+	double get_X() const
 	{
-		return nf;
-	}
-	double get_nc() const
-	{
-		return nc;
+		return X;
 	}
 
-
+	double get_PA() const
+	{
+		return PA;
+	}
 };
 
 
