@@ -21,6 +21,8 @@
 #define IDI_ICON3                       153
 #define IDI_ICON4                       154
 #define IDI_ICON5                       155
+#define IDD_COMFIRM_CAM_OPEN            157
+#define IDD_COMFIRM_OBJECT_OPEN         158
 #define IDC_EDIT1                       1000
 #define IDC_EDIT2                       1001
 #define IDC_LIST1                       1002
@@ -28,6 +30,10 @@
 #define IDC_LIST3                       1006
 #define IDC_BUTTON_CALCULATE            1008
 #define IDC_STATIC2                     1010
+#define IDC_BUTTON_COMFIRM_OBJ          1011
+#define IDC_BUTTON_COMFIRM_CAM          1012
+#define IDC_BUTTON_CANCEL_OBJ           1013
+#define IDC_BUTTON_CANCEL_CAM           1014
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -116,9 +122,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        157
+#define _APS_NEXT_RESOURCE_VALUE        161
 #define _APS_NEXT_COMMAND_VALUE         32856
-#define _APS_NEXT_CONTROL_VALUE         1011
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

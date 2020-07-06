@@ -36,6 +36,12 @@
     <ClInclude Include="aboutdlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ComfirmCamOpen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ComfirmObjOpen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ray_Tracing.cpp">
@@ -48,6 +54,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="aboutdlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ComfirmCamOpen.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ComfirmObjOpen.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -102,6 +114,33 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="..\cal.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\ICON1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\ICON2.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\calICON.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\ZJULOGO.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\background.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\white.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\blue.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\star.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\macaron.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

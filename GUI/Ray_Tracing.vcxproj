@@ -184,6 +184,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="aboutdlg.h" />
+    <ClInclude Include="ComfirmCamOpen.h" />
+    <ClInclude Include="ComfirmObjOpen.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Ray_Tracing.h" />
@@ -193,6 +195,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aboutdlg.cpp" />
+    <ClCompile Include="ComfirmCamOpen.cpp" />
+    <ClCompile Include="ComfirmObjOpen.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -222,7 +226,16 @@
     <Image Include="..\star.bmp" />
     <Image Include="..\white.bmp" />
     <Image Include="..\ZJULOGO.bmp" />
+    <Image Include="res\background.bmp" />
+    <Image Include="res\blue.bmp" />
+    <Image Include="res\calICON.ico" />
+    <Image Include="res\ICON1.ico" />
+    <Image Include="res\ICON2.ico" />
+    <Image Include="res\macaron.bmp" />
     <Image Include="res\Ray_Tracing.ico" />
+    <Image Include="res\star.bmp" />
+    <Image Include="res\white.bmp" />
+    <Image Include="res\ZJULOGO.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

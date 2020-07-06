@@ -8,13 +8,16 @@
 #include "Ray_TracingDlg.h"
 #include "afxdialogex.h"
 #include "aboutdlg.h"
+#include "ComfirmCamOpen.h"
+#include "ComfirmObjOpen.h"
 #include <string>
 #include <iostream>
 #include <vector>
 #include <fstream>
 #include <sstream>
 #include <GdiPlus.h>
-
+#include <cassert>
+#include <math.h>
 using namespace std;
 
 #ifdef _DEBUG
@@ -60,11 +63,15 @@ END_MESSAGE_MAP()
 int m_Row, m_Col;
 int bgcmode = 0, iconmode = 0;
 int* ErrorPlacePermanent;
+string** StoreList = NULL;
+
+//CRayTracingDlg* pCRayTracingDlg = new CRayTracingDlg;
 
 CRayTracingDlg::CRayTracingDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_RAY_TRACING_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON4);
+	//pCRayTracingDlg = this;
 }
 
 void CRayTracingDlg::DoDataExchange(CDataExchange* pDX)
@@ -274,6 +281,31 @@ void CRayTracingDlg::OnAbout()
 	dlg.DoModal();
 }
 
+void CRayTracingDlg::StoreLastList(CListCtrl& m_List)
+{
+	int v, j;
+	int nltem = m_List.GetItemCount();
+	int nlsub = m_List.GetHeaderCtrl()->GetItemCount();
+	StoreList = new string* [nltem+1];
+	if (nltem != 0)
+	{
+		StoreList[0] = new string[2];
+		string temp = to_string(nltem);
+		StoreList[0][0] = temp;
+		temp = to_string(nlsub);
+		StoreList[0][1] = temp;
+		for (v = 1; v < nltem+1; v++)
+		{
+			StoreList[v] = new string[nlsub];
+			for (j = 0; j < nlsub; j++)
+			{
+				temp = CT2A(m_List.GetItemText(v-1, j).GetString());
+				StoreList[v][j] = temp;
+			}
+		}
+	}
+}
+
 void CRayTracingDlg::OnOpenCamFactorFile()
 {
 	BOOL isOpen = TRUE;     //是否打开(否则为保存)  
@@ -287,8 +319,10 @@ void CRayTracingDlg::OnOpenCamFactorFile()
 	CString filePath;
 	if (result == IDOK) 
 	{
+		//暂时存储读取前的数据
+		StoreLastList(m_ACCESSList);
+
 		filePath = openFileDlg.GetPathName();
-		AfxMessageBox(L"读取成功！");
 	
 		//CWnd::SetDlgItemTextW(IDC_EDIT1, filePath);
 		ifstream inFile(filePath, ios::in);
@@ -348,6 +382,12 @@ void CRayTracingDlg::OnOpenCamFactorFile()
 				m_ACCESSList.SetItem(&lvitemAdd); //插入数据	
 			}
 		}
+		if (!JudgeListIsCorrect(m_ACCESSList))
+		{
+			ComfirmCamOpen  Dlg;
+			Dlg.DoModal();
+		}
+		ZeroDotCorrectFormat(m_ACCESSList);
 	}
 }
 
@@ -433,8 +473,9 @@ void CRayTracingDlg::OnOpenObjectFactorFile()
 	CString filePath;
 	if (result == IDOK)
 	{
+		StoreLastList(m_ACCESSList3);
+		
 		filePath = openFileDlg.GetPathName();
-		AfxMessageBox(L"读取成功！");
 	
 		//CWnd::SetDlgItemTextW(IDC_EDIT1, filePath);
 		ifstream inFile(filePath, ios::in);
@@ -482,6 +523,12 @@ void CRayTracingDlg::OnOpenObjectFactorFile()
 			}
 		}
 		// TODO: 在此添加命令处理程序代码
+		if (!JudgeListIsCorrect(m_ACCESSList3))
+		{
+			ComfirmObjOpen  Dlg;
+			Dlg.DoModal();
+		}
+		ZeroDotCorrectFormat(m_ACCESSList3);
 	}
 }
 
@@ -913,6 +960,18 @@ void CRayTracingDlg::OnInsertSurface()
 
 void CRayTracingDlg::OnCalculateResult()
 {
+	//预备传输的参数
+	double a;
+	int nsf;
+	double *dists;
+	double *rs;
+	double *nfs;
+	double *nds;
+	double *ncs;
+	double l;
+	double y;
+	double W;
+	vector<double> res;
 	//CamFactorStr 存储镜头参数的二维数组   以下方列表形式储存 不保存表头
 	/*序号	曲率半径	厚度	d光折射率	F光折射率	C光折射率 
 		1	    35	             4	      1.542	     1.222	     1.133
@@ -921,17 +980,38 @@ void CRayTracingDlg::OnCalculateResult()
 	int v, j;
 	string lineStr;
 	int nltem = m_ACCESSList.GetItemCount();
-	for (v = 0; v < nltem; v++)
+	if (nltem != 0)
 	{
-		vector<string> lineArray;
-		for (j = 0; j < 6; j++)
+		dists = new double[nltem];
+		rs = new double[nltem];
+		nfs = new double[nltem];
+		nds = new double[nltem];
+		ncs = new double[nltem];
+		for (v = 0; v < nltem; v++)
 		{
-			lineStr = CT2A(m_ACCESSList.GetItemText(v, j).GetString());
-			lineArray.push_back(lineStr);
+			vector<string> lineArray;
+			for (j = 0; j < 6; j++)
+			{
+				lineStr = CT2A(m_ACCESSList.GetItemText(v, j).GetString());
+				lineArray.push_back(lineStr);
+				switch (j)
+				{
+				case 1:
+					rs[v] = TransStrToDouble(lineStr);
+				case 2:
+					dists[v] = TransStrToDouble(lineStr);
+				case 3:
+					nds[v] = TransStrToDouble(lineStr);
+				case 4:
+					nfs[v] = TransStrToDouble(lineStr);
+				case 5:
+					ncs[v] = TransStrToDouble(lineStr);
+				}
+			}
+			CamFactorStr.push_back(lineArray);
 		}
-		CamFactorStr.push_back(lineArray);
+		nsf = CamFactorStr.size();
 	}
-	
 	//ObjectFactorStr 存储物方参数的一维数组  不保存表头
 	/*物方距离l	物高y	入瞳直径2a	无穷远半视场角W
 		35	                4	          1.542           	1.222*/
@@ -945,7 +1025,22 @@ void CRayTracingDlg::OnCalculateResult()
 	//计算函数
 	vector<vector<string>>CalResultStr; //存计算结果
 	//CamFactorStr和ObjectFactorStr转换成double
-
+	/*double a, int nsf, double* dists, double* rs, double* nfs, double* nds, 
+		double* ncs, double l, double y_or_W, vector<double>& res*/
+	if (ObjectFactorStr[0] == "无限")
+	{
+		l = -INF;
+		a = TransStrToDouble(ObjectFactorStr[2]);
+		W = TransStrToDouble(ObjectFactorStr[3]);
+		cal_res(a, nsf, dists, rs, nfs, nds, ncs, l, W, res);
+	}
+	else
+	{
+		l = TransStrToDouble(ObjectFactorStr[0]);
+		y = TransStrToDouble(ObjectFactorStr[1]);
+		a = TransStrToDouble(ObjectFactorStr[2]);
+		cal_res(a, nsf, dists, rs, nfs, nds, ncs, l, y, res);
+	}
 	//
 	//输出结果
 
@@ -1248,7 +1343,7 @@ BOOL CRayTracingDlg::JudgeStringIsFloat(string x)
 	return bReturnValue;
 }
 
-BOOL CRayTracingDlg::JudgeListIsCorrect(CListCtrl m_List)
+BOOL CRayTracingDlg::JudgeListIsCorrect(CListCtrl& m_List)
 {
 	int nltem = m_List.GetItemCount();
 	int nlsub = m_List.GetHeaderCtrl()->GetItemCount();
@@ -1259,9 +1354,9 @@ BOOL CRayTracingDlg::JudgeListIsCorrect(CListCtrl m_List)
 		for (j = 0; j < nlsub; j++)
 		{
 			string temp = CT2A(m_List.GetItemText(v, j).GetString());
-			if ((v == 0 && j == 0) && temp == "无限")
+			if (JudgeStringIsFloat(temp) && (nlsub != 4 || (nlsub == 4 && (v != 0 || j != 0))))
 				;
-			else if (JudgeStringIsFloat(temp))
+			else if ((nlsub == 4 && (v == 0 || j == 0)) && temp == "无限")
 				;
 			else
 			{
@@ -1272,13 +1367,17 @@ BOOL CRayTracingDlg::JudgeListIsCorrect(CListCtrl m_List)
 		}
 	if (flag == 1)
 	{
-		string ErrorString = "检测到非数字数值\n错误位置为:";
+		string ErrorString;
+		if (nlsub == 6)
+			ErrorString = "检测到非数字数值\n错误位置为:\n";
+		else
+			ErrorString = "检测到非数字数值或给出无穷远半视场角但物距未设置成无穷远\n错误位置为:\n";
 		int size = ErrorPlace.size();
 		ErrorPlacePermanent = (int*)calloc(size+1,sizeof(int));
 		ErrorPlacePermanent[0] = size;
 		for (v = 0; v < size / 2; v++)
 		{
-			ErrorString += "第" + to_string(ErrorPlace[2 * v]) + "行" + "第" + to_string(ErrorPlace[2 * v + 1]) + "列\n";
+			ErrorString += "第" + to_string(ErrorPlace[2 * v]+1) + "行" + "第" + to_string(ErrorPlace[2 * v + 1]+1) + "列\n";
 			ErrorPlacePermanent[2 * v+1] = ErrorPlace[2 * v];
 			ErrorPlacePermanent[2 * v + 2] = ErrorPlace[2 * v + 1];
 		}
@@ -1290,17 +1389,30 @@ BOOL CRayTracingDlg::JudgeListIsCorrect(CListCtrl m_List)
 		return 1;
 }
 
-void CRayTracingDlg::ListCorrectZero(CListCtrl m_List)
+void CRayTracingDlg::ListCorrectZero(CListCtrl& m_List)
 {
 	if (ErrorPlacePermanent != NULL)
 	{
 		int v;
 		int size = ErrorPlacePermanent[0];
-		for (v = 0; v < size / 2; v++)
+		int nlsub = m_List.GetHeaderCtrl()->GetItemCount();
+		if (nlsub != 6)
 		{
-			m_List.SetItemText(ErrorPlacePermanent[2 * v + 1], ErrorPlacePermanent[2 * v + 2], L"0");
+			for (v = 0; v < size / 2; v++)
+			{
+				if (v == 0)
+					m_List.SetItemText(ErrorPlacePermanent[2 * v + 1], ErrorPlacePermanent[2 * v + 2], L"无限");
+				else
+					m_List.SetItemText(ErrorPlacePermanent[2 * v + 1], ErrorPlacePermanent[2 * v + 2], L"0");
+			}
 		}
-		AfxMessageBox(L"所有非数字数值已修正为0");
+		else
+		{
+			for (v = 0; v < size / 2; v++)
+			{
+				m_List.SetItemText(ErrorPlacePermanent[2 * v + 1], ErrorPlacePermanent[2 * v + 2], L"0");
+			}
+		}
 		free(ErrorPlacePermanent);
 	}
 }
@@ -1310,44 +1422,71 @@ double CRayTracingDlg::TransStrToDouble(string x)
 	//确保负数的string也可以转换成负的double   未试验
 	bool minus = false;      //标记是否是负数  
       string real = x;       //real表示num的绝对值
-      if (x.at(0) == '-')
-      {
-          minus = true;
-          real = x.substr(1, x.size()-1);
-      }
- 
-     char c;
-     int i = 0;
-     double result = 0.0 , dec = 10.0;
-     bool isDec = false;       //标记是否有小数
-     unsigned long size = real.size();
-     while(i < size)
-     {
-         c = real.at(i);
-        if (c == '.')
-         {//包含小数
-             isDec = true;
-             i++;
-             continue;
-         }
-         if (!isDec) 
-         {
-             result = result*10 + c - '0';
-         }
-         else
-         {//识别小数点之后都进入这个分支
-            result = result + ((double)c - '0')/dec;
-             dec *= 10;
-         }
-         i++;
-    }
-    if (minus == true) {
-        result = -result;
-     }
-     return result;
+	  if (x != "")
+	  {
+
+		  if (x.at(0) == '-')
+		  {
+			  minus = true;
+			  real = x.substr(1, x.size() - 1);
+		  }
+		  char c;
+		  int i = 0;
+		  double result = 0.0, dec = 10.0;
+		  bool isDec = false;       //标记是否有小数
+		  unsigned long size = real.size();
+		  while (i < size)
+		  {
+			  c = real.at(i);
+			  if (c == '.')
+			  {//包含小数
+				  isDec = true;
+				  i++;
+				  continue;
+			  }
+			  if (!isDec)
+			  {
+				  result = result * 10 + c - '0';
+			  }
+			  else
+			  {//识别小数点之后都进入这个分支
+				  result = result + ((double)c - '0') / dec;
+				  dec *= 10;
+			  }
+			  i++;
+		  }
+		  if (minus == true && result != 0.0) {
+			  result = -result;
+		  }
+
+		  return result;
+	  }
+	  return 0;
 }
 
-void  CRayTracingDlg::ZeroDotCorrectFormat(CListCtrl m_List)
+void  CRayTracingDlg::ZeroDotCorrectFormat(CListCtrl& m_List)
 {
-	
+	int v, j;
+	int nltem = m_List.GetItemCount();
+	int nlsub = m_List.GetHeaderCtrl()->GetItemCount();
+	for (v = 0; v < nltem; v++)
+		for (j = 0; j < nlsub; j++)
+		{
+			string temp = CT2A(m_List.GetItemText(v, j).GetString());
+			if ((v == 0 && j == 0 &&temp=="无限"))
+				;
+			else
+			{
+				double number = TransStrToDouble(temp);
+					int IntPart = floor(number);
+					double DotPart = number - (double)IntPart;
+					if (DotPart == 0.0)
+					{
+						std::ostringstream stream;
+						stream << number;
+						_bstr_t bstr(stream.str().c_str());
+						m_List.SetItemText(v, j, (LPTSTR)bstr);
+					}
+			}
+		}
 }
