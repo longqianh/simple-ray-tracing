@@ -1,13 +1,13 @@
 #pragma once
 #include "Ray.h"
 #include "Lens.h"
-#include "utils.h"
 #ifndef PI
 #define PI 3.14159265358979323846264338
 #endif
 #ifndef INF
 #define INF 1e15
 #endif
+using namespace std;
 
 class OptSys
 {
@@ -525,13 +525,8 @@ double* OptSys::cal_Distortion(double l,double y_or_W,double ku,double kw)
 	double *d=new double[2]; 
 	double y1=cal_y(l,y_or_W,ku,kw);
 	double y0=cal_y0(l,y_or_W,ku,kw);
-	// cout<<"y0 ⛽️ y0 "<<y0<<endl;
-	// cout<<"y1 ⛽️ y1 "<<y1<<endl;
 	d[0]=y1-y0; // 绝对畸变
-	// cout<<d[0]<<endl;
 	d[1]=d[0]/y0; // 相对畸变
-	// cout<<d[1]<<endl;
-	// cout<<&d<<endl;
 	return d;
 }
 
@@ -543,8 +538,6 @@ double OptSys::cal_SA(double l,double ku)
 	Ray rayout1,rayout2;
 	rayout1=ray_tracing(rayin1,ku);
 	rayout2=ray_tracing(rayin2,ku);
-	// cout<<rayout2.get_l()<<"######"<<endl;
-	// cout<<rayout1.get_l()<<"######"<<endl;
 	return rayout2.get_l()-rayout1.get_l();
 }
 
@@ -568,16 +561,6 @@ double OptSys::cal_LCAx(double *nfs,double *ncs,double l, double ku)
 		rayout1=sys_f.ray_tracing(rayin1,ku);	
 		rayout2=sys_c.ray_tracing(rayin2,ku);
 	}
-
-	// cout<<endl;
-	// cout<<"1 ✊"<<endl;
-	// rayout1.show_rayinfo();
-	// cout<<"1 ✊"<<endl;
-	// cout<<endl;
-	// cout<<"2 ✊"<<endl;
-	// rayout2.show_rayinfo();
-	// cout<<"2 ✊"<<endl;
-	// cout<<endl;
 
 	return rayout1.get_l()-rayout2.get_l();
 
@@ -645,7 +628,7 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 	// cout<<y_dn<<endl;
 
 
-	return (y_up+y_dn)/2-yp;
+	return (y_up+y_dn)/2-yp; // 之前的bug：+写成了- orz
 
 
 

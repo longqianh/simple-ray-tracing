@@ -1,6 +1,6 @@
 #pragma once
-#include<iostream>
-#include<math.h>
+#include <stdio.h>
+#include <math.h>
 #include "utils.h"
 using namespace std;
 #ifndef PI
@@ -17,7 +17,6 @@ protected:
 
 	double U; //弧度
 	double l; // 物距
-	// double i; // 入射角 弧度
 	string rayinfo; // 一些信息
 
 public:

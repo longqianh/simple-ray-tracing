@@ -1,5 +1,4 @@
 #pragma once
-#include<iostream>
 using namespace std;
 
 #ifndef PI
@@ -84,7 +83,7 @@ public:
 
 
 
-// // 透镜类 : 设计失败
+// 设计失败的透镜类
 // class Lens
 // {
 // private:
