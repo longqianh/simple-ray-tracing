@@ -400,6 +400,7 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 
 		l2=1/rho*(1+sin(I2)/sin(U2));
 		U2=U1+I1-I2;
+		U2tmp[k]=U2;
 
 		l2=1/rho*(1+sin(I2)/sin(U2));
 
@@ -431,7 +432,7 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 			rho=sf[k].get_rho();
 			n2=sf[k].get_n();
 
-			double a=(n2*tmp2-n1*tmp1)*rho;
+			double tmpa=(n2*tmp2-n1*tmp1)*rho;
 
 			if(k<nsf-1)
 			{
@@ -441,8 +442,8 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 			}
 			
 
-			t2=n2*tmp1*tmp1/(a+n1*tmp1*tmp1/t1);
-			s2=n2/(n1/s1+(n2*tmp2-n1*tmp1)*rho);
+			t2=n2*tmp2*tmp2/(tmpa+n1*tmp1*tmp1/t1);
+			s2=n2/(n1/s1+tmpa);
 			t1=t2-D;
 			s1=s2-D;
 			n1=n2;
@@ -645,8 +646,7 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 	// cout<<y_up<<endl;
 	// cout<<y_dn<<endl;
 
-
-	return (y_up+y_dn)/2-yp; // 之前的bug：+写成了- orz
+	return myabs((y_up+y_dn)/2-yp); // 之前的bug：+写成了- orz
 
 }
 

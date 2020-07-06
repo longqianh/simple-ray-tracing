@@ -222,27 +222,15 @@ void cal_test()
 
 	cout<<endl;
 	OptSys sys_f(a,nsf,dists,rs,nfs,nds);
-	sys_f.show_sysinfo();
+	// sys_f.show_sysinfo();
 	OptSys sys_c(a,nsf,dists,rs,ncs,nds);
 	cout<<"Exit Ray :"<<endl;
 	cout<<"Ideal image height -- inf -- nd -- "<<sys.cal_y0(-INF,3,1,1)<<endl;
 	cout<<"Ideal image height -- inf -- nd -- 0.7W --  "<<sys.cal_y0(-INF,3,1,0.7)<<endl;
-	
-	// cout<<"Ideal image height -- inf -- nf -- "<<sys_f.cal_y0(-INF,3,1,1)<<endl;
-	// cout<<"Ideal image height -- inf -- nf -- 0.7W --  "<<sys_f.cal_y0(-INF,3,1,0.7)<<endl;
-	
-	// cout<<"Ideal image height -- inf -- nc -- "<<sys_c.cal_y0(-INF,3,1,1)<<endl;
-	// cout<<"Ideal image height -- inf -- nc -- 0.7W -- "<<sys_c.cal_y0(-INF,3,1,0.7)<<endl;
 
 	cout<<"Ideal image height -- finite -- nd -- "<<sys.cal_y0(l,y,1,1)<<endl;
 	cout<<"Ideal image height -- finite -- nd -- 0.7W --  "<<sys.cal_y0(l,y,1,0.7)<<endl;
 	
-	// cout<<"Ideal image height -- finite -- nf -- "<<sys_f.cal_y0(l,y,1,1)<<endl;
-	// cout<<"Ideal image height -- finite -- nf -- 0.7W --  "<<sys_f.cal_y0(-INF,3,1,0.7)<<endl;
-	
-	// cout<<"Ideal image height -- finite -- nc -- "<<sys_c.cal_y0(l,y,1,1)<<endl;
-	// cout<<"Ideal image height -- finite -- nc -- 0.7W -- "<<sys_c.cal_y0(l,y,1,0.7)<<endl;
-
 	cout<<"Actual image height -- inf -- nd -- "<<sys.cal_y(-INF,3,1,1)<<endl;
 	cout<<"Actual image height -- inf -- nd -- 0.7W -- "<<sys.cal_y(-INF,3,1,0.7)<<endl;
 
@@ -263,16 +251,24 @@ void cal_test()
 
 	cout<<endl;
 	cout<<"Aberrations : "<<endl;
-	double *d1,*d2;
+	
+	double *d1,*d2,*d3,*d4;
 	d1=sys.cal_Distortion(-INF,3);
-	// cout<<&d1<<endl;
-	d2=sys.cal_Distortion(l,y);
-	// cout<<&d2<<endl;
+	d2=sys.cal_Distortion(-INF,3,1,0.7);
+	d3=sys.cal_Distortion(l,y);
+	d4=sys.cal_Distortion(l,y,1,0.7);
+
 	cout<<"Absolute Distortion -- inf -- "<<d1[0]<<endl;
 	cout<<"Relative Distortion -- inf -- "<<d1[1]<<endl;
 
-	cout<<"Absolute Distortion -- finite -- "<<d2[0]<<endl;
-	cout<<"Relative Distortion -- finite -- "<<d2[1]<<endl;
+	cout<<"Absolute Distortion -- inf -- 0.7W -- "<<d2[0]<<endl;
+	cout<<"Relative Distortion -- inf -- "<<d2[1]<<endl;
+
+	cout<<"Absolute Distortion -- finite -- "<<d3[0]<<endl;
+	cout<<"Relative Distortion -- finite -- "<<d3[1]<<endl;
+
+	cout<<"Absolute Distortion -- finite -- 0.7W -- "<<d4[0]<<endl;
+	cout<<"Relative Distortion -- finite -- "<<d4[1]<<endl;
 
 
 	cout<<"Spheroical Aberration -- inf -- "<<sys.cal_SA(-INF,1)<<endl;
@@ -296,6 +292,7 @@ void cal_test()
 	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAy(nfs,ncs,l,y,0.7)<<endl;
 	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAy(nfs,ncs,l,y,1)<<endl;
 
+
 	cout<<"Coma -- inf -- "<<sys.cal_Coma(-INF,W)<<endl;
 	cout<<"Coma -- finite -- "<<sys.cal_Coma(l,y)<<endl;
 
@@ -316,27 +313,10 @@ void cal_test()
 	cout<<"Field Curvature -- inf -- "<<"xt-- "<<FC1[0]<<" xs-- "<<FC1[1]<<endl;
 	cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
 	
-	// cout<<"Field Curvature -- inf -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
-	// cout<<"Astigmatism -- inf -- "<<FC2[2]<<endl;
-	
 
 	cout<<"Field Curvature -- finite -- "<<"xt-- "<<FC2[0]<<" xs-- "<<FC2[1]<<endl;
 	cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
-	
-	// cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
-	// cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
 
-	// cout<<"Field Curvature -- finite -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
-	// cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
-
-	// cout<<"Field Curvature -- finite -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
-	// cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
-
-	// cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
-	// cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
-	
-	// cout<<"Field Curvature -- finite -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
-	// cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
 
 
 }
