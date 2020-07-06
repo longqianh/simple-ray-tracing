@@ -24,11 +24,17 @@ public:
 	double * dists;
 	double * rs;
 	double * ns;
+	double * nds; // F、C系统所依附的主系统参数
 
 	OptSys(){}
-	OptSys(int a,int nsf,double *dists,double * rs,double *ns){
+	OptSys(int a,int nsf,double *dists,double * rs,double *ns,double *nds=nullptr){
 		
-		
+		if(nds!=nullptr){
+			this->nds=new double[nsf];
+		}
+		else{
+			this->nds=nullptr;
+		}
 		this->a=a;
 		this->nsf=nsf;
 		sf=new Surface[nsf];
@@ -42,6 +48,10 @@ public:
 			this->dists[k]=dists[k];
 			this->rs[k]=rs[k];
 			this->ns[k]=ns[k];
+			if(nds!=nullptr){
+				this->nds[k]=nds[k];
+			}
+
 		}
 
 		this->init_sys();
@@ -55,6 +65,9 @@ public:
 		delete [] dists;
 		delete [] rs;
 		delete [] ns;
+		if(nds!=nullptr){
+			delete [] nds;
+		}
 	}
 
 	double get_f() const { return f; }
@@ -103,6 +116,25 @@ public:
 // double get_y0(){
 // 	return y0;
 // }
+
+
+void OptSys::show_sflist(){
+
+	for(int i=0;i<nsf;i++){
+		cout<<i+1<<" th surface: ";
+		double rho=sf[i].get_rho();
+		double thick=sf[i].get_d();
+		if(rho==0){
+			cout<<"radius -- "<<"inf"<<" , distance to the next surface -- "<<thick;				
+		}
+		else{
+			cout<<"radius -- "<<1/rho<<" , distance to the next surface -- "<<thick;
+		}
+		cout<<" , diffraction index -- "<<sf[i].get_n()<<endl;
+
+	}
+}
+
 void OptSys::show_sysinfo()
 {
 	cout<<"Optical System Parameters:"<<endl;
@@ -111,23 +143,13 @@ void OptSys::show_sysinfo()
 	cout<<"Effective Focal Length -- "<<f<<endl;
 	cout<<"Main Surface Distance -- "<<lH<<endl;
 	cout<<"Exit Pupil Distance -- "<<lp<<endl;
+	// if(nds!=nullptr)
+	// {
+	// 	cout<<"NDS"<<nds[0]<<endl;
+	// }
 
 }
-void OptSys::show_sflist(){
 
-	for(int i=0;i<nsf;i++){
-		cout<<i+1<<" th surface: ";
-		double rho=sf[i].get_rho();
-		double thick=sf[i].get_d();
-		if(rho==0){
-			cout<<"radius -- "<<"∞"<<" , distance to the next surface -- "<<thick<<endl;				
-		}
-		else{
-			cout<<"radius -- "<<1/rho<<" , distance to the next surface -- "<<thick<<endl;
-		}
-
-	}
-}
 
 
 void OptSys::init_sys()
@@ -146,20 +168,18 @@ void OptSys::init_sys()
 // 利用多态
 Ray OptSys::ray_tracing(FPR rayin,double ku,double kw,string info){
 	
-	double u1,u2; // u1 -- u, u2 -- u'
-	double l1,l2;
-	double i;
-	double n2,n1=1; // n2 -- n', n1 -- n
-	bool isINF;
+	double u1=0,u2=0; // u1 -- u, u2 -- u'
+	double l1=rayin.get_l();
+	double l2=0;
+	double i=0;
+	double n2=1,n1=1; // n2 -- n', n1 -- n
+	bool isINF=(l1<=-INF);
 
 	Ray rayout(info);
-	l1=rayin.get_l();
-
-	isINF=(l1<=-INF);
 
 	if(!isINF)
 	{
-		u1=atan((a/2)/l1); // ?
+		u1=atan((a/2)/l1); 
 		rayin.set_U(u1);
 	}
 		
@@ -193,15 +213,14 @@ Ray OptSys::ray_tracing(FPR rayin,double ku,double kw,string info){
 
 Ray OptSys::ray_tracing(SPR rayin,double ku,double kw,string info){
 
-	double u1,u2;
-	double l1=0,l2;
-	double i1,i2;
-	double n2,n1=1;
-	double L;
-	bool isINF; 
+	double u1=0,u2=0;
+	double l1=0,l2=0;
+	double i1=0,i2=0;
+	double n2=1,n1=1;
+	double L=rayin.get_L();
+
+	bool isINF=(L<=-INF);
 	Ray rayout(info);
-	L=rayin.get_L();
-	isINF=(L<=-INF);
 
 	if(isINF){			
 		double w=rayin.get_W();
@@ -244,15 +263,13 @@ Ray OptSys::ray_tracing(SPR rayin,double ku,double kw,string info){
 
 Ray OptSys::ray_tracing(FAR rayin,double ku,double kw,string info){
 
-	double U1,U2; // U,U'
-	double l1,l2; // l,l'
-	double I1,I2; // I,I'
-	double n1=1,n2; // n,n'
-	double d,rho;
-	bool isINF;
-
-	l1=rayin.get_l();
-	isINF=(l1<=-INF);
+	double U1=0,U2=0; // U,U'
+	double l1=rayin.get_l();
+	double l2=0; // l,l'
+	double I1=0,I2=0; // I,I'
+	double n1=1,n2=1; // n,n'
+	double d=0,rho=0;
+	bool isINF=(l1<=-INF);
 
 	Ray rayout(info);
 
@@ -296,20 +313,22 @@ Ray OptSys::ray_tracing(FAR rayin,double ku,double kw,string info){
 
 SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 
-	double U1,U2; // U,U'
-	double l1,l2; // l,l'
-	double I1,I2; // I,I'
-	double n1=1,n2; // n,n'
-	double L; // 物距
-	double d,rho;
-	double t1,t2,s1,s2; 
-	double y;
-	double U2tmp[nsf],tmp1s[nsf],tmp2s[nsf];
-	bool isINF;
+	double U1=0,U2=0; // U,U'
+	double l1=0,l2=0; // l,l'
+	double I1=0,I2=0; // I,I'
+	double n1=1,n2=1; // n,n'
+	double L=rayin.get_L(); // 物距
+	double d=0,rho=0;
+	double t1=0,t2=0,s1=0,s2=0; 
+	double y=0;
+	// double 
+	double * U2tmp = new double[nsf];
+	double * tmp1s = new double[nsf];
+	double * tmp2s = new double[nsf];
+
+	bool isINF=(L<=-INF);
 
 	string label=rayin.get_label();
-	L=rayin.get_L();
-	isINF=(L<=-INF);
 
 	SAR rayout;
 
@@ -436,9 +455,20 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 		rayout.set_s(s2);
 	}
 	
+	delete [] U2tmp;
+	delete [] tmp1s;
+	delete [] tmp2s;
 
 	return rayout;
 }
+
+
+// Ray rayin(l);
+// Ray rayout;
+// rayout=ray_tracing(rayin);
+// rayout.get_l();
+
+
 
 double OptSys::cal_y0(double l,double y_or_W,double ku,double kw)
 {
@@ -464,25 +494,19 @@ double OptSys::cal_y0(double l,double y_or_W,double ku,double kw)
 
 double OptSys::cal_y(double l,double y_or_W,double ku,double kw)
 {
-
+	
 	FPR rayin1(l);
 	SAR rayin2(l,y_or_W);
 	Ray rayout1,rayout2;
-	rayout1=ray_tracing(rayin1,ku,kw);
-	rayout2=ray_tracing(rayin2,ku,kw);
+	if(nds==nullptr){
+		rayout1=ray_tracing(rayin1,ku,kw);
+	}
+	else{
+		OptSys sys_d(a,nsf,dists,rs,nds);
+		rayout1=sys_d.ray_tracing(rayin1,ku,kw);
+	}
 	
-	// cout<<rayout2.get_l()<<endl;
-	// cout<<endl;
-	// cout<<"RAY1 L "<<rayout1.get_l()<<endl;
-	// cout<<"RAY2 L "<<rayout2.get_l()<<endl;
-	// cout<<"RAY2 U "<<rayout2.get_U()<<endl;
-	// cout<<"1 🐭"<<endl;
-	// rayout1.show_rayinfo();
-	// cout<<"1 🐭"<<endl;
-	// cout<<endl;
-	// cout<<"2 🐭"<<endl;
-	// rayout2.show_rayinfo();
-	// cout<<"2 🐭"<<endl;
+	rayout2=ray_tracing(rayin2,ku,kw);
 
 
 	return myabs((rayout2.get_l()-rayout1.get_l())*tan(rayout2.get_U()));
@@ -580,7 +604,7 @@ double* OptSys::cal_FCs(double l,double y_or_W,double ku,double kw)
 	double X=sf[nsf-1].get_X();
 
 
-	static double FC[3];
+	double *FC = new double[3];
 	double xt=t*cos(U)+X-l2;
 	double xs=s*cos(U)+X-l2;
 	
@@ -592,9 +616,9 @@ double* OptSys::cal_FCs(double l,double y_or_W,double ku,double kw)
 
 double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 {	
-	double coma;
+	double coma=0;
 	double yp=cal_y(l,y_or_W,ku,kw);
-	double y_up,y_dn;
+	double y_up=0,y_dn=0;
 
 	FPR rayin(l);
 	SAR rayin_up(l,y_or_W,"up");
@@ -605,12 +629,18 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 	rayout=ray_tracing(rayin,ku,kw);
 	rayout_up=ray_tracing(rayin_up,ku,kw);
 	rayout_dn=ray_tracing(rayin_dn,ku,kw);
+
+	cout<<yp<<endl;
+
 	
 	y_up=(rayout_up.get_l()-rayout.get_l())*tan(rayout_up.get_U());
 	y_dn=(rayout_dn.get_l()-rayout.get_l())*tan(rayout_dn.get_U());
 
-	return (y_up-y_dn)/2-yp;
+	cout<<y_up<<endl;
+	cout<<y_dn<<endl;
 
+
+	return (y_up+y_dn)/2-yp;
 
 
 
