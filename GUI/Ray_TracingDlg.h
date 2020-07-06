@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include <iostream>
 
 // CRayTracingDlg 对话框
 class CRayTracingDlg : public CDialogEx
@@ -28,7 +29,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	void CRayTracingDlg::CreateList1();
 	void CRayTracingDlg::CreateList2();
-	void CRayTracingDlg::CreateList3();
+	void CRayTracingDlg::CreateList3(int nlsub);
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -39,7 +40,7 @@ public:
 	afx_msg void OnSaveResult();
 	CBrush m_brush; //用于改变字体
 	CFont m_font;
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+//	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg void OnLvnItemchangedList1(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnOpenObjectFactorFile();
 	afx_msg void OnLvnItemchangedList2(NMHDR* pNMHDR, LRESULT* pResult);
@@ -65,4 +66,33 @@ public:
 	afx_msg void OnInsertBackSurface();
 	afx_msg void OnDeleteSurface();
 	void ResetOrder();
+	int Delete = 0;
+	afx_msg void OnInsertSurface();
+	afx_msg void OnCalculateResult();
+	afx_msg void OnBnClickedButtonCalculate();
+	afx_msg void OnNMRClickList3(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnUpLine();
+	afx_msg void OnDownLine();
+	afx_msg void OnNMKillfocusList1(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnNMKillfocusList3(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnSetInfinity();
+	afx_msg void OnSetDistance();
+	afx_msg void OnCopyCell2();
+	afx_msg void OnPasteCell2();
+	afx_msg void OnCopyCell3();
+	afx_msg void OnPasteCell3();
+	afx_msg void OnQiushiBlue();
+	CButton m_Button_Cal;
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	void RefreshControl(UINT uCtlID);
+	afx_msg void OnBgcWhite();
+	afx_msg void OnBgcStar();
+	afx_msg void OnBgcChageblue();
+	afx_msg void OnBgcSlightgreen();
+	afx_msg void OnBgcmacaron();
+	BOOL JudgeStringIsFloat(std::string x);
+	BOOL JudgeListIsCorrect(CListCtrl m_List);
+	void ListCorrectZero(CListCtrl m_List);
+	double TransStrToDouble(std::string x);
+	void ZeroDotCorrectFormat(CListCtrl m_List);
 };

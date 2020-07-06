@@ -29,6 +29,7 @@ void aboutdlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(aboutdlg, CDialogEx)
 	ON_COMMAND(ID_ABOUT, &aboutdlg::OnAbout)
+	ON_COMMAND(ID_PASTE_CELL3, &aboutdlg::OnPasteCell3)
 END_MESSAGE_MAP()
 
 
@@ -38,4 +39,9 @@ void aboutdlg::OnAbout()
 {
 	aboutdlg dlg;
 	dlg.DoModal();
+}
+
+void aboutdlg::OnPasteCell3()
+{
+	// TODO: 在此添加命令处理程序代码
 }

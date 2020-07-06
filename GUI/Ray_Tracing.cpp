@@ -99,7 +99,6 @@ BOOL CRayTracingApp::InitInstance()
 #if !defined(_AFXDLL) && !defined(_AFX_NO_MFC_CONTROLS_IN_DIALOGS)
 	ControlBarCleanUp();
 #endif
-
 	// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
 	//  而不是启动应用程序的消息泵。
 	return FALSE;
