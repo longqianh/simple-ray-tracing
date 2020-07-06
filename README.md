@@ -87,9 +87,7 @@ Optsys(a,nsf,dists[],rs[],ns[]);
 
 ### cal_res
 
-输出结果。
-
-输出格式：数组
+输出结果到 vector 。
 
 数组 *res* 的每一位依次为：
 

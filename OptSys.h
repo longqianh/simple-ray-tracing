@@ -15,7 +15,8 @@ private:
 	int	nsf; // 系统面数
 	int a; // 入瞳直径
 	double f; // 系统焦距
-	double lH; // 像方主面距离
+	// double lH0; // 物方主面位置（相对第一面） 需使用set方法设置
+	double lH; // 像方主面位置（相对最后一面）
 	double lp; // 出瞳距
 
 public:
@@ -42,6 +43,10 @@ public:
 		this->rs=new double[nsf];
 		this->ns=new double[nsf];
 		for(int k=0;k<nsf;k++){
+			// if((k==nsf-1)&&(sizeof(dists)/sizeof(dists[0])<nsf-1))
+			// {
+			// 	sf[k].set_d(INF);
+			// }
 			sf[k].set_d(dists[k]);
 			sf[k].set_rho(rs[k]);
 			sf[k].set_n(ns[k]);
@@ -70,9 +75,12 @@ public:
 		}
 	}
 
+
 	double get_f() const { return f; }
 
 	double get_lH() const { return lH; }
+
+	// double get_lH0() const { return lH0; }
 
 	double get_lp() const { return lp; }
 
@@ -81,7 +89,9 @@ public:
 	void init_sys();
 
 	void show_sflist();
-		
+
+	void set_lH0();
+
 	Ray ray_tracing(FPR rayin, double ku=1,double kw=1,string info="First Paraxial Ray-tracing");
 	Ray ray_tracing(SPR rayin, double ku=1, double kw=1,string info="Second Paraxial Ray-tracing");
 	Ray ray_tracing(FAR rayin, double ku=1, double kw=1,string info="First Actual Ray-tracing");
@@ -104,18 +114,10 @@ public:
 
 	double* cal_FCs(double l,double y_or_W, double ku=1,double kw=1); // Field Curvature and Astigmatism
 
-};// get_nd nc nf
+	// void cal_allres(double l,double y_or_W, vector<double> &res );
 
+};
 
-
-
-
-
-
-
-// double get_y0(){
-// 	return y0;
-// }
 
 
 void OptSys::show_sflist(){
@@ -163,6 +165,7 @@ void OptSys::init_sys()
 	f=(a/2)/abs(u2); 
 	lH=rayout1.get_l()-f;
 	lp=rayout2.get_l();
+
 }
 
 // 利用多态
@@ -321,10 +324,9 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 	double d=0,rho=0;
 	double t1=0,t2=0,s1=0,s2=0; 
 	double y=0;
-	// double 
-	double * U2tmp = new double[nsf];
-	double * tmp1s = new double[nsf];
-	double * tmp2s = new double[nsf];
+	double * U2tmp = new double[nsf](); // 须初始化为0
+	double * tmp1s = new double[nsf]();
+	double * tmp2s = new double[nsf]();
 
 	bool isINF=(L<=-INF);
 
@@ -396,14 +398,9 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 		tmp1s[k]=cos(I1);
 		tmp2s[k]=cos(I2);
 
-		// cout<<" I1 "<<Arc2Angle(I1)<<endl;
-		// cout<<" I2 "<<Arc2Angle(I2)<<endl;
-
 		l2=1/rho*(1+sin(I2)/sin(U2));
 		U2=U1+I1-I2;
-		// cout<<" U2 "<<cos(U2)<<endl;
-		
-		// U2tmp[k]=U2;
+
 		l2=1/rho*(1+sin(I2)/sin(U2));
 
 		if(label=="cf")
@@ -426,7 +423,8 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 	{
 		for(int k=0;k<nsf;k++)
 		{		
-			double X1,X2,D;
+
+			double X1=0,X2=0,D=0;
 			double tmp1=tmp1s[k],tmp2=tmp2s[k];
 			
 			d=sf[k].get_d();
@@ -448,12 +446,15 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 			t1=t2-D;
 			s1=s2-D;
 			n1=n2;
-			
+			// cout<<endl;
+			// cout<<t2<<" "<<s2<<endl;
 		}
 		
 		rayout.set_t(t2);
 		rayout.set_s(s2);
+
 	}
+	// rayout.show_rayinfo();
 	
 	delete [] U2tmp;
 	delete [] tmp1s;
@@ -463,34 +464,45 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 }
 
 
-// Ray rayin(l);
-// Ray rayout;
-// rayout=ray_tracing(rayin);
-// rayout.get_l();
-
-
 
 double OptSys::cal_y0(double l,double y_or_W,double ku,double kw)
 {
 	FPR rayin1(l);
-	SPR rayin2(l,y_or_W);	
-	double L=l;
 
 	if(l<=-INF)
 	{
+		SPR rayin2(l,y_or_W);	
 		double W=rayin2.get_W();
 		return myabs(f*tan(kw*W)); // 输出正像高
 	}
 
+	double u1=0,u2=0; 
+	double l1=l;
+	double l2=0;
+	double i=0;
+	double n2=1,n1=1; 
+	double beta=1;
+	u1=atan((a/2)/l1);
 
-	Ray rayout1,rayout2;
-	// rayout1=ray_tracing(rayin1,ku,kw);
-	rayout2=ray_tracing(rayin2,ku,kw);
-	// cout<<rayout2.get_l()<<endl;
-	// cout<<L<<endl;	
-	return (-rayout2.get_l()/L)*y_or_W;
+	
+	for(int k=0;k<nsf;k++)
+	{
 
-	// return myabs((rayout2.get_l()-rayout1.get_l())*tan(rayout2.get_U()));
+		double d=sf[k].get_d(); 
+		double rho=sf[k].get_rho();
+		i=(rho*l1-1)*u1;						
+		n2=sf[k].get_n();
+		u2=(n2-n1)/n2*i+u1;
+
+		l2=(i+u1)/(u2*rho);
+		beta*=(-l2/l1);
+		l1=l2-d;
+		n1=n2; // n1是n2前面的折射率			
+		u1=u2;
+	}
+
+	return kw*y_or_W*beta;
+	
 
 }
 
@@ -522,7 +534,7 @@ double OptSys::cal_y(double l,double y_or_W,double ku,double kw)
 double* OptSys::cal_Distortion(double l,double y_or_W,double ku,double kw)
 {
 	// static double d[2]; // 使用静态变量 会出现地址错误
-	double *d=new double[2]; 
+	double *d=new double[2](); 
 	double y1=cal_y(l,y_or_W,ku,kw);
 	double y0=cal_y0(l,y_or_W,ku,kw);
 	d[0]=y1-y0; // 绝对畸变
@@ -582,19 +594,25 @@ double OptSys::cal_LCAy(double *nfs,double *ncs,double l,double y_or_W,double kw
 
 double* OptSys::cal_FCs(double l,double y_or_W,double ku,double kw)
 {
-	SAR rayin(l,y_or_W);
-	SAR rayout;
-	rayout=ray_tracing(rayin,ku,kw);
-	double l2=rayout.get_l();
-	double U=rayout.get_U();
-	double t=rayout.get_t();
-	double s=rayout.get_s();
+	FPR rayin1(l);
+	SAR rayin2(l,y_or_W);
+	Ray rayout1;
+	SAR rayout2;
+	rayout1=ray_tracing(rayin1);
+	rayout2=ray_tracing(rayin2,ku,kw);
+
+	double l2=rayout1.get_l();
+	double U=rayout2.get_U();
+	double t=rayout2.get_t();
+	double s=rayout2.get_s();
 	double X=sf[nsf-1].get_X();
 
-
-	double *FC = new double[3];
+	double *FC = new double[3]();
 	double xt=t*cos(U)+X-l2;
 	double xs=s*cos(U)+X-l2;
+
+	// cout<<cos(U)<<endl;
+	// cout<<s<<endl;
 	
 	FC[0]=xt,FC[1]=xs,FC[2]=xt-xs;
 
@@ -630,6 +648,128 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 
 	return (y_up+y_dn)/2-yp; // 之前的bug：+写成了- orz
 
-
-
 }
+
+
+// void OptSys::set_lH0()
+// {
+// 	double * invrs = new double[nsf];
+// 	double * invns = new double[nsf];
+// 	double * invdists = new double[nsf];
+
+// 	for(int k=0;k<nsf;k++)
+// 	{
+// 		invrs[k]=-rs[nsf-k-1];
+// 		if(k<nsf-1)
+// 		{
+// 			invdists[k]=dists[nsf-k-2];
+// 			invns[k]=ns[nsf-k-2];	
+// 		}
+
+// 		else if(k==nsf-1)
+// 		{
+// 			invdists[k]=INF;	
+// 			invns[k]=1;
+// 		} 
+// 		// cout<<"RS "<<invrs[k]<<endl;
+// 		// cout<<"DISTS "<<invdists[k]<<endl;
+// 		// cout<<"NS "<<invns[k]<<endl;
+// 	}
+
+// 	OptSys invsys(a,nsf,dists,rs,ns); //利用逆系统获得物方主面位置
+// 	lH0=-invsys.get_lH();
+
+// 	delete []invrs;
+// 	delete []invns;
+// 	delete []invdists;
+// }
+
+
+	
+
+// void OptSys::cal_allres(double *nfs,double *nds, double *ncs,double l,double y_or_W, vector<double> &res )
+// {
+
+// 	OptSys sys(a,nsf,dists,rs,nds);
+// 	res.push_back(sys.get_f()); // f'
+// 	res.push_back(sys.get_lH()); // lH'
+// 	res.push_back(sys.get_lp()); // lp'
+// 	Ray rayout;
+	
+// 	FPR ray1(l);
+// 	FAR ray2(l);
+
+// 	rayout=sys.ray_tracing(ray1);
+// 	res.push_back(rayout.get_l()); // ld0'
+// 	rayout=sys.ray_tracing(ray2); 
+// 	res.push_back(rayout.get_l()); // ld'
+// 	rayout=sys.ray_tracing(ray2,0.7);
+// 	res.push_back(rayout.get_l()); // lud'
+
+// 	res.push_back(sys.cal_y0(l,y_or_W)); // yd0'
+
+// 	res.push_back(sys.cal_y0(l,y_or_W,1,0.7)); // ywd0'
+
+// 	res.push_back(sys.cal_y(l,y_or_W)); // yd'
+
+// 	res.push_back(sys.cal_y(l,y_or_W,1,0.7)); // ywd'
+
+// 	OptSys sys_f(a,nsf,dists,rs,nfs,nds);
+// 	rayout=sys_f.ray_tracing(ray1);
+// 	res.push_back(rayout.get_l()); // lf0'
+// 	rayout=sys_f.ray_tracing(ray2);
+// 	res.push_back(rayout.get_l()); // lf'
+// 	rayout=sys_f.ray_tracing(ray2,0.7);
+// 	res.push_back(rayout.get_l()); // luf'
+
+// 	res.push_back(sys_f.cal_y0(l,y_or_W)); // yf0'
+
+// 	res.push_back(sys_f.cal_y0(l,y_or_W,1,0.7)); // ywf0'
+
+// 	res.push_back(sys_f.cal_y(l,y_or_W)); // yf'
+
+// 	res.push_back(sys_f.cal_y(l,y_or_W,1,0.7)); // ywf'
+
+// 	OptSys sys_c(a,nsf,dists,rs,nfs,nds);
+// 	rayout=sys_c.ray_tracing(ray1);
+// 	res.push_back(rayout.get_l()); // lc0'
+// 	rayout=sys_c.ray_tracing(ray2);
+// 	res.push_back(rayout.get_l()); // lc'
+// 	rayout=sys_c.ray_tracing(ray2,0.7);
+// 	res.push_back(rayout.get_l()); // luc'
+
+// 	res.push_back(sys_c.cal_y0(l,y_or_W)); // yc0'
+
+// 	res.push_back(sys_c.cal_y0(l,y_or_W,1,0.7)); // ywc0'
+
+// 	res.push_back(sys_c.cal_y(l,y_or_W)); // yc'
+
+// 	res.push_back(sys_c.cal_y(l,y_or_W,1,0.7)); // ywc'
+
+// 	res.push_back(sys.cal_SA(l)); // SA
+// 	res.push_back(sys.cal_SA(l,0.7)); // SAu
+
+// 	res.push_back(sys.cal_LCAx(nfs,ncs,l)); // LCAx
+// 	res.push_back(sys.cal_LCAx(nfs,ncs,l,0.7)); // LCAXu
+// 	res.push_back(sys.cal_LCAx(nfs,ncs,l,0)); // LCAxu0
+
+// 	double * FCs=sys.cal_FCs(l,y_or_W,0);
+// 	res.push_back(FCs[0]); // xt'
+// 	res.push_back(FCs[1]); // xs'
+// 	res.push_back(FCs[2]); // xts'
+
+// 	double *Dt1s=sys.cal_Distortion(l,y_or_W);
+// 	double *Dt2s=sys.cal_Distortion(l,y_or_W,1,0.7);
+
+// 	res.push_back(Dt1s[0]); // adt (Absolute distortion)
+// 	res.push_back(Dt2s[0]); // adtw
+// 	res.push_back(Dt1s[1]); // rdt (Relutive distortion)
+// 	res.push_back(Dt2s[1]); // rdtw
+
+// 	res.push_back(sys.cal_Coma(l,y_or_W)); // coma1
+// 	res.push_back(sys.cal_Coma(l,y_or_W,0.7)); // coma2
+// 	res.push_back(sys.cal_Coma(l,y_or_W,1,0.7)); // coma3
+// 	res.push_back(sys.cal_Coma(l,y_or_W,0.7,0.7)); // coma4
+
+
+// }

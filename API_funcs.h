@@ -228,20 +228,20 @@ void cal_test()
 	cout<<"Ideal image height -- inf -- nd -- "<<sys.cal_y0(-INF,3,1,1)<<endl;
 	cout<<"Ideal image height -- inf -- nd -- 0.7W --  "<<sys.cal_y0(-INF,3,1,0.7)<<endl;
 	
-	cout<<"Ideal image height -- inf -- nf -- "<<sys_f.cal_y0(-INF,3,1,1)<<endl;
-	cout<<"Ideal image height -- inf -- nf -- 0.7W --  "<<sys_f.cal_y0(-INF,3,1,0.7)<<endl;
+	// cout<<"Ideal image height -- inf -- nf -- "<<sys_f.cal_y0(-INF,3,1,1)<<endl;
+	// cout<<"Ideal image height -- inf -- nf -- 0.7W --  "<<sys_f.cal_y0(-INF,3,1,0.7)<<endl;
 	
-	cout<<"Ideal image height -- inf -- nc -- "<<sys_c.cal_y0(-INF,3,1,1)<<endl;
-	cout<<"Ideal image height -- inf -- nc -- 0.7W -- "<<sys_c.cal_y0(-INF,3,1,0.7)<<endl;
+	// cout<<"Ideal image height -- inf -- nc -- "<<sys_c.cal_y0(-INF,3,1,1)<<endl;
+	// cout<<"Ideal image height -- inf -- nc -- 0.7W -- "<<sys_c.cal_y0(-INF,3,1,0.7)<<endl;
 
 	cout<<"Ideal image height -- finite -- nd -- "<<sys.cal_y0(l,y,1,1)<<endl;
-	cout<<"Ideal image height -- finite -- nd -- 0.7W --  "<<sys.cal_y0(-INF,3,1,0.7)<<endl;
+	cout<<"Ideal image height -- finite -- nd -- 0.7W --  "<<sys.cal_y0(l,y,1,0.7)<<endl;
 	
-	cout<<"Ideal image height -- finite -- nf -- "<<sys_f.cal_y0(l,y,1,1)<<endl;
-	cout<<"Ideal image height -- finite -- nf -- 0.7W --  "<<sys_f.cal_y0(-INF,3,1,0.7)<<endl;
+	// cout<<"Ideal image height -- finite -- nf -- "<<sys_f.cal_y0(l,y,1,1)<<endl;
+	// cout<<"Ideal image height -- finite -- nf -- 0.7W --  "<<sys_f.cal_y0(-INF,3,1,0.7)<<endl;
 	
-	cout<<"Ideal image height -- finite -- nc -- "<<sys_c.cal_y0(l,y,1,1)<<endl;
-	cout<<"Ideal image height -- finite -- nc -- 0.7W -- "<<sys_c.cal_y0(l,y,1,0.7)<<endl;
+	// cout<<"Ideal image height -- finite -- nc -- "<<sys_c.cal_y0(l,y,1,1)<<endl;
+	// cout<<"Ideal image height -- finite -- nc -- 0.7W -- "<<sys_c.cal_y0(l,y,1,0.7)<<endl;
 
 	cout<<"Actual image height -- inf -- nd -- "<<sys.cal_y(-INF,3,1,1)<<endl;
 	cout<<"Actual image height -- inf -- nd -- 0.7W -- "<<sys.cal_y(-INF,3,1,0.7)<<endl;
@@ -282,17 +282,17 @@ void cal_test()
 	cout<<"Spheroical Aberration -- finite -- 0.7U -- "<<sys.cal_SA(l,0.7)<<endl;
 
 
-	// cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0)<<endl;
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0)<<endl;
 	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0.7)<<endl;
 	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAx(nfs,ncs,-INF,1)<<endl;
-	// cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,l,0)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,l,0)<<endl;
 	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAx(nfs,ncs,l,0.7)<<endl;
 	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAx(nfs,ncs,l,1)<<endl;
 
-	// cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,0)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,0)<<endl;
 	cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,0.7)<<endl;
 	cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,1)<<endl;
-	// cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAy(nfs,ncs,l,y,0)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAy(nfs,ncs,l,y,0)<<endl;
 	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAy(nfs,ncs,l,y,0.7)<<endl;
 	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAy(nfs,ncs,l,y,1)<<endl;
 
@@ -309,25 +309,19 @@ void cal_test()
 	cout<<"Coma -- finite -- 0.7U&0.7W -- "<<sys.cal_Coma(l,y,0.7,0.7)<<endl;
 
 
-	double *FC1,*FC2,*FC3,*FC4,*FC5,*FC6,*FC7,*FC8;
+	double *FC1, *FC2;
 
-	FC1=sys.cal_FCs(-INF,W,1,1);
-	FC2=sys.cal_FCs(-INF,W,1,0.7);
-	FC3=sys.cal_FCs(-INF,W,0.7,1);
-	FC4=sys.cal_FCs(-INF,W,0.7,0.7);
-	FC5=sys.cal_FCs(l,y,1,1);
-	FC6=sys.cal_FCs(l,y,1,0.7);
-	FC7=sys.cal_FCs(l,y,0.7,1);
-	FC8=sys.cal_FCs(l,y,0.7,0.7);
-	cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
+	FC1=sys.cal_FCs(-INF,W);
+	FC2=sys.cal_FCs(l,y);
+	cout<<"Field Curvature -- inf -- "<<"xt-- "<<FC1[0]<<" xs-- "<<FC1[1]<<endl;
 	cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
 	
 	// cout<<"Field Curvature -- inf -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
 	// cout<<"Astigmatism -- inf -- "<<FC2[2]<<endl;
 	
 
-	cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
-	cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
+	cout<<"Field Curvature -- finite -- "<<"xt-- "<<FC2[0]<<" xs-- "<<FC2[1]<<endl;
+	cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
 	
 	// cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
 	// cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
