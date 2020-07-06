@@ -25,6 +25,26 @@ void cal_res(double a,int nsf, double *dists,double *rs,double * nfs, double * n
 	res.push_back(sys.get_f());
 	res.push_back(sys.get_lH());
 	res.push_back(sys.get_lp());
+	Ray rayout;
+	
+	FPR ray1(l);
+	FAR ray2(l);
+	rayout=sys.ray_tracing(ray1);
+	res.push_back(rayout.get_l());
+	rayout=sys.ray_tracing(ray2);
+	res.push_back(rayout.get_l());
+	rayout=sys.ray_tracing(ray2,0.7);
+	res.push_back(rayout.get_l());
+
+	res.push_back(sys.cal_y0(l,y_or_W));
+
+	res.push_back(sys.cal_y0(l,y_or_W,1,0.7));
+
+	res.push_back(sys.cal_y(l,y_or_W));
+
+	res.push_back(sys.cal_y(l,y_or_W,1,0.7));
+	
+
 }
  
 
@@ -226,16 +246,52 @@ void cal_test()
 	cout<<"Coma -- inf -- "<<sys.cal_Coma(-INF,W)<<endl;
 	cout<<"Coma -- finite -- "<<sys.cal_Coma(l,y)<<endl;
 
-	double *FC1,*FC2;
+	cout<<"Coma -- inf -- 0.7W -- "<<sys.cal_Coma(-INF,W,1,0.7)<<endl;
+	cout<<"Coma -- finite -- 0.7W -- "<<sys.cal_Coma(l,y,1,0.7)<<endl;
 
-	FC1=sys.cal_FCs(-INF,W);
-	FC2=sys.cal_FCs(l,y);
+	cout<<"Coma -- inf -- 0.7U -- "<<sys.cal_Coma(-INF,W,0.7,1)<<endl;
+	cout<<"Coma -- finite -- 0.7U -- "<<sys.cal_Coma(l,y,0.7,1)<<endl;
+
+	cout<<"Coma -- inf -- 0.7U&0.7W -- "<<sys.cal_Coma(-INF,W,0.7,0.7)<<endl;
+	cout<<"Coma -- finite -- 0.7U&0.7W -- "<<sys.cal_Coma(l,y,0.7,0.7)<<endl;
+
+
+	double *FC1,*FC2,*FC3,*FC4,*FC5,*FC6,*FC7,*FC8;
+
+	FC1=sys.cal_FCs(-INF,W,1,1);
+	FC2=sys.cal_FCs(-INF,W,1,0.7);
+	FC3=sys.cal_FCs(-INF,W,0.7,1);
+	FC4=sys.cal_FCs(-INF,W,0.7,0.7);
+	FC5=sys.cal_FCs(l,y,1,1);
+	FC6=sys.cal_FCs(l,y,1,0.7);
+	FC7=sys.cal_FCs(l,y,0.7,1);
+	FC8=sys.cal_FCs(l,y,0.7,0.7);
+	cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
+	cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
+	
+	// cout<<"Field Curvature -- inf -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
+	// cout<<"Astigmatism -- inf -- "<<FC2[2]<<endl;
+	
 
 	cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
 	cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
 	
-	cout<<"Field Curvature -- finite -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
-	cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
+	// cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
+	// cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
+
+	// cout<<"Field Curvature -- finite -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
+	// cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
+
+	// cout<<"Field Curvature -- finite -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
+	// cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
+
+	// cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
+	// cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
+	
+	// cout<<"Field Curvature -- finite -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
+	// cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
+
+
 }
  
 
@@ -244,29 +300,29 @@ void cal_test()
 
 int main()
 {
-	cal_test();
-	// double ku=1,kw=1;
-	// int nsf=3;
-	// double a=20;
-	// bool isINF;
-	// string raytype;
-	// double dists[]={4,2.5,60};
-	// double rs[]={62.5,-43.65,-124.35};
-	// double nfs[]={1.5223709191,1.6875154791,1};
-	// double nds[]={1.5167969495,1.6727015725,1};
-	// double ncs[]={1.5143226707,1.6666104143,1};
+	// cal_test();
+	double ku=1,kw=1;
+	int nsf=3;
+	double a=20;
+	bool isINF;
+	string raytype;
+	double dists[]={4,2.5,60};
+	double rs[]={62.5,-43.65,-124.35};
+	double nfs[]={1.5223709191,1.6875154791,1};
+	double nds[]={1.5167969495,1.6727015725,1};
+	double ncs[]={1.5143226707,1.6666104143,1};
 	
-	// double l=-500; // 物距：用户输入 左负右正
-	// double y=26; // 像高 ：上正下负
-	// double W=3; // 物方视场角：用户输入
-	// double y_or_W=y;
-	// vector<double> res;
-	// cal_res(a,nsf,dists,rs,nfs,nds,ncs,l,y_or_W,res);
-	// double * p=res.data();
-	// for (int k = 0; k<res.size() ; k++)
-	// {
-	// 	cout<<*(p+k)<<endl;
-	// }
+	double l=-500; // 物距：用户输入 左负右正
+	double y=26; // 像高 ：上正下负
+	double W=3; // 物方视场角：用户输入
+	double y_or_W=y;
+	vector<double> res;
+	cal_res(a,nsf,dists,rs,nfs,nds,ncs,l,y_or_W,res);
+	double * p=res.data();
+	for (int k = 0; k<res.size() ; k++)
+	{
+		cout<<*(p+k)<<endl;
+	}
 	return 0;
 
 }

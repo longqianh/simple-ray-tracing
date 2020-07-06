@@ -305,7 +305,7 @@ Ray OptSys::ray_tracing(FAR rayin,double ku,double kw,string info){
 	}
 	
 	rayout.set_U(U2);
-	rayout.set_l(l2);
+	rayout.set_l(l2);	
 
 	return rayout;
 
@@ -363,7 +363,7 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 		if(label=="up")
 		{
 			U1=-atan((-y*kw+ku*a/2)/L);
-			l1=-ku*(a/2)/((-y*kw+ku*a/2)/L);
+			l1=ku*(a/2)/((-y*kw+ku*a/2)/L);
 		}
 		else if(label == "cf")
 		{
@@ -377,7 +377,7 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 		}
 		else if(label=="dn"){
 			U1=-atan((-y*kw-ku*a/2)/L);
-			l1=ku*(a/2)/((-y*kw-ku*a/2)/L);
+			l1=-ku*(a/2)/((-y*kw-ku*a/2)/L);
 		}
 		rayin.set_U(U1);
 		rayin.set_l(l1);
@@ -473,24 +473,28 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 double OptSys::cal_y0(double l,double y_or_W,double ku,double kw)
 {
 	FPR rayin1(l);
-	SPR rayin2(l,y_or_W);
-
+	SPR rayin2(l,y_or_W);	
+	double L=l;
 
 	if(l<=-INF)
 	{
 		double W=rayin2.get_W();
-		return myabs(f*tan(kw*W));
+		return myabs(f*tan(kw*W)); // 输出正像高
 	}
 
+
 	Ray rayout1,rayout2;
-	rayout1=ray_tracing(rayin1,ku,kw);
+	// rayout1=ray_tracing(rayin1,ku,kw);
 	rayout2=ray_tracing(rayin2,ku,kw);
+	// cout<<rayout2.get_l()<<endl;
+	// cout<<L<<endl;	
+	return (-rayout2.get_l()/L)*y_or_W;
 
-
-	return myabs((rayout2.get_l()-rayout1.get_l())*tan(rayout2.get_U()));
-
+	// return myabs((rayout2.get_l()-rayout1.get_l())*tan(rayout2.get_U()));
 
 }
+
+
 
 double OptSys::cal_y(double l,double y_or_W,double ku,double kw)
 {
@@ -583,10 +587,11 @@ double OptSys::cal_LCAx(double *nfs,double *ncs,double l, double ku)
 
 double OptSys::cal_LCAy(double *nfs,double *ncs,double l,double y_or_W,double kw)
 {
-	OptSys sys_f(a,nsf,dists,rs,nfs);
-	OptSys sys_c(a,nsf,dists,rs,ncs);
+	OptSys sys_f(a,nsf,dists,rs,nfs,ns);
+	OptSys sys_c(a,nsf,dists,rs,ncs,ns);
 	double yf=sys_f.cal_y(l,y_or_W,1,kw);
 	double yc=sys_c.cal_y(l,y_or_W,1,kw);
+
 	
 	return yf-yc;
 
@@ -630,14 +635,14 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 	rayout_up=ray_tracing(rayin_up,ku,kw);
 	rayout_dn=ray_tracing(rayin_dn,ku,kw);
 
-	cout<<yp<<endl;
+	// cout<<yp<<endl;
 
 	
 	y_up=(rayout_up.get_l()-rayout.get_l())*tan(rayout_up.get_U());
 	y_dn=(rayout_dn.get_l()-rayout.get_l())*tan(rayout_dn.get_U());
 
-	cout<<y_up<<endl;
-	cout<<y_dn<<endl;
+	// cout<<y_up<<endl;
+	// cout<<y_dn<<endl;
 
 
 	return (y_up+y_dn)/2-yp;
