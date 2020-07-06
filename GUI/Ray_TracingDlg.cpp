@@ -13,6 +13,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <GdiPlus.h>
 
 using namespace std;
 
@@ -57,11 +58,13 @@ END_MESSAGE_MAP()
 // CRayTracingDlg 对话框
 
 int m_Row, m_Col;
+int bgcmode = 0, iconmode = 0;
+int* ErrorPlacePermanent;
 
 CRayTracingDlg::CRayTracingDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_RAY_TRACING_DIALOG, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON1);
+	m_hIcon = AfxGetApp()->LoadIcon(IDI_ICON4);
 }
 
 void CRayTracingDlg::DoDataExchange(CDataExchange* pDX)
@@ -74,6 +77,7 @@ void CRayTracingDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST3, m_ACCESSList3);
 	DDX_Control(pDX, IDC_EDIT1, m_Edit);
 	DDX_Control(pDX, IDC_EDIT2, m_Edit2);
+	DDX_Control(pDX, IDC_BUTTON_CALCULATE, m_Button_Cal);
 }
 
 BEGIN_MESSAGE_MAP(CRayTracingDlg, CDialogEx)
@@ -83,7 +87,7 @@ BEGIN_MESSAGE_MAP(CRayTracingDlg, CDialogEx)
 	ON_COMMAND(ID_ABOUT, &CRayTracingDlg::OnAbout)
 	ON_COMMAND(ID_OPEN_CAM_FACTOR_FILE, &CRayTracingDlg::OnOpenCamFactorFile)
 	ON_COMMAND(ID_SAVE_RESULT, &CRayTracingDlg::OnSaveResult)
-	ON_WM_CTLCOLOR()
+//	ON_WM_CTLCOLOR()
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST1, &CRayTracingDlg::OnLvnItemchangedList1)
 	ON_COMMAND(ID_OPEN_OBJECT_FACTOR_FILE, &CRayTracingDlg::OnOpenObjectFactorFile)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST2, &CRayTracingDlg::OnLvnItemchangedList2)
@@ -101,6 +105,27 @@ BEGIN_MESSAGE_MAP(CRayTracingDlg, CDialogEx)
 	ON_COMMAND(ID_INSERT_FRONT_SURFACE, &CRayTracingDlg::OnInsertFrontSurface)
 	ON_COMMAND(ID_INSERT_BACK_SURFACE, &CRayTracingDlg::OnInsertBackSurface)
 	ON_COMMAND(ID_DELETE_SURFACE, &CRayTracingDlg::OnDeleteSurface)
+	ON_COMMAND(ID_INSERT_SURFACE, &CRayTracingDlg::OnInsertSurface)
+	ON_COMMAND(ID_CALCULATE_RESULT, &CRayTracingDlg::OnCalculateResult)
+	ON_BN_CLICKED(IDC_BUTTON_CALCULATE, &CRayTracingDlg::OnBnClickedButtonCalculate)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST3, &CRayTracingDlg::OnNMRClickList3)
+	ON_COMMAND(ID_UP_LINE, &CRayTracingDlg::OnUpLine)
+	ON_COMMAND(ID_DOWN_LINE, &CRayTracingDlg::OnDownLine)
+	ON_NOTIFY(NM_KILLFOCUS, IDC_LIST1, &CRayTracingDlg::OnNMKillfocusList1)
+	ON_NOTIFY(NM_KILLFOCUS, IDC_LIST3, &CRayTracingDlg::OnNMKillfocusList3)
+	ON_COMMAND(ID_SET_INFINITY, &CRayTracingDlg::OnSetInfinity)
+	ON_COMMAND(ID_SET_DISTANCE, &CRayTracingDlg::OnSetDistance)
+	ON_COMMAND(ID_COPY_CELL2, &CRayTracingDlg::OnCopyCell2)
+	ON_COMMAND(ID_PASTE_CELL2, &CRayTracingDlg::OnPasteCell2)
+	ON_COMMAND(ID_COPY_CELL3, &CRayTracingDlg::OnCopyCell3)
+	ON_COMMAND(ID_PASTE_CELL3, &CRayTracingDlg::OnPasteCell3)
+	ON_COMMAND(ID_QIUSHI_BLUE, &CRayTracingDlg::OnQiushiBlue)
+	ON_WM_CTLCOLOR()
+	ON_COMMAND(ID_BGC_WHITE, &CRayTracingDlg::OnBgcWhite)
+	ON_COMMAND(ID_BGC_STAR, &CRayTracingDlg::OnBgcStar)
+	ON_COMMAND(ID_BGC_CHAGEBLUE, &CRayTracingDlg::OnBgcChageblue)
+	ON_COMMAND(ID_BGC_SLIGHTGREEN, &CRayTracingDlg::OnBgcSlightgreen)
+	ON_COMMAND(ID_BGC_macaron, &CRayTracingDlg::OnBgcmacaron)
 END_MESSAGE_MAP()
 
 
@@ -109,8 +134,9 @@ END_MESSAGE_MAP()
 BOOL CRayTracingDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+	
 	m_font.CreatePointFont(150, L"微软雅黑");
-	m_brush.CreateSolidBrush(RGB(0, 255, 0));
+	RefreshControl(IDC_STATIC);
 	
 	// 将菜单项添加到系统菜单中。
 	m_menu.LoadMenuW(IDR_MENU1); //IDR_MENU1是菜单资源ID
@@ -141,10 +167,17 @@ BOOL CRayTracingDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
+	
+	CRect rect;
+	m_Button_Cal.GetWindowRect(rect);
+	long width = rect.right - rect.left;
+	long height = rect.bottom - rect.top;
+	HICON hicon_btn = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_ICON5), IMAGE_ICON, width - 20, height - 20, LR_DEFAULTCOLOR | LR_CREATEDIBSECTION);
+	m_Button_Cal.SetIcon(hicon_btn);
 
 	CreateList1();
 	CreateList2();
-	CreateList3();
+	CreateList3(3);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -165,7 +198,7 @@ void CRayTracingDlg::OnSysCommand(UINT nID, LPARAM lParam)
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。  对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
-
+using namespace Gdiplus;
 void CRayTracingDlg::OnPaint()
 {
 	if (IsIconic())
@@ -187,8 +220,45 @@ void CRayTracingDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		CPaintDC   dc(this);
+		CRect   rect;
+		GetClientRect(&rect);    //获取对话框长宽      
+		CDC   dcBmp;             //定义并创建一个内存设备环境
+		dcBmp.CreateCompatibleDC(&dc);             //创建兼容性DC
+		CBitmap   bmpBackground;
+		switch(bgcmode)
+		{
+			case 0:
+				bmpBackground.LoadBitmap(IDB_BITMAP3);    //淡绿色
+				break; 
+			case 1:
+				bmpBackground.LoadBitmap(IDB_BITMAP2);    //纯白
+				break;
+			case 2:
+				bmpBackground.LoadBitmap(IDB_BITMAP4);    //渐变蓝
+				break;
+			case 3 :
+				bmpBackground.LoadBitmap(IDB_BITMAP5);    //星空
+				break;
+			case 4:
+				bmpBackground.LoadBitmap(IDB_BITMAP6);    //马卡龙
+				break;
+			defalt:
+				bmpBackground.LoadBitmap(IDB_BITMAP3);    //淡绿色
+				break;
+		}
+		BITMAP   m_bitmap;                         //图片变量               
+		bmpBackground.GetBitmap(&m_bitmap);       //将图片载入位图中
+		//将位图选入临时内存设备环境
+		CBitmap* pbmpOld = dcBmp.SelectObject(&bmpBackground);
+		//调用函数显示图片StretchBlt显示形状可变
+		dc.StretchBlt(0, 0, rect.Width(), rect.Height(), &dcBmp, 0, 0, m_bitmap.bmWidth, m_bitmap.bmHeight, SRCCOPY);
+		dcBmp.SelectObject(pbmpOld);
+		dcBmp.DeleteDC();
+		/*CDialogEx::OnPaint();*/
+		/* void SetDialogBkColor( COLORREF clrCtlBk = RGB(192, 192, 192), COLORREF clrCtlText = RGB(0, 0, 0) );*/
 	}
+
 }
 
 //当用户拖动最小化窗口时系统调用此函数取得光标
@@ -215,66 +285,68 @@ void CRayTracingDlg::OnOpenCamFactorFile()
 	INT_PTR result = openFileDlg.DoModal();
 	// CString filePath = defaultDir + L"\\test.doc"; 
 	CString filePath;
-	if (result==IDOK) {
+	if (result == IDOK) 
+	{
 		filePath = openFileDlg.GetPathName();
 		AfxMessageBox(L"读取成功！");
-	}
-	//CWnd::SetDlgItemTextW(IDC_EDIT1, filePath);
-	ifstream inFile(filePath, ios::in);
-	string lineStr;
-	vector<vector<string>> strArray;
-	while (getline(inFile, lineStr))
-	{
-		// 打印整行字符串
-		cout << lineStr << endl;
-		// 存成二维表结构
-		stringstream ss(lineStr);
-		string str;
-		vector<string> lineArray;
-		// 按照逗号分隔
-		while (getline(ss, str, ',')) //ss为得到的数据  得到的数据进行后处理传递给算法不过首先得先列表列出来
-		lineArray.push_back(str);
-		strArray.push_back(lineArray);
-	}
-	//清除
-	while (m_ACCESSList.DeleteItem(0));
-	int v, j,start_row,start_col,temp;
-	LPTSTR str;
-	string x;
-	if (strArray[0][0] == "序号")   //兼容两种格式，包含表头的一种格式(正式格式，也是输出格式)，不包含表头的也不包含序号的(草稿格式)
-	{
-		start_row = 1;
-		start_col = 1;
-	}
-	else
-	{
-		start_row = 0;
-		start_col = 0;
-	}
-	for(v=0;v<(strArray.size()- start_row);v++)
-	{
-		temp = min(strArray[v].size()-start_row+1, 6);
-		for (j = 0; j < temp; j++)
+	
+		//CWnd::SetDlgItemTextW(IDC_EDIT1, filePath);
+		ifstream inFile(filePath, ios::in);
+		string lineStr;
+		vector<vector<string>> strArray;
+		while (getline(inFile, lineStr))
 		{
-			LV_ITEM lvitemAdd = { 0 };
-			lvitemAdd.mask = LVIF_TEXT;
-			lvitemAdd.iItem = v; //行
-			lvitemAdd.iSubItem = j;//列
-			if (j == 0) 
+			// 打印整行字符串
+			cout << lineStr << endl;
+			// 存成二维表结构
+			stringstream ss(lineStr);
+			string str;
+			vector<string> lineArray;
+			// 按照逗号分隔
+			while (getline(ss, str, ',')) //ss为得到的数据  得到的数据进行后处理传递给算法不过首先得先列表列出来
+			lineArray.push_back(str);
+			strArray.push_back(lineArray);
+		}
+		//清除
+		while (m_ACCESSList.DeleteItem(0));
+		int v, j,start_row,start_col,temp;
+		LPTSTR str;
+		string x;
+		if (strArray[0][0] == "序号")   //兼容两种格式，包含表头的一种格式(正式格式，也是输出格式)，不包含表头的也不包含序号的(草稿格式)
+		{
+			start_row = 1;
+			start_col = 1;
+		}
+		else
+		{
+			start_row = 0;
+			start_col = 0;
+		}
+		for(v=0;v<(strArray.size()- start_row);v++)
+		{
+			temp = min(strArray[v].size()-start_row+1, 6);
+			for (j = 0; j < temp; j++)
 			{
-				x = to_string(v+1);
-				_bstr_t bstr(x.c_str());
-				str = (LPTSTR)bstr;
-				lvitemAdd.pszText = str;
-				m_ACCESSList.InsertItem(&lvitemAdd);//插入行
+				LV_ITEM lvitemAdd = { 0 };
+				lvitemAdd.mask = LVIF_TEXT;
+				lvitemAdd.iItem = v; //行
+				lvitemAdd.iSubItem = j;//列
+				if (j == 0) 
+				{
+					x = to_string(v+1);
+					_bstr_t bstr(x.c_str());
+					str = (LPTSTR)bstr;
+					lvitemAdd.pszText = str;
+					m_ACCESSList.InsertItem(&lvitemAdd);//插入行
+				}
+				else 
+				{
+					_bstr_t bstr(strArray[v+start_row][j-1+start_col].c_str());
+					str = (LPTSTR)bstr;
+					lvitemAdd.pszText = str;
+				}
+				m_ACCESSList.SetItem(&lvitemAdd); //插入数据	
 			}
-			else 
-			{
-				_bstr_t bstr(strArray[v+start_row][j-1+start_col].c_str());
-				str = (LPTSTR)bstr;
-				lvitemAdd.pszText = str;
-			}
-			m_ACCESSList.SetItem(&lvitemAdd); //插入数据	
 		}
 	}
 }
@@ -313,18 +385,32 @@ void CRayTracingDlg::OnSaveResult()
 	outFile.close();
 	// TODO: 在此添加命令处理程序代码
 }
+
 HBRUSH CRayTracingDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 	if (pWnd->GetDlgCtrlID() == IDC_STATIC)
 	{
 		pDC->SetTextColor(RGB(0, 0, 0));//文字为黑色
-		pDC->SelectObject(&m_font);//文字为15号字体，华文行楷
-		return m_brush;
+		pDC->SelectObject(&m_font);//
+		pDC->SetBkMode(TRANSPARENT);    
+		return (HBRUSH)GetStockObject(NULL_BRUSH);
+	}
+	if (pWnd->GetDlgCtrlID() == IDC_STATIC2)
+	{
+		pDC->SetBkMode(TRANSPARENT);
+		return (HBRUSH)GetStockObject(NULL_BRUSH);
 	}
 	return hbr;
 }
 
+void CRayTracingDlg::RefreshControl(UINT uCtlID)
+{
+	CRect rc;
+	GetDlgItem(uCtlID)->GetWindowRect(&rc);
+	ScreenToClient(&rc);
+	InvalidateRect(rc);
+}
 
 void CRayTracingDlg::OnLvnItemchangedList1(NMHDR* pNMHDR, LRESULT* pResult)
 {
@@ -336,7 +422,6 @@ void CRayTracingDlg::OnLvnItemchangedList1(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CRayTracingDlg::OnOpenObjectFactorFile()
 {
-	
 	BOOL isOpen = TRUE;     //是否打开(否则为保存)  
 	CString defaultDir = L"E:\\FileTest";   //默认打开的文件路径  
 	CString fileName = L"";         //默认打开的文件名  
@@ -346,55 +431,58 @@ void CRayTracingDlg::OnOpenObjectFactorFile()
 	INT_PTR result = openFileDlg.DoModal();
 	// CString filePath = defaultDir + L"\\test.doc"; 
 	CString filePath;
-	if (result == IDOK) {
+	if (result == IDOK)
+	{
 		filePath = openFileDlg.GetPathName();
 		AfxMessageBox(L"读取成功！");
-	}
-	//CWnd::SetDlgItemTextW(IDC_EDIT1, filePath);
-	ifstream inFile(filePath, ios::in);
-	string lineStr;
-	vector<vector<string>> strArray;
-	while (getline(inFile, lineStr))
-	{
-		// 打印整行字符串
-		cout << lineStr << endl;
-		// 存成二维表结构
-		stringstream ss(lineStr);
-		string str;
-		vector<string> lineArray;
-		// 按照逗号分隔
-		while (getline(ss, str, ',')) //ss为得到的数据  得到的数据进行后处理传递给算法不过首先得先列表列出来
-			lineArray.push_back(str);
-		strArray.push_back(lineArray);
-	}
-	//清除
-	while (m_ACCESSList3.DeleteItem(0));
-	int v, j,temp,start_row;
-	LPTSTR str;
-	LV_ITEM lvitemAdd = { 0 };
-	lvitemAdd.mask = LVIF_TEXT;
-	lvitemAdd.iItem = 0; //行
-	lvitemAdd.iSubItem =0;//列
-	lvitemAdd.pszText = L"";
-	m_ACCESSList3.InsertItem(&lvitemAdd);//插入行
-	if (strArray[0][0] == "物方距离")   //兼容两种格式，包含表头的一种格式(正式格式，也是输出格式)，不包含表头的也不包含序号的(草稿格式)
-		start_row = 1;
-	else
-		start_row = 0;
-	for (v = 0; v < strArray.size()-start_row; v++)
-	{
-		temp = min(strArray[v].size(), 4);
-		for (j = 0; j < temp; j++)
+	
+		//CWnd::SetDlgItemTextW(IDC_EDIT1, filePath);
+		ifstream inFile(filePath, ios::in);
+		string lineStr;
+		vector<vector<string>> strArray;
+		while (getline(inFile, lineStr))
 		{
-			lvitemAdd.iItem = v; //行
-			lvitemAdd.iSubItem = j;//列
-			_bstr_t bstr(strArray[v+start_row][j].c_str());
-			str = (LPTSTR)bstr;
-			lvitemAdd.pszText = str;
-			m_ACCESSList3.SetItem(&lvitemAdd); //插入数据	
+			// 打印整行字符串
+			cout << lineStr << endl;
+			// 存成二维表结构
+			stringstream ss(lineStr);
+			string str;
+			vector<string> lineArray;
+			// 按照逗号分隔
+			while (getline(ss, str, ',')) //ss为得到的数据  得到的数据进行后处理传递给算法不过首先得先列表列出来
+				lineArray.push_back(str);
+			strArray.push_back(lineArray);
 		}
+		//清除
+		while (m_ACCESSList3.DeleteItem(0));
+		int v, j,temp,start_row;
+		LPTSTR str;
+		LV_ITEM lvitemAdd = { 0 };
+		lvitemAdd.mask = LVIF_TEXT;
+		lvitemAdd.iItem = 0; //行
+		lvitemAdd.iSubItem =0;//列
+		lvitemAdd.pszText = L"";
+		if (strArray[0][0] == "物方距离l")   //兼容两种格式，包含表头的一种格式(正式格式，也是输出格式)，不包含表头的也不包含序号的(草稿格式)
+			start_row = 1;
+		else
+			start_row = 0;
+		temp = min(strArray[0].size(), 4);
+		CreateList3(temp);
+		m_ACCESSList3.InsertItem(&lvitemAdd);//插入行
+		for (v = 0; v < strArray.size()-start_row; v++)
+		{
+			for (j = 0; j < temp; j++)
+			{
+				lvitemAdd.iItem = v; //行
+				lvitemAdd.iSubItem = j;//列
+				_bstr_t bstr(strArray[v+start_row][j].c_str());
+				str = (LPTSTR)bstr;
+				lvitemAdd.pszText = str;
+				m_ACCESSList3.SetItem(&lvitemAdd); //插入数据	
+			}
+		}
+		// TODO: 在此添加命令处理程序代码
 	}
-	// TODO: 在此添加命令处理程序代码
 }
 
 
@@ -485,7 +573,7 @@ void CRayTracingDlg::CreateList2()
 	m_ACCESSList2.DeleteColumn(0);
 }
 
-void CRayTracingDlg::CreateList3()
+void CRayTracingDlg::CreateList3(int nlsub)
 {
 	//设置计算结果的表
 		//清除
@@ -509,20 +597,21 @@ void CRayTracingDlg::CreateList3()
 	imagelist.Create(1, 30, ILC_COLOR, 1, 1);
 	m_ACCESSList3.SetImageList(&imagelist, LVSIL_SMALL);
 	//物方参数 距离 无穷远时视场角W 有限距离是半孔径角U 物高y
-	TCHAR fieldname3[5][40] = { _T(""), _T("物方距离"),  _T("无穷远半视场角W"),_T("有限距离半孔径角U"),  _T("物高y") };
-	for (int i = 0; i < 5; i++)
+	TCHAR fieldname3[5][40] = { _T(""), _T("物方距离l"),  _T("物高y"),_T("入瞳直径2a") ,_T("无穷远半视场角W") };
+	for (int i = 0; i < nlsub+1; i++)
 	{
 		lvcolumn.pszText = fieldname3[i];
 		lvcolumn.iSubItem = i;
 		lvcolumn.iOrder = i;
 		//曲率半径 厚度 三个n 
-		if(i==0)
+		if (i == 0)
 			lvcolumn.cx = 0;
 		else
-			lvcolumn.cx = rect.Width() / 4;
+			lvcolumn.cx = rect.Width() / nlsub;
 		m_ACCESSList3.InsertColumn(i, &lvcolumn);
 	}
 	m_ACCESSList3.DeleteColumn(0);
+	m_ACCESSList3.InsertItem(0,NULL);//插入空白行
 }
 
 void CRayTracingDlg::OnNMDblclkList1(NMHDR* pNMHDR, LRESULT* pResult)
@@ -533,7 +622,7 @@ void CRayTracingDlg::OnNMDblclkList1(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
 	m_Row = pNMListView->iItem;//获得选中的行
 	m_Col = pNMListView->iSubItem;//获得选中列
-	if (pNMListView->iItem != -1) //如果选择的是子项;
+	if (pNMListView->iSubItem != 0) //如果选择的是子项;
 	{
 		m_ACCESSList.GetSubItemRect(m_Row, m_Col, LVIR_LABEL, rc);//获得子项的RECT；
 		m_Edit.SetParent(&m_ACCESSList);//转换坐标为列表框中的坐标
@@ -553,6 +642,7 @@ void CRayTracingDlg::OnEnKillfocusEdit1()
 	m_Edit.GetWindowText(tem);    //得到用户输入的新的内容
 	m_ACCESSList.SetItemText(m_Row, m_Col, tem);   //设置编辑框的新内容
 	m_Edit.ShowWindow(SW_HIDE);
+	m_ACCESSList.SetItemState(m_Row, 0, LVIS_SELECTED | LVIS_FOCUSED); //取消选中状态
 	// TODO: 在此添加控件通知处理程序代码
 }
 
@@ -573,24 +663,21 @@ void CRayTracingDlg::OnNMDblclkList3(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
 	m_Row = pNMListView->iItem;//获得选中的行
 	m_Col = pNMListView->iSubItem;//获得选中列
+	int nlsub = m_ACCESSList3.GetHeaderCtrl()->GetItemCount(); //取列数
 	if (pNMListView->iItem != -1) //如果选择的是子项;
 	{
-		m_ACCESSList3.GetSubItemRect(m_Row, m_Col, LVIR_LABEL, rc);//获得子项的RECT；
-		m_Edit2.SetParent(&m_ACCESSList3);//转换坐标为列表框中的坐标
-		m_Edit2.MoveWindow(rc);//移动Edit到RECT坐在的位置;
-		m_Edit2.SetWindowText(m_ACCESSList3.GetItemText(m_Row, m_Col));//将该子项中的值放在Edit控件中；
-		m_Edit2.ShowWindow(SW_SHOW);//显示Edit控件；
-		m_Edit2.SetFocus();//设置Edit焦点
-		m_Edit2.ShowCaret();//显示光标
-		m_Edit2.SetSel(-1);//将光标移动到最后
+		if (nlsub != 4 || m_Col != 0) 
+		{
+			m_ACCESSList3.GetSubItemRect(m_Row, m_Col, LVIR_LABEL, rc);//获得子项的RECT；
+			m_Edit2.SetParent(&m_ACCESSList3);//转换坐标为列表框中的坐标
+			m_Edit2.MoveWindow(rc);//移动Edit到RECT坐在的位置;
+			m_Edit2.SetWindowText(m_ACCESSList3.GetItemText(m_Row, m_Col));//将该子项中的值放在Edit控件中；
+			m_Edit2.ShowWindow(SW_SHOW);//显示Edit控件；
+			m_Edit2.SetFocus();//设置Edit焦点
+			m_Edit2.ShowCaret();//显示光标
+			m_Edit2.SetSel(-1);//将光标移动到最后
+		}
 	}
-	/*POSITION pos = m_ACCESSList3.GetFirstSelectedItemPosition();
-	int nIndex = m_ACCESSList3.GetNextSelectedItem(pos);
-	if (nIndex >= 0)
-	{
-		m_ACCESSList3.SetFocus();
-		CEdit* pEdit = m_ACCESSList3.EditLabel(nIndex);
-	}*/
 	*pResult = 0;
 }
 
@@ -601,6 +688,7 @@ void CRayTracingDlg::OnEnKillfocusEdit2()
 	m_Edit2.GetWindowText(tem);    //得到用户输入的新的内容
 	m_ACCESSList3.SetItemText(m_Row, m_Col, tem);   //设置编辑框的新内容
 	m_Edit2.ShowWindow(SW_HIDE);
+	m_ACCESSList3.SetItemState(m_Row, 0, LVIS_SELECTED | LVIS_FOCUSED);//取消选中状态
 	// TODO: 在此添加控件通知处理程序代码
 }
 
@@ -662,27 +750,28 @@ void CRayTracingDlg::OnSaveCamFactor()
 	openFileDlg.GetOFN().lpstrInitialDir = L"E:\\FileTest\\镜头参数.csv";
 	INT_PTR result = openFileDlg.DoModal();
 	CString filePath = defaultDir + L"\\" + fileName;
-	if (result == IDOK) {
+	if (result == IDOK) 
+	{
 		filePath = openFileDlg.GetPathName();
 		AfxMessageBox(L"保存成功！");
-	}
-	ofstream outFile;
-	outFile.open(filePath, ios::out);
-	outFile << "序号" << ',' << "曲率半径" << ',' << "厚度" << ',' << "d光折射率" << ',' << "F光折射率" << ',' << "C光折射率" << endl;
-	int v, j;
-	int nltem = m_ACCESSList.GetItemCount();
-	if (nltem != 0)
-	{
-		for (v = 0; v < nltem; v++)
-			for (j = 0; j < 6; j++)
-			{
-				if (j != 5)
-					outFile << CT2A(m_ACCESSList.GetItemText(v, j).GetString())<< ',';
-				else
-					outFile << CT2A(m_ACCESSList.GetItemText(v, j).GetString()) << endl;
-			}
-	}
-	outFile.close();
+		ofstream outFile;
+		outFile.open(filePath, ios::out);
+		outFile << "序号" << ',' << "曲率半径" << ',' << "厚度" << ',' << "d光折射率" << ',' << "F光折射率" << ',' << "C光折射率" << endl;
+		int v, j;
+		int nltem = m_ACCESSList.GetItemCount();
+		if (nltem != 0)
+		{
+			for (v = 0; v < nltem; v++)
+				for (j = 0; j < 6; j++)
+				{
+					if (j != 5)
+						outFile << CT2A(m_ACCESSList.GetItemText(v, j).GetString())<< ',';
+					else
+						outFile << CT2A(m_ACCESSList.GetItemText(v, j).GetString()) << endl;
+				}
+		}
+		outFile.close();
+		}
 	// TODO: 在此添加命令处理程序代码
 }
 
@@ -697,28 +786,33 @@ void CRayTracingDlg::OnSaveObjectFactor()
 	openFileDlg.GetOFN().lpstrInitialDir = L"E:\\FileTest\\物方参数.csv";
 	INT_PTR result = openFileDlg.DoModal();
 	CString filePath = defaultDir + L"\\" + fileName;
-	if (result == IDOK) {
+	if (result == IDOK) 
+	{
 		filePath = openFileDlg.GetPathName();
 		AfxMessageBox(L"保存成功！");
+		ofstream outFile;
+		outFile.open(filePath, ios::out); 
+		int v, j;
+		int nltem = m_ACCESSList3.GetItemCount();
+		int nlsub = m_ACCESSList3.GetHeaderCtrl()->GetItemCount();
+		if (nlsub == 3)
+			outFile << "物方距离l" << ',' << "物高y" << ',' << "入瞳直径2a" << endl;
+		if(nlsub == 4) 
+			outFile << "物方距离l" << ',' << "物高y" << ',' << "入瞳直径2a" << ',' << "无穷远半视场角W" << endl;
+		if (nltem != 0)
+		{
+			for (v = 0; v < nltem; v++)
+				for (j = 0; j < nlsub; j++)
+				{
+					if (j != nlsub-1)
+						outFile << CT2A(m_ACCESSList3.GetItemText(v, j).GetString()) << ',';
+					else
+						outFile << CT2A(m_ACCESSList3.GetItemText(v, j).GetString()) << endl;
+				}
+		}
+		outFile.close();
+		// TODO: 在此添加命令处理程序代码
 	}
-	ofstream outFile;
-	outFile.open(filePath, ios::out);
-	outFile << "物方距离" << ',' << "无穷远半视场角W" << ',' << "有限距离半孔径角U" << ',' << "物高y" << endl;
-	int v, j;
-	int nltem = m_ACCESSList3.GetItemCount();
-	if (nltem != 0)
-	{
-		for (v = 0; v < nltem; v++)
-			for (j = 0; j < 4; j++)
-			{
-				if (j != 3)
-					outFile << CT2A(m_ACCESSList3.GetItemText(v, j).GetString()) << ',';
-				else
-					outFile << CT2A(m_ACCESSList3.GetItemText(v, j).GetString()) << endl;
-			}
-	}
-	outFile.close();
-	// TODO: 在此添加命令处理程序代码
 }
 
 
@@ -736,7 +830,7 @@ void CRayTracingDlg::OnCopyCell()
 			pBuf = (TCHAR*)GlobalLock(hClip);//锁定剪贴板
 			lstrcpy(pBuf, m_ACCESSList.GetItemText(m_Row, m_Col));//把CString转换
 			GlobalUnlock(hClip);//解除锁定剪贴板
-			SetClipboardData(CF_TEXT, hClip);//把文本数据发送到剪贴板 CF_UNICODETEXT为Unicode编码
+			SetClipboardData(CF_UNICODETEXT, hClip);//把文本数据发送到剪贴板 CF_UNICODETEXT为Unicode编码
 		}
 		CloseClipboard();
 	}
@@ -776,23 +870,484 @@ void CRayTracingDlg::ResetOrder()
 
 void CRayTracingDlg::OnInsertFrontSurface()
 {
-	LV_ITEM lvitemAdd = { 0 };
-	lvitemAdd.mask = LVIF_TEXT;
-	lvitemAdd.iItem = m_Row; //行
-	lvitemAdd.iSubItem = m_Col;//列
-	lvitemAdd.pszText = L"";
-	m_ACCESSList.InsertItem(&lvitemAdd);//插入行
+	m_ACCESSList.InsertItem(m_Row, NULL);//插入行
+	ResetOrder();
 	// TODO: 在此添加命令处理程序代码
 }
 
 
 void CRayTracingDlg::OnInsertBackSurface()
 {
+	m_ACCESSList.InsertItem(m_Row+1, NULL);//插入行
+	ResetOrder();
 	// TODO: 在此添加命令处理程序代码
 }
 
 
 void CRayTracingDlg::OnDeleteSurface()
 {
+	POSITION  sSelPos = NULL;
+	while (sSelPos = m_ACCESSList.GetFirstSelectedItemPosition())
+	{
+		int nSelItem = -1;
+		nSelItem = m_ACCESSList.GetNextSelectedItem(sSelPos);
+		if (nSelItem >= 0 && nSelItem < m_ACCESSList.GetItemCount())
+		{
+			m_ACCESSList.DeleteItem(nSelItem);
+			Delete++;  //用于判断保存时的保存方式
+		}
+	}
+	ResetOrder();
 	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CRayTracingDlg::OnInsertSurface()
+{
+	int nltem = m_ACCESSList.GetItemCount();
+	m_ACCESSList.InsertItem(nltem, NULL);//插入行
+	ResetOrder();
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CRayTracingDlg::OnCalculateResult()
+{
+	//CamFactorStr 存储镜头参数的二维数组   以下方列表形式储存 不保存表头
+	/*序号	曲率半径	厚度	d光折射率	F光折射率	C光折射率 
+		1	    35	             4	      1.542	     1.222	     1.133
+		2	     31	         1	      1.542	     1.222	     1.133*/
+	vector<vector<string>> CamFactorStr;
+	int v, j;
+	string lineStr;
+	int nltem = m_ACCESSList.GetItemCount();
+	for (v = 0; v < nltem; v++)
+	{
+		vector<string> lineArray;
+		for (j = 0; j < 6; j++)
+		{
+			lineStr = CT2A(m_ACCESSList.GetItemText(v, j).GetString());
+			lineArray.push_back(lineStr);
+		}
+		CamFactorStr.push_back(lineArray);
+	}
+	
+	//ObjectFactorStr 存储物方参数的一维数组  不保存表头
+	/*物方距离l	物高y	入瞳直径2a	无穷远半视场角W
+		35	                4	          1.542           	1.222*/
+	vector<string> ObjectFactorStr;
+	int nlsub = m_ACCESSList3.GetHeaderCtrl()->GetItemCount();
+	for (j = 0; j < nlsub; j++)
+	{
+		lineStr = CT2A(m_ACCESSList3.GetItemText(0, j).GetString());
+		ObjectFactorStr.push_back(lineStr);
+	}
+	//计算函数
+	vector<vector<string>>CalResultStr; //存计算结果
+	//CamFactorStr和ObjectFactorStr转换成double
+
+	//
+	//输出结果
+
+}
+
+
+void CRayTracingDlg::OnBnClickedButtonCalculate()
+{
+	OnCalculateResult();
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CRayTracingDlg::OnNMRClickList3(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	m_Row = pNMListView->iItem;//获得选中的行
+	m_Col = pNMListView->iSubItem;//获得选中列
+	POINT pt;
+	GetCursorPos(&pt);
+	int x = m_ACCESSList3.GetSelectionMark();
+	CMenu menu;
+	if (pNMListView->iItem != -1)
+	{
+		if(pNMListView->iSubItem == 0)
+			menu.LoadMenuW(IDR_MENU4);
+		else
+			menu.LoadMenuW(IDR_MENU6);
+		CMenu* pop = menu.GetSubMenu(0);
+		pop->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, this);
+		*pResult = 0;
+	}
+	*pResult = 0;
+}
+
+
+void CRayTracingDlg::OnUpLine()
+{
+	CString temp[5];
+	int i;
+	if (m_Row != 0)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			temp[i] = m_ACCESSList.GetItemText(m_Row, i+1);
+			m_ACCESSList.SetItemText(m_Row, i+1, m_ACCESSList.GetItemText(m_Row-1, i+1));
+			m_ACCESSList.SetItemText(m_Row-1, i+1, temp[i]);
+		}
+	}
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CRayTracingDlg::OnDownLine()
+{
+	CString temp[5];
+	int i;
+	int nltem = m_ACCESSList.GetItemCount();
+	if (m_Row != nltem-1)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			temp[i] = m_ACCESSList.GetItemText(m_Row, i + 1);
+			m_ACCESSList.SetItemText(m_Row, i + 1, m_ACCESSList.GetItemText(m_Row + 1, i + 1));
+			m_ACCESSList.SetItemText(m_Row + 1, i + 1, temp[i]);
+		}
+	}
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CRayTracingDlg::OnNMKillfocusList1(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_ACCESSList.SetItemState(m_Row, 0, LVIS_SELECTED | LVIS_FOCUSED);//取消选中状态
+	*pResult = 0;
+}
+
+
+void CRayTracingDlg::OnNMKillfocusList3(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_ACCESSList3.SetItemState(m_Row, 0, LVIS_SELECTED | LVIS_FOCUSED);//取消选中状态
+	*pResult = 0;
+}
+
+
+void CRayTracingDlg::OnSetInfinity()
+{
+	// TODO: 在此添加命令处理程序代码
+	int nlsub = m_ACCESSList3.GetHeaderCtrl()->GetItemCount(); //取列数
+	CString temp[3];
+	if (nlsub == 3) 
+	{
+		int i;
+		for (i = 0; i < nlsub-1; i++)
+		{
+			temp[i] = m_ACCESSList3.GetItemText(0, i + 1);
+		}
+		CreateList3(4);
+		m_ACCESSList3.SetItemText(0, 0, L"无限");
+		m_ACCESSList3.SetItemText(0, 1, temp[0]);
+		m_ACCESSList3.SetItemText(0, 2, temp[1]);
+	}
+}
+
+
+void CRayTracingDlg::OnSetDistance()
+{
+	// TODO: 在此添加命令处理程序代码
+	int nlsub = m_ACCESSList3.GetHeaderCtrl()->GetItemCount(); //取列数
+	CString temp[3];
+	if (nlsub == 4)
+	{
+		int i;
+		for (i = 0; i < nlsub - 2; i++)
+		{
+			temp[i] = m_ACCESSList3.GetItemText(0, i + 1);
+		}
+		CreateList3(3);
+		m_ACCESSList3.SetItemText(0, 0, L"0");
+		m_ACCESSList3.SetItemText(0, 1, temp[0]);
+		m_ACCESSList3.SetItemText(0, 2, temp[1]);
+	}
+}
+
+
+void CRayTracingDlg::OnCopyCell2()
+{
+	// TODO: 在此添加命令处理程序代码
+	if (!m_ACCESSList3.GetItemText(m_Row, m_Col).IsEmpty())
+	{
+		if (OpenClipboard())
+		{
+			EmptyClipboard(); //清空剪贴板，使该窗口成为剪贴板的拥有者
+			HGLOBAL hClip;
+			hClip = GlobalAlloc(GMEM_MOVEABLE, (m_ACCESSList3.GetItemText(m_Row, m_Col).GetLength() * 2) + 2); //判断要是文本数据，分配内存时多分配一个字符
+			TCHAR* pBuf;
+			pBuf = (TCHAR*)GlobalLock(hClip);//锁定剪贴板
+			lstrcpy(pBuf, m_ACCESSList3.GetItemText(m_Row, m_Col));//把CString转换
+			GlobalUnlock(hClip);//解除锁定剪贴板
+			SetClipboardData(CF_UNICODETEXT, hClip);//把文本数据发送到剪贴板 CF_UNICODETEXT为Unicode编码
+		}
+		CloseClipboard();
+	}
+}
+
+
+void CRayTracingDlg::OnPasteCell2()
+{
+	// TODO: 在此添加命令处理程序代码
+	//粘贴
+	char* buffer = NULL;
+	CString   fromClipboard;
+	if (OpenClipboard())
+	{
+		HANDLE   hData = GetClipboardData(CF_TEXT);
+		char* buffer = (char*)GlobalLock(hData);
+		fromClipboard = buffer;
+		GlobalUnlock(hData);
+		CloseClipboard();
+	}
+	m_ACCESSList3.SetItemText(m_Row, m_Col, fromClipboard);
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CRayTracingDlg::OnCopyCell3()
+{
+	// TODO: 在此添加命令处理程序代码
+	OnCopyCell2();
+}
+
+
+void CRayTracingDlg::OnPasteCell3()
+{
+	OnPasteCell2();
+	// TODO: 在此添加命令处理程序代码
+}
+
+void CRayTracingDlg::OnQiushiBlue()
+{
+	//颜色选择框
+	COLORREF color = RGB(214, 214, 214);
+	CColorDialog colorDlg(color);
+	if (IDOK == colorDlg.DoModal())       // 显示颜色对话框，并判断是否点击了“确定”   
+	{
+		color = colorDlg.GetColor();      // 获取颜色对话框中选择的颜色值   
+		//修改子菜单颜色
+		MENUINFO menu;
+		menu.cbSize = sizeof(MENUINFO);
+		menu.fMask = MIM_APPLYTOSUBMENUS | MIM_BACKGROUND; //子菜单也变色
+		HBRUSH br = CreateSolidBrush(color);
+		menu.hbrBack = br;
+		CMenu* pMenu = GetMenu();
+		SetMenuInfo(pMenu->m_hMenu, &menu);
+	}
+}
+
+
+
+void CRayTracingDlg::OnBgcWhite()
+{
+	bgcmode = 1;
+	Invalidate(); //更新
+}
+
+
+void CRayTracingDlg::OnBgcStar()
+{
+	bgcmode = 3;
+	Invalidate(); //更新
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CRayTracingDlg::OnBgcChageblue()
+{
+	bgcmode = 2;
+	Invalidate(); //更新
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CRayTracingDlg::OnBgcSlightgreen()
+{
+	bgcmode = 0;
+	Invalidate(); //更新
+	// TODO: 在此添加命令处理程序代码
+}
+
+
+void CRayTracingDlg::OnBgcmacaron()
+{
+	bgcmode = 4;
+	Invalidate(); //更新
+	// TODO: 在此添加命令处理程序代码
+}
+
+BOOL CRayTracingDlg::JudgeStringIsFloat(string x)
+{
+	char cTemp;
+	int nStringLength = x.length();
+	bool bReturnValue = true;  //返回值
+	int nint = 0;  //整数有几位
+	int ndot = 0;   //小数有几位
+	bool bReachDot = false;  //是否已经读到小数点了
+	for (int nLoopindex = 0; nLoopindex < nStringLength; nLoopindex++)
+	{
+		cTemp = x[nLoopindex];
+		if (nLoopindex == 0 && (cTemp == '-' || cTemp == '+'))
+			;
+		else if (cTemp >= 0x30 && cTemp <= 0x39)
+		{
+			if (bReachDot == true)
+			{
+				ndot++;
+			}
+			else
+			{
+				nint++;
+			}
+		}
+		else
+		{
+			//非数字，看看是不是小数点
+			if (cTemp == '.')
+			{
+				if (bReachDot == true)
+				{
+					//已经碰到过小数点了，又碰到，所以错误
+					bReturnValue = false;
+					break;
+				}
+				else
+				{
+					//碰到小数点了，看看整数部分是不是有了
+					bReachDot = true;
+					if (nint > 0)
+					{
+						//整数部分正确
+					}
+					else
+					{
+						//无整数部分，错误
+						bReturnValue = false;
+						break;
+					}
+				}
+			}
+			else
+			{
+				bReturnValue = false;
+				break;
+			}
+		}
+	}
+	return bReturnValue;
+}
+
+BOOL CRayTracingDlg::JudgeListIsCorrect(CListCtrl m_List)
+{
+	int nltem = m_List.GetItemCount();
+	int nlsub = m_List.GetHeaderCtrl()->GetItemCount();
+	int v, j;
+	BOOL flag = 0;
+	vector <int> ErrorPlace;
+	for(v=0;v<nltem;v++)
+		for (j = 0; j < nlsub; j++)
+		{
+			string temp = CT2A(m_List.GetItemText(v, j).GetString());
+			if ((v == 0 && j == 0) && temp == "无限")
+				;
+			else if (JudgeStringIsFloat(temp))
+				;
+			else
+			{
+				ErrorPlace.push_back(v);
+				ErrorPlace.push_back(j);
+				flag = 1;
+			}
+		}
+	if (flag == 1)
+	{
+		string ErrorString = "检测到非数字数值\n错误位置为:";
+		int size = ErrorPlace.size();
+		ErrorPlacePermanent = (int*)calloc(size+1,sizeof(int));
+		ErrorPlacePermanent[0] = size;
+		for (v = 0; v < size / 2; v++)
+		{
+			ErrorString += "第" + to_string(ErrorPlace[2 * v]) + "行" + "第" + to_string(ErrorPlace[2 * v + 1]) + "列\n";
+			ErrorPlacePermanent[2 * v+1] = ErrorPlace[2 * v];
+			ErrorPlacePermanent[2 * v + 2] = ErrorPlace[2 * v + 1];
+		}
+		_bstr_t bstr(ErrorString.c_str());
+		AfxMessageBox((LPTSTR)bstr);
+		return 0;
+	}
+	else
+		return 1;
+}
+
+void CRayTracingDlg::ListCorrectZero(CListCtrl m_List)
+{
+	if (ErrorPlacePermanent != NULL)
+	{
+		int v;
+		int size = ErrorPlacePermanent[0];
+		for (v = 0; v < size / 2; v++)
+		{
+			m_List.SetItemText(ErrorPlacePermanent[2 * v + 1], ErrorPlacePermanent[2 * v + 2], L"0");
+		}
+		AfxMessageBox(L"所有非数字数值已修正为0");
+		free(ErrorPlacePermanent);
+	}
+}
+
+double CRayTracingDlg::TransStrToDouble(string x)
+{
+	//确保负数的string也可以转换成负的double   未试验
+	bool minus = false;      //标记是否是负数  
+      string real = x;       //real表示num的绝对值
+      if (x.at(0) == '-')
+      {
+          minus = true;
+          real = x.substr(1, x.size()-1);
+      }
+ 
+     char c;
+     int i = 0;
+     double result = 0.0 , dec = 10.0;
+     bool isDec = false;       //标记是否有小数
+     unsigned long size = real.size();
+     while(i < size)
+     {
+         c = real.at(i);
+        if (c == '.')
+         {//包含小数
+             isDec = true;
+             i++;
+             continue;
+         }
+         if (!isDec) 
+         {
+             result = result*10 + c - '0';
+         }
+         else
+         {//识别小数点之后都进入这个分支
+            result = result + ((double)c - '0')/dec;
+             dec *= 10;
+         }
+         i++;
+    }
+    if (minus == true) {
+        result = -result;
+     }
+     return result;
+}
+
+void  CRayTracingDlg::ZeroDotCorrectFormat(CListCtrl m_List)
+{
+	
 }

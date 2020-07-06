@@ -71,5 +71,38 @@
     <Image Include="..\icon.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="..\OPTLOGO.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\background.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\softwarelogo.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\white.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\blue.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\star.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\macaron.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\ICON1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\ICON2.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\calICON.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\cal.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

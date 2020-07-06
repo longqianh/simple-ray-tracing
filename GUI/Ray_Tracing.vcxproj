@@ -209,7 +209,18 @@
     <None Include="res\RayTracing.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\background.bmp" />
+    <Image Include="..\blue.bmp" />
+    <Image Include="..\cal.ico" />
+    <Image Include="..\calICON.ico" />
     <Image Include="..\icon.ico" />
+    <Image Include="..\ICON1.ico" />
+    <Image Include="..\ICON2.ico" />
+    <Image Include="..\macaron.bmp" />
+    <Image Include="..\OPTLOGO.bmp" />
+    <Image Include="..\softwarelogo.ico" />
+    <Image Include="..\star.bmp" />
+    <Image Include="..\white.bmp" />
     <Image Include="..\ZJULOGO.bmp" />
     <Image Include="res\Ray_Tracing.ico" />
   </ItemGroup>

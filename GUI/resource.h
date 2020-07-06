@@ -9,14 +9,25 @@
 #define IDR_MAINFRAME                   128
 #define IDR_MENU1                       129
 #define IDB_BITMAP1                     135
-#define IDI_ICON1                       136
 #define IDR_MENU2                       139
 #define IDR_MENU3                       140
+#define IDR_MENU4                       141
+#define IDR_MENU6                       143
+#define IDB_BITMAP3                     147
+#define IDB_BITMAP2                     149
+#define IDB_BITMAP4                     150
+#define IDB_BITMAP5                     151
+#define IDB_BITMAP6                     152
+#define IDI_ICON3                       153
+#define IDI_ICON4                       154
+#define IDI_ICON5                       155
 #define IDC_EDIT1                       1000
 #define IDC_EDIT2                       1001
 #define IDC_LIST1                       1002
 #define IDC_LIST2                       1003
 #define IDC_LIST3                       1006
+#define IDC_BUTTON_CALCULATE            1008
+#define IDC_STATIC2                     1010
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -62,14 +73,52 @@
 #define ID_COPY_CELL                    32813
 #define ID_                             32814
 #define ID_PASTE_CELL                   32815
+#define ID_INSERT_SURFACE               32816
+#define ID_32817                        32817
+#define ID_32818                        32818
+#define ID_32821                        32821
+#define ID_32822                        32822
+#define ID_32823                        32823
+#define ID_32824                        32824
+#define ID_32825                        32825
+#define ID_32826                        32826
+#define ID_SET_INFINITY                 32827
+#define ID_SET_DISTANCE                 32828
+#define ID_COPY_CELL2                   32829
+#define ID_PASTE_CELL2                  32830
+#define ID_COPY_CELL3                   32831
+#define ID_PASTE_CELL3                  32832
+#define ID_32833                        32833
+#define ID_32834                        32834
+#define ID_UP_LINE                      32835
+#define ID_DOWN_LINE                    32836
+#define ID_32837                        32837
+#define ID_32838                        32838
+#define ID_QIUSHI_BLUE                  32839
+#define ID_GUANGDIAN_ORANGE             32840
+#define ID_32841                        32841
+#define ID_32842                        32842
+#define ID_32843                        32843
+#define ID_32844                        32844
+#define ID_32845                        32845
+#define ID_BGC_WHITE                    32846
+#define ID_BGC_STAR                     32847
+#define ID_BGC_                         32848
+#define ID_BGC_CHAGEBLUE                32849
+#define ID_BGC_SLIGHTGREEN              32850
+#define ID_32851                        32851
+#define ID_BGC_MARCLONE                 32852
+#define ID_BGC_macaron                  32853
+#define ID_32854                        32854
+#define ID_32855                        32855
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        141
-#define _APS_NEXT_COMMAND_VALUE         32816
-#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_RESOURCE_VALUE        157
+#define _APS_NEXT_COMMAND_VALUE         32856
+#define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
