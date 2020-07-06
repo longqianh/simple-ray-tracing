@@ -1,6 +1,6 @@
 #pragma once
-#include<iostream>
-#include<math.h>
+#include <stdio.h>
+#include <math.h>
 #include "utils.h"
 using namespace std;
 #ifndef PI
@@ -17,7 +17,6 @@ protected:
 
 	double U; //弧度
 	double l; // 物距
-	// double i; // 入射角 弧度
 	string rayinfo; // 一些信息
 
 public:
@@ -270,7 +269,12 @@ private:
 	string label; // 区分主、上、下光线
 
 public:
-	SAR(){ rayinfo="SAR"; }
+	SAR()
+	{ 
+		rayinfo="SAR";
+		label="cf"; 
+		t=-INF,s=-INF;
+	}
 	SAR(double l,double y_or_W):Ray(l)
 	{
 		if(l==-INF||l==INF)
@@ -287,6 +291,7 @@ public:
 		// 默认为主光线，可根据上下光线重新设置
 		label="cf";
 		l=0; 
+		t=-INF,s=-INF;
 	}
 
 	SAR(double l,double y_or_W,string label):Ray(l)
@@ -301,6 +306,7 @@ public:
 
 		L=l;
 		this->label=label;
+		t=-INF,s=-INF;
 		
 	}
 
@@ -315,10 +321,10 @@ public:
 		else { y=y_or_W; }
 
 		L=l;
+		t=-INF,s=-INF;
 		this->label=label;
 		this->rayinfo=rayinfo;
-		
-		
+
 	}
 	
 	~SAR(){}
