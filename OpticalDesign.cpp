@@ -218,10 +218,10 @@ void cal_test(){
 	FC1=sys.cal_FCs(-INF,W);
 	FC2=sys.cal_FCs(l,y);
 
-	cout<<"Field Curvature -- inf -- "<<"t--"<<FC1[0]<<"s--"<<FC1[1]<<endl;
+	cout<<"Field Curvature -- inf -- "<<"t-- "<<FC1[0]<<"s--"<<FC1[1]<<endl;
 	cout<<"Astigmatism -- inf -- "<<FC1[2]<<endl;
 	
-	cout<<"Field Curvature -- finite -- "<<"t--"<<FC2[0]<<"s--"<<FC2[1]<<endl;
+	cout<<"Field Curvature -- finite -- "<<"t-- "<<FC2[0]<<"s--"<<FC2[1]<<endl;
 	cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
 }
  

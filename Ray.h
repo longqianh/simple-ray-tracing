@@ -31,8 +31,14 @@ public:
 	{
 		this->rayinfo=rayinfo;
 	}
- 
-	~Ray(){}
+ 	
+ 	Ray(double l,string rayinfo)
+	{
+		this->l=l;
+		this->rayinfo=rayinfo;
+	}
+	
+	virtual ~Ray(){}
 
 
 	void set_U(double U){
@@ -99,9 +105,8 @@ public:
 		rayinfo="FPR"; 
 		U=0;
 	}
-	FPR(double l,string rayinfo):Ray(l)
+	FPR(double l,string rayinfo):Ray(l,rayinfo)
 	{
-		this->rayinfo=rayinfo;
 		U=0;
 	}
 

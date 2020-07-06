@@ -23,10 +23,10 @@ public:
 	Surface *sf;
 	double * dists;
 	double * rs;
-	double * nds;
+	double * ns;
 
 	OptSys(){}
-	OptSys(int a,int nsf,double *dists,double * rs,double *nds){
+	OptSys(int a,int nsf,double *dists,double * rs,double *ns){
 		
 		
 		this->a=a;
@@ -34,14 +34,14 @@ public:
 		sf=new Surface[nsf];
 		this->dists=new double[nsf];
 		this->rs=new double[nsf];
-		this->nds=new double[nsf];
+		this->ns=new double[nsf];
 		for(int k=0;k<nsf;k++){
 			sf[k].set_d(dists[k]);
 			sf[k].set_rho(rs[k]);
-			sf[k].set_n(nds[k]);
+			sf[k].set_n(ns[k]);
 			this->dists[k]=dists[k];
 			this->rs[k]=rs[k];
-			this->nds[k]=nds[k];
+			this->ns[k]=ns[k];
 		}
 
 		this->init_sys();
@@ -54,7 +54,7 @@ public:
 		delete [] sf;
 		delete [] dists;
 		delete [] rs;
-		delete [] nds;
+		delete [] ns;
 	}
 
 	double get_f() const { return f; }
