@@ -16,7 +16,7 @@ private:
 	double rho;
 	double n; // 与下一个面之间的折射率
 	double d; // 到下一个面的距离
-	double X; // 
+	double X; 
 	double PA; 
 
 public:

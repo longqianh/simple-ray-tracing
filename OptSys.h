@@ -193,8 +193,6 @@ Ray OptSys::ray_tracing(FPR rayin,double ku,double kw,string info){
 		
 		if(isINF&&k==0) i=(a/2)*rho;
 		else i=(rho*l1-1)*u1;				
-
-		// if(k==0)rayin.set_i(i);	
 		
 		n2=sf[k].get_n();
 		u2=(n2-n1)/n2*i+u1;

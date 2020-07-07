@@ -318,5 +318,5 @@ void cal_test()
 	cout<<"Astigmatism -- finite -- "<<FC2[2]<<endl;
 
 
-
 }
+
