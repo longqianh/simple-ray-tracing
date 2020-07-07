@@ -2,11 +2,9 @@
 
 
 
-## 光路追迹程序说明
+## 1. 光路追迹计算程序说明
 
-这是一个非专业协作的非专业项目，头文件和cpp没有分开，GitHub提交也比较混乱，文件、代码、GitHub 加专业是我学习的方向。
-
-但是这是我较为满意的一次项目，至少我不认为这是学术垃圾。光线的计算程序写了三、四十个小时，在类的设计上花了不少功夫，我认为程序具有可拓展性、易理解性，比如要进行光路追迹，只需要声明光线，便可利用`ray_tracing(ray,ku,kw)` 函数得到输出光线。
+光线的计算程序写了三、四十个小时，在类的设计上花了不少功夫，我认为程序具有可拓展性、易理解性，比如要进行光路追迹，只需要声明光线，便可利用`ray_tracing(ray,ku,kw)` 函数得到输出光线。
 
 
 
@@ -60,9 +58,9 @@ Second Paraxial Ray 的缩写。
 
 
 
-#### 第一实际光 FAR
+#### 第一实际光 FRR
 
-First Actual Ray 的缩写。
+First Real Ray 的缩写。(一开始为 FAR 为 First Actual Ray，无奈与MFC中的一个指针重名)
 
 声明时需要提供物距 l , 可选参数为光线信息 `rayinfo`。
 
@@ -113,7 +111,7 @@ Optsys(a,nsf,dists[],rs[],ns[]);
 
 **光路追迹函数** `ray_tracing` ，利用多态可以自动判断光线类型，所以只需要输入光线，即可得到输出光线，并利用 `get_` 方法得到输出光线的相关参数。下一步的改进可以是做成模版类。
 
-例如，根据输入光线的参数：物距 l 、有限远像高 y 或者无限远视场 W, 便可利用 `Ray rayin(l),FPR rayin(l), SPR rayin(l,y_or_W), FAR rayin(l), SAR rayin(l,y_or_W);` 声明四种光线，然后利用 `Ray rayout; rayout = ray_tracing(rayin,ku,kw)`  即可得到某一光线光路追迹后的结果，其中 `ku,kw` 分别是孔径和视场因子，0.7孔径时 ku=0.7, 0.7视场时 kw=0.7, 若不填写则默认为 1 。
+例如，根据输入光线的参数：物距 l 、有限远像高 y 或者无限远视场 W, 便可利用 `Ray rayin(l),FPR rayin(l), SPR rayin(l,y_or_W), FRR rayin(l), SAR rayin(l,y_or_W);` 声明四种光线，然后利用 `Ray rayout; rayout = ray_tracing(rayin,ku,kw)`  即可得到某一光线光路追迹后的结果，其中 `ku,kw` 分别是孔径和视场因子，0.7孔径时 ku=0.7, 0.7视场时 kw=0.7, 若不填写则默认为 1 。
 
 **像高计算函数** `cal_y0,cal_y` 可分别根据输入的物距、像高或视场计算理想像高和实际像高。
 
@@ -171,11 +169,13 @@ Optsys(a,nsf,dists[],rs[],ns[]);
 
 
 
-## OpticalDesign.cpp
 
-测试程序。
 
-### 测试程序输出
+### cal_test
+
+测试程序。输出如下：
+
+
 
 ```tex
 Optical System Parameters:
@@ -207,16 +207,16 @@ Aperture Angle U -- -2.936655
 Distance l -- -4.200444
 
 First Actual Ray:
-Ray Information : FAR,rayout,inf 
+Ray Information : FRR,rayout,inf 
 Aperture Angle U -- 5.754339
 Distance l -- 96.82104
-Ray Information : FAR,rayout,inf,0.7U 
+Ray Information : FRR,rayout,inf,0.7U 
 Aperture Angle U -- 4.025652
 Distance l -- 96.80548
-Ray Information : FAR,rayout,finite 
+Ray Information : FRR,rayout,finite 
 Aperture Angle U -- 4.639631
 Distance l -- 121.3194
-Ray Information : FAR,rayout,finite,0.7U 
+Ray Information : FRR,rayout,finite,0.7U 
 Aperture Angle U -- 3.239016
 Distance l -- 121.4342
 
@@ -302,4 +302,6 @@ Astigmatism -- finite -- -0.3977977
 
 
 
+
+## 2. 用户操作界面说明
 
