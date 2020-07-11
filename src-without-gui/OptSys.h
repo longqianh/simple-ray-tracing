@@ -182,7 +182,7 @@ Ray OptSys::ray_tracing(FPR rayin,double ku,double kw,string info){
 
 	if(!isINF)
 	{
-		u1=atan((ku*a/2)/l1);  // whether ot not : add ku
+		u1=atan((ku*a/2)/l1);  // add ku
 		rayin.set_U(u1);
 	}
 		
@@ -191,7 +191,7 @@ Ray OptSys::ray_tracing(FPR rayin,double ku,double kw,string info){
 		double d=sf[k].get_d(); 
 		double rho=sf[k].get_rho();
 		
-		if(isINF&&k==0) i=(a/2)*rho;
+		if(isINF&&k==0) i=ku*(a/2)*rho; // add ku
 		else i=(rho*l1-1)*u1;				
 		
 		n2=sf[k].get_n();
@@ -600,15 +600,15 @@ double* OptSys::cal_FCs(double l,double y_or_W,double ku,double kw)
 	rayout1=ray_tracing(rayin1);
 	rayout2=ray_tracing(rayin2,ku,kw);
 
-	double l2=rayout1.get_l();
+	double l0=rayout1.get_l();
 	double U=rayout2.get_U();
 	double t=rayout2.get_t();
 	double s=rayout2.get_s();
 	double X=sf[nsf-1].get_X();
 
 	double *FC = new double[3]();
-	double xt=t*cos(U)+X-l2;
-	double xs=s*cos(U)+X-l2;
+	double xt=t*cos(U)+X-l0;
+	double xs=s*cos(U)+X-l0;
 
 	// cout<<cos(U)<<endl;
 	// cout<<"l' -- "<<l2<<endl;
