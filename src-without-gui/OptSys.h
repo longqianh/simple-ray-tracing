@@ -92,9 +92,9 @@ public:
 
 	void set_lH0();
 
-	Ray ray_tracing(FPR rayin, double ku=1,double kw=1,string info="First Paraxial Ray-tracing");
+	Ray ray_tracing(FPR rayin, double ku=1,double kw=0,string info="First Paraxial Ray-tracing"); // 可以去掉kw
 	Ray ray_tracing(SPR rayin, double ku=1, double kw=1,string info="Second Paraxial Ray-tracing");
-	Ray ray_tracing(FRR rayin, double ku=1, double kw=1,string info="First Actual Ray-tracing");
+	Ray ray_tracing(FRR rayin, double ku=1, double kw=0,string info="First Actual Ray-tracing");
 	SAR ray_tracing(SAR rayin, double ku=1, double kw=1,string info="Second Actual Ray-tracing");
 
 
@@ -182,7 +182,7 @@ Ray OptSys::ray_tracing(FPR rayin,double ku,double kw,string info){
 
 	if(!isINF)
 	{
-		u1=atan((a/2)/l1); 
+		u1=atan((ku*a/2)/l1);  // whether ot not : add ku
 		rayin.set_U(u1);
 	}
 		
