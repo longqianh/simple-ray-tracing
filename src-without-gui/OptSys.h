@@ -92,7 +92,7 @@ public:
 
 	void set_lH0();
 
-	Ray ray_tracing(FPR rayin, string info="First Paraxial Ray-tracing");
+	Ray ray_tracing(FPR rayin, double ku=1,double kw=1,string info="First Paraxial Ray-tracing");
 	Ray ray_tracing(SPR rayin, double ku=1, double kw=1,string info="Second Paraxial Ray-tracing");
 	Ray ray_tracing(FRR rayin, double ku=1, double kw=1,string info="First Actual Ray-tracing");
 	SAR ray_tracing(SAR rayin, double ku=1, double kw=1,string info="Second Actual Ray-tracing");
@@ -168,8 +168,8 @@ void OptSys::init_sys()
 
 }
 
-// 多态
-Ray OptSys::ray_tracing(FPR rayin,string info){
+// 利用多态
+Ray OptSys::ray_tracing(FPR rayin,double ku,double kw,string info){
 	
 	double u1=0,u2=0; // u1 -- u, u2 -- u'
 	double l1=rayin.get_l();
@@ -514,11 +514,11 @@ double OptSys::cal_y(double l,double y_or_W,double ku,double kw)
 	SAR rayin2(l,y_or_W);
 	Ray rayout1,rayout2;
 	if(nds==nullptr){
-		rayout1=ray_tracing(rayin1);
+		rayout1=ray_tracing(rayin1,ku,kw);
 	}
 	else{
 		OptSys sys_d(a,nsf,dists,rs,nds);
-		rayout1=sys_d.ray_tracing(rayin1);
+		rayout1=sys_d.ray_tracing(rayin1,ku,kw);
 	}
 	
 	rayout2=ray_tracing(rayin2,ku,kw);
@@ -547,7 +547,7 @@ double OptSys::cal_SA(double l,double ku)
 	FPR rayin1(l);
 	FRR rayin2(l);
 	Ray rayout1,rayout2;
-	rayout1=ray_tracing(rayin1);
+	rayout1=ray_tracing(rayin1,ku);
 	rayout2=ray_tracing(rayin2,ku);
 	return rayout2.get_l()-rayout1.get_l();
 }
@@ -562,8 +562,8 @@ double OptSys::cal_LCAx(double *nfs,double *ncs,double l, double ku)
 	if(ku==0)
 	{
 		FPR rayin1(l),rayin2(l);		
-		rayout1=sys_f.ray_tracing(rayin1);	
-		rayout2=sys_c.ray_tracing(rayin2);
+		rayout1=sys_f.ray_tracing(rayin1,ku);	
+		rayout2=sys_c.ray_tracing(rayin2,ku);
 	}
 
 	else
@@ -635,7 +635,7 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 	Ray rayout;
 	SAR rayout_up,rayout_dn;
 
-	rayout=ray_tracing(rayin);
+	rayout=ray_tracing(rayin,ku,kw);
 	rayout_up=ray_tracing(rayin_up,ku,kw);
 	rayout_dn=ray_tracing(rayin_dn,ku,kw);
 

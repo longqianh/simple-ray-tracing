@@ -136,13 +136,13 @@ void cal_test()
 		cout<<"First Paraxial Ray:"<<endl;
 		FPR rayin1(-INF);
 		Ray rayout1;
-		rayout1=sys.ray_tracing(rayin1,"FPR,rayout,inf");
+		rayout1=sys.ray_tracing(rayin1,1,1,"FPR,rayout,inf");
 		rayout1.show_rayinfo();
 
 		FPR rayin2(l);
 		Ray rayout2;
 		
-		rayout2=sys.ray_tracing(rayin2,"FPR,rayout,finite");
+		rayout2=sys.ray_tracing(rayin2,1,1,"FPR,rayout,finite");
 		rayout2.show_rayinfo();
 	}
 	
