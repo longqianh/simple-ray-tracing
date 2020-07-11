@@ -1,11 +1,41 @@
-
 #include "API_funcs.h"
 using namespace std;
 
 
+
+
 int main()
 {
-	cal_test();
+	int nsf=3;
+	double a=20;
+	double l=-500;
+	double dists[]={4,2.5,60};
+	double rs[]={62.5,-43.65,-124.35};
+	double nfs[]={1.5223709191,1.6875154791,1};
+	double nds[]={1.5167969495,1.6727015725,1};
+	double ncs[]={1.5143226707,1.6666104143,1};
+	
+	OptSys sys(a,nsf,dists,rs,nds);
+	// cout<<sys.cal_SA(l,0.5)<<endl;
+	double SAs[100]={0};
+	// double LCAx[100]={0};
+	for (int ku = 1; ku<100; ku++)
+	{
+		SAs[ku]=sys.cal_SA(l,ku/100.0);
+		// sys.cal_LCAx(nfs,ncs,l)
+	}
+	cout<<"[";
+	for (int i = 0; i < 100; ++i)
+	{
+		if(i<99)
+		{
+			cout<<SAs[i]<<",";
+		}
+		else
+			cout<<SAs[i];
+		
+	}
+	cout<<"]";
 
 	return 0;
 
