@@ -8,30 +8,30 @@ int main()
 	cal_test();
 
 
-	int nsf=3;
-	double a=20;
-	double l=-500;
-	double y=26;
-	double dists[]={4,2.5,60};
-	double rs[]={62.5,-43.65,-124.35};
-	double nfs[]={1.5223709191,1.6875154791,1};
-	double nds[]={1.5167969495,1.6727015725,1};
-	double ncs[]={1.5143226707,1.6666104143,1};
+	// int nsf=3;
+	// double a=20;
+	// double l=-500;
+	// double y=26;
+	// double dists[]={4,2.5,60};
+	// double rs[]={62.5,-43.65,-124.35};
+	// double nfs[]={1.5223709191,1.6875154791,1};
+	// double nds[]={1.5167969495,1.6727015725,1};
+	// double ncs[]={1.5143226707,1.6666104143,1};
 	
-	OptSys sys;
-	sys.show_sysinfo();
-	sys.set_sys(a,nsf,dists,rs,nds);
+	// OptSys sys;
 	// // sys.show_sysinfo();
-	vector<double> res;
-	double * ans=sys.get_DTs(l,y);
+	// sys.set_sys(a,nsf,dists,rs,nds,nfs,ncs);
+	// sys.show_sysinfo();
+	// vector<double> res;
+	// double * ans=sys.get_DTs(l,y);
 
-	// sys.cal_allres(res,l,y,nfs,ncs);
-	cout<<"[";
-	for(int k=0;k<100;k++){
-		cout<<ans[k]<<',';
+	// // sys.cal_allres(res,l,y,nfs,ncs);
+	// cout<<"[";
+	// for(int k=0;k<100;k++){
+	// 	cout<<ans[k]<<',';
 
-	}
-	cout<<']';
+	// }
+	// cout<<']';
 
 	// double tmp=sys.cal_SA(l);
 	// cout<<tmp;

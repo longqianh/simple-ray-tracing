@@ -25,8 +25,9 @@ public:
 	Surface *sf;
 	double * dists;
 	double * rs;
-	double * ns;
-	double * nds; // F、C系统所依附的主系统参数
+	double * nds;
+	double * nfs; 
+	double * ncs;
 
 	OptSys(){
 		nsf=0;
@@ -37,38 +38,40 @@ public:
 		sf=nullptr;
 		dists=nullptr;
 		rs=nullptr;
-		ns=nullptr;
 		nds=nullptr;
+		nfs=nullptr;
+		ncs=nullptr;
 	}
-	OptSys(int a,int nsf,double *dists,double * rs,double *ns,double *nds=nullptr){
-		
-		if(nds!=nullptr){
-			this->nds=new double[nsf];
+	OptSys(int a,int nsf,double *dists,double * rs,double *nds,double *nfs=nullptr,double *ncs=nullptr){
+
+		if(nfs!=nullptr)
+		{
+			this->nfs=new double[nsf]();
 		}
-		else{
-			this->nds=nullptr;
+		if(ncs!=nullptr)
+		{
+			this->ncs=new double[nsf]();
 		}
 		this->a=a;
 		this->nsf=nsf;
 		sf=new Surface[nsf];
 		this->dists=new double[nsf];
 		this->rs=new double[nsf];
-		this->ns=new double[nsf];
+		this->nds=new double[nsf];
 		for(int k=0;k<nsf;k++){
-			// if((k==nsf-1)&&(sizeof(dists)/sizeof(dists[0])<nsf-1))
-			// {
-			// 	sf[k].set_d(INF);
-			// }
+
 			sf[k].set_d(dists[k]);
 			sf[k].set_rho(rs[k]);
-			sf[k].set_n(ns[k]);
+			sf[k].set_n(nds[k]);
 			this->dists[k]=dists[k];
 			this->rs[k]=rs[k];
-			this->ns[k]=ns[k];
-			if(nds!=nullptr){
-				this->nds[k]=nds[k];
+			this->nds[k]=nds[k];
+			if(nfs!=nullptr){
+				this->nfs[k]=nfs[k];
 			}
-
+			if(ncs!=nullptr){
+				this->ncs[k]=ncs[k];
+			}
 		}
 
 		this->init_sys();
@@ -81,11 +84,13 @@ public:
 		delete [] sf;
 		delete [] dists;
 		delete [] rs;
-		delete [] ns;
-		if(nds!=nullptr){
-			delete [] nds;
+		delete [] nds;
+		if(nfs!=nullptr){
+			delete [] nfs;
 		}
-		// delete [] SAs;
+		if(ncs!=nullptr){
+			delete [] ncs;
+		}
 	}
 
 
@@ -99,9 +104,9 @@ public:
 
 	double * get_dists() const {return dists; }
 	double * get_rs() const {return rs;}
-	double * get_ns() const {return ns;}
-	// double * get_nfs()const {return nfs;}
-	// double * get_ncs()const {return ncs;}
+	double * get_nds() const {return nds;}
+	double * get_nfs()const {return nfs;}
+	double * get_ncs()const {return ncs;}
 
 	double get_lp() const { return lp; }
 
@@ -113,7 +118,7 @@ public:
 
 	void set_lH0();
 
-	void set_sys(int a,int nsf,double *dists,double * rs,double *ns,double *nds=nullptr);
+	void set_sys(int a,int nsf,double *dists,double * rs,double *nds,double *nfs=nullptr,double *ncs=nullptr);
 
 	Ray ray_tracing(FPR rayin, double ku=1,double kw=0,string info="First Paraxial Ray-tracing"); // 可以去掉kw
 	Ray ray_tracing(SPR rayin, double ku=1, double kw=1,string info="Second Paraxial Ray-tracing");
@@ -123,13 +128,13 @@ public:
 
 	double cal_y0(double l,double y_or_W,double ku=1,double kw=1);
 
-	double cal_y(double l,double y_or_W,double ku=1,double kw=1);
+	double cal_y(double l,double y_or_W,double ku=1,double kw=1,char label='d');
 
 	double cal_SA(double l,double ku=1);
 
-	double cal_LCAx(double *nfs,double *ncs,double l, double ku=1); // Lateral Chromatic Aberration
+	double cal_LCAx(double l, double ku=1); // Lateral Chromatic Aberration
 
-	double cal_LCAy(double *nfs,double *ncs,double l,double y_or_W, double kw=1); // Longitudinal Chromatic Aberration
+	double cal_LCAy(double l,double y_or_W, double kw=1); // Longitudinal Chromatic Aberration
 
 	double* cal_DT(double l,double y_or_W,double ku=1,double kw=1);
 
@@ -137,17 +142,20 @@ public:
 
 	double* cal_FCs(double l,double y_or_W, double ku=1,double kw=1); // Field Curvature and Astigmatism
 
-	void cal_allres(vector<double> &res, double l,double y_or_W, double * nfs,double *ncs);
+	void cal_allres(vector<double> &res, double l,double y_or_W);
 
 	// 获得绘像差图所需的数据
 	double * get_SAs(double l, double interval = 0.01); //球差曲线～随孔径变化的球差
-	double * get_LCAxs(double *nfs,double*ncs,double l,double interval = 0.01); // 位置色差曲线～随孔径变化的位置色差
-	double * get_LCAys(double *nfs,double*ncs,double l,double y_or_W,double interval = 0.01); // 倍率色差曲线～随视场变化的倍率色差
+	
+	double * get_LCAxs(double l,double interval = 0.01); // 位置色差曲线～随孔径变化的位置色差
+	
+	double * get_LCAys(double l,double y_or_W,double interval = 0.01); // 倍率色差曲线～随视场变化的倍率色差
+	
 	double * get_DTs(double l,double y_or_W,double interval = 0.01); // 相对畸变曲线～随视场变化的相对畸变
+	
 	double * get_ATMs(double l,double y_or_W,double interval = 0.01); // 像散曲线～随视场变化的像散
 	// double * get_FCs(double l,double y_or_W, double interval = 0.01);
 	// double * get_Comas(double l,y_or_W,double interval=0.01);
-
 
 
 
@@ -156,32 +164,37 @@ public:
 
 
 
-void OptSys::set_sys(int a,int nsf,double *dists,double * rs,double *ns,double *nds)
+void OptSys::set_sys(int a,int nsf,double *dists,double * rs,double *nds,double *nfs,double *ncs)
 {
 
-	if(nds!=nullptr)
+	if(nfs!=nullptr)
 	{
-		this->nds=new double[nsf];
+		this->nfs=new double[nsf]();
 	}
-	else{
-		this->nds=nullptr;
+	if(ncs!=nullptr)
+	{
+		this->ncs=new double[nsf]();
 	}
 	
 	this->a=a;
 	this->nsf=nsf;
 	sf=new Surface[nsf];
-	this->dists=new double[nsf];
-	this->rs=new double[nsf];
-	this->ns=new double[nsf];
+	this->dists=new double[nsf]();
+	this->rs=new double[nsf]();
+	this->nds=new double[nsf]();
+
 	for(int k=0;k<nsf;k++){
 		sf[k].set_d(dists[k]);
 		sf[k].set_rho(rs[k]);
-		sf[k].set_n(ns[k]);
+		sf[k].set_n(nds[k]);
 		this->dists[k]=dists[k];
 		this->rs[k]=rs[k];
-		this->ns[k]=ns[k];
-		if(nds!=nullptr){
-			this->nds[k]=nds[k];
+		this->nds[k]=nds[k];
+		if(nfs!=nullptr){
+			this->nfs[k]=nfs[k];
+		}
+		if(ncs!=nullptr){
+			this->ncs[k]=ncs[k];
 		}
 
 	}
@@ -574,26 +587,40 @@ double OptSys::cal_y0(double l,double y_or_W,double ku,double kw)
 
 
 
-double OptSys::cal_y(double l,double y_or_W,double ku,double kw)
+double OptSys::cal_y(double l,double y_or_W,double ku,double kw,char label)
 {
 	if(nsf==0)return 0;
 	
 	FPR rayin1(l);
 	SAR rayin2(l,y_or_W);
 	Ray rayout1,rayout2;
-	if(nds==nullptr){
-		rayout1=ray_tracing(rayin1,ku,kw);
+	rayout1=ray_tracing(rayin1,ku,kw);
+	if(label=='d')
+	{
+		rayout2=ray_tracing(rayin2,ku,kw);
 	}
-	else{
-		OptSys sys_d(a,nsf,dists,rs,nds);
-		rayout1=sys_d.ray_tracing(rayin1,ku,kw);
+	if(label=='f'||label=='F')
+	{
+		OptSys sys_f(a,nsf,dists,rs,nfs);
+		rayout2=sys_f.ray_tracing(rayin2,ku,kw);
 	}
+	if(label=='c'||label=='C')
+	{
+		OptSys sys_c(a,nsf,dists,rs,ncs);
+		rayout2=sys_c.ray_tracing(rayin2,ku,kw);
+	}
+	// if(nfs==nullptr){
+	// 	rayout1=ray_tracing(rayin1,ku,kw);
+	// }
+	// else{
+	// 	OptSys sys_d(a,nsf,dists,rs,nds);
+	// 	rayout1=sys_d.ray_tracing(rayin1,ku,kw);
+	// }
 	
-	rayout2=ray_tracing(rayin2,ku,kw);
+	// rayout2=ray_tracing(rayin2,ku,kw);
 
 
 	return myabs((rayout2.get_l()-rayout1.get_l())*tan(rayout2.get_U()));
-
 
 }
 
@@ -625,10 +652,9 @@ double OptSys::cal_SA(double l,double ku)
 	return rayout2.get_l()-rayout1.get_l();
 }
 
-double OptSys::cal_LCAx(double *nfs,double *ncs,double l, double ku)
+double OptSys::cal_LCAx(double l, double ku)
 {	
 	if(nsf==0)return 0;
-
 	OptSys sys_f(a,nsf,dists,rs,nfs);
 	OptSys sys_c(a,nsf,dists,rs,ncs);
 	Ray rayout1,rayout2;
@@ -646,19 +672,19 @@ double OptSys::cal_LCAx(double *nfs,double *ncs,double l, double ku)
 		rayout1=sys_f.ray_tracing(rayin1,ku);	
 		rayout2=sys_c.ray_tracing(rayin2,ku);
 	}
-
+	
 	return rayout1.get_l()-rayout2.get_l();
 
 }
 
 
 
-double OptSys::cal_LCAy(double *nfs,double *ncs,double l,double y_or_W,double kw)
+double OptSys::cal_LCAy(double l,double y_or_W,double kw)
 {
-	OptSys sys_f(a,nsf,dists,rs,nfs,ns);
-	OptSys sys_c(a,nsf,dists,rs,ncs,ns);
-	double yf=sys_f.cal_y(l,y_or_W,1,kw);
-	double yc=sys_c.cal_y(l,y_or_W,1,kw);
+	// OptSys sys_f(a,nsf,dists,rs,nfs);
+	// OptSys sys_c(a,nsf,dists,rs,ncs);
+	double yf=cal_y(l,y_or_W,1,kw,'f');
+	double yc=cal_y(l,y_or_W,1,kw,'c');
 
 	
 	return yf-yc;
@@ -727,7 +753,7 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 
 
 
-void OptSys::cal_allres(vector<double> &res,double l,double y_or_W,double *nfs,double *ncs )
+void OptSys::cal_allres(vector<double> &res,double l,double y_or_W)
 {
 	if(nsf==0)
 	{
@@ -758,7 +784,7 @@ void OptSys::cal_allres(vector<double> &res,double l,double y_or_W,double *nfs,d
 
 	res.push_back(cal_y(l,y_or_W,1,0.7)); // ywd'
 
-	OptSys sys_f(a,nsf,dists,rs,nfs,ns);
+	OptSys sys_f(a,nsf,dists,rs,nfs);
 	rayout=sys_f.ray_tracing(ray1);
 	res.push_back(rayout.get_l()); // lf0'
 	rayout=sys_f.ray_tracing(ray2);
@@ -770,11 +796,11 @@ void OptSys::cal_allres(vector<double> &res,double l,double y_or_W,double *nfs,d
 
 	res.push_back(sys_f.cal_y0(l,y_or_W,1,0.7)); // ywf0'
 
-	res.push_back(sys_f.cal_y(l,y_or_W)); // yf'
+	res.push_back(cal_y(l,y_or_W,1,1,'f')); // yf'
 
-	res.push_back(sys_f.cal_y(l,y_or_W,1,0.7)); // ywf'
+	res.push_back(cal_y(l,y_or_W,1,0.7,'f')); // ywf'
 
-	OptSys sys_c(a,nsf,dists,rs,nfs,ns);
+	OptSys sys_c(a,nsf,dists,rs,ncs);
 	rayout=sys_c.ray_tracing(ray1);
 	res.push_back(rayout.get_l()); // lc0'
 	rayout=sys_c.ray_tracing(ray2);
@@ -786,16 +812,16 @@ void OptSys::cal_allres(vector<double> &res,double l,double y_or_W,double *nfs,d
 
 	res.push_back(sys_c.cal_y0(l,y_or_W,1,0.7)); // ywc0'
 
-	res.push_back(sys_c.cal_y(l,y_or_W)); // yc'
+	res.push_back(cal_y(l,y_or_W,1,1,'c')); // yc'
 
-	res.push_back(sys_c.cal_y(l,y_or_W,1,0.7)); // ywc'
+	res.push_back(cal_y(l,y_or_W,1,0.7,'c')); // ywc'
 
 	res.push_back(cal_SA(l)); // SA
 	res.push_back(cal_SA(l,0.7)); // SAu
 
-	res.push_back(cal_LCAx(nfs,ncs,l)); // LCAx
-	res.push_back(cal_LCAx(nfs,ncs,l,0.7)); // LCAXu
-	res.push_back(cal_LCAx(nfs,ncs,l,0)); // LCAxu0
+	res.push_back(cal_LCAx(l)); // LCAx
+	res.push_back(cal_LCAx(l,0.7)); // LCAXu
+	res.push_back(cal_LCAx(l,0)); // LCAxu0
 
 	double * FCs=cal_FCs(l,y_or_W,0);
 	res.push_back(FCs[0]); // xt'
@@ -858,25 +884,25 @@ double * OptSys::get_ATMs(double l,double y_or_W,double interval)
 	return ATMs;
 }
 
-double * OptSys::get_LCAxs(double *nfs,double *ncs,double l,double interval)
+double * OptSys::get_LCAxs(double l,double interval)
 {
 	int n=int(1/interval);
 	double *LCAxs=new double[n]();
 	for (int i = 1; i < n; i++)
 	{
 		double ku=double(i)/double(n);
-		LCAxs[i]=cal_LCAx(nfs,ncs,l,ku);
+		LCAxs[i]=cal_LCAx(l,ku);
 	}
 	return LCAxs;
 }
-double * OptSys::get_LCAys(double *nfs,double*ncs,double l,double y_or_W,double interval)
+double * OptSys::get_LCAys(double l,double y_or_W,double interval)
 {
 	int n=int(1/interval);
 	double *LCAys=new double[n]();
 	for (int i = 1; i < n; i++)
 	{
 		double kw=double(i)/double(n);
-		LCAys[i]=cal_LCAy(nfs,ncs,l,y_or_W,kw);
+		LCAys[i]=cal_LCAy(l,y_or_W,kw);
 	}
 	return LCAys;
 
@@ -895,7 +921,7 @@ double * OptSys::get_LCAys(double *nfs,double*ncs,double l,double y_or_W,double 
 // 		if(k<nsf-1)
 // 		{
 // 			invdists[k]=dists[nsf-k-2];
-// 			invns[k]=ns[nsf-k-2];	
+// 			invns[k]=nds[nsf-k-2];	
 // 		}
 
 // 		else if(k==nsf-1)
@@ -908,7 +934,7 @@ double * OptSys::get_LCAys(double *nfs,double*ncs,double l,double y_or_W,double 
 // 		// cout<<"NS "<<invns[k]<<endl;
 // 	}
 
-// 	OptSys invsys(a,nsf,dists,rs,ns); //利用逆系统获得物方主面位置
+// 	OptSys invsys(a,nsf,dists,rs,nds); //利用逆系统获得物方主面位置
 // 	lH0=-invsys.get_lH();
 
 // 	delete []invrs;

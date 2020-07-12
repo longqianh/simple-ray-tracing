@@ -77,9 +77,9 @@ void cal_res(double a,int nsf, double *dists,double *rs,double * nfs, double * n
 	res.push_back(sys.cal_SA(l)); // SA
 	res.push_back(sys.cal_SA(l,0.7)); // SAu
 
-	res.push_back(sys.cal_LCAx(nfs,ncs,l)); // LCAx
-	res.push_back(sys.cal_LCAx(nfs,ncs,l,0.7)); // LCAXu
-	res.push_back(sys.cal_LCAx(nfs,ncs,l,0)); // LCAxu0
+	res.push_back(sys.cal_LCAx(l)); // LCAx
+	res.push_back(sys.cal_LCAx(l,0.7)); // LCAXu
+	res.push_back(sys.cal_LCAx(l,0)); // LCAxu0
 
 	double * FCs=sys.cal_FCs(l,y_or_W,0);
 	res.push_back(FCs[0]); // xt'
@@ -123,7 +123,7 @@ void cal_test()
 	double l=-500; // 物距：用户输入 左负右正
 	double y=26; // 像高 ：上正下负
 	double W=3; // 物方视场角：用户输入
-	OptSys sys(a,nsf,dists,rs,nds);
+	OptSys sys(a,nsf,dists,rs,nds,nfs,ncs);
 
 
 	sys.show_sysinfo();
@@ -221,9 +221,9 @@ void cal_test()
 	}
 
 	cout<<endl;
-	OptSys sys_f(a,nsf,dists,rs,nfs,nds);
-	// sys_f.show_sysinfo();
-	OptSys sys_c(a,nsf,dists,rs,ncs,nds);
+	// OptSys sys_f(a,nsf,dists,rs,nfs);
+	// // sys_f.show_sysinfo();
+	// OptSys sys_c(a,nsf,dists,rs,ncs);
 	cout<<"Exit Ray :"<<endl;
 	cout<<"Ideal image height -- inf -- nd -- "<<sys.cal_y0(-INF,3,1,1)<<endl;
 	cout<<"Ideal image height -- inf -- nd -- 0.7W --  "<<sys.cal_y0(-INF,3,1,0.7)<<endl;
@@ -234,20 +234,20 @@ void cal_test()
 	cout<<"Actual image height -- inf -- nd -- "<<sys.cal_y(-INF,3,1,1)<<endl;
 	cout<<"Actual image height -- inf -- nd -- 0.7W -- "<<sys.cal_y(-INF,3,1,0.7)<<endl;
 
-	cout<<"Actual image height -- inf -- nf -- "<<sys_f.cal_y(-INF,3,1,1)<<endl;
-	cout<<"Actual image height -- inf -- nf -- 0.7W -- "<<sys_f.cal_y(-INF,3,1,0.7)<<endl;
+	cout<<"Actual image height -- inf -- nf -- "<<sys.cal_y(-INF,3,1,1)<<endl;
+	cout<<"Actual image height -- inf -- nf -- 0.7W -- "<<sys.cal_y(-INF,3,1,0.7)<<endl;
 
-	cout<<"Actual image height -- inf -- nc -- "<<sys_c.cal_y(-INF,3,1,1)<<endl;
-	cout<<"Actual image height -- inf -- nc -- 0.7W -- "<<sys_c.cal_y(-INF,3,1,0.7)<<endl;
+	cout<<"Actual image height -- inf -- nc -- "<<sys.cal_y(-INF,3,1,1)<<endl;
+	cout<<"Actual image height -- inf -- nc -- 0.7W -- "<<sys.cal_y(-INF,3,1,0.7)<<endl;
 
 	cout<<"Actual image height -- finite -- nd -- "<<sys.cal_y(l,y,1,1)<<endl;
 	cout<<"Actual image height -- finite -- nd -- 0.7W -- "<<sys.cal_y(l,y,1,0.7)<<endl;
 
-	cout<<"Actual image height -- finite -- nf -- "<<sys_f.cal_y(l,y,1,1)<<endl;
-	cout<<"Actual image height -- finite -- nf -- 0.7W -- "<<sys_f.cal_y(l,y,1,0.7)<<endl;
+	cout<<"Actual image height -- finite -- nf -- "<<sys.cal_y(l,y,1,1)<<endl;
+	cout<<"Actual image height -- finite -- nf -- 0.7W -- "<<sys.cal_y(l,y,1,0.7)<<endl;
 
-	cout<<"Actual image height -- finite -- nc -- "<<sys_c.cal_y(l,y,1,1)<<endl;
-	cout<<"Actual image height -- finite -- nc -- 0.7W -- "<<sys_c.cal_y(l,y,1,0.7)<<endl;
+	cout<<"Actual image height -- finite -- nc -- "<<sys.cal_y(l,y,1,1)<<endl;
+	cout<<"Actual image height -- finite -- nc -- 0.7W -- "<<sys.cal_y(l,y,1,0.7)<<endl;
 
 	cout<<endl;
 	cout<<"Aberrations : "<<endl;
@@ -278,19 +278,19 @@ void cal_test()
 	cout<<"Spheroical Aberration -- finite -- 0.7U -- "<<sys.cal_SA(l,0.7)<<endl;
 
 
-	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0)<<endl;
-	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAx(nfs,ncs,-INF,0.7)<<endl;
-	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAx(nfs,ncs,-INF,1)<<endl;
-	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAx(nfs,ncs,l,0)<<endl;
-	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAx(nfs,ncs,l,0.7)<<endl;
-	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAx(nfs,ncs,l,1)<<endl;
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAx(-INF,0)<<endl;
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAx(-INF,0.7)<<endl;
+	cout<<"Lateral Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAx(-INF,1)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAx(l,0)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAx(l,0.7)<<endl;
+	cout<<"Lateral Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAx(l,1)<<endl;
 
 	// cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 0 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,0)<<endl;
-	cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,0.7)<<endl;
-	cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAy(nfs,ncs,-INF,3,1)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 0.7 -- "<<sys.cal_LCAy(-INF,3,0.7)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- inf -- Aperture 1 -- "<<sys.cal_LCAy(-INF,3,1)<<endl;
 	// cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 0 -- "<<sys.cal_LCAy(nfs,ncs,l,y,0)<<endl;
-	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAy(nfs,ncs,l,y,0.7)<<endl;
-	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAy(nfs,ncs,l,y,1)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 0.7 -- "<<sys.cal_LCAy(l,y,0.7)<<endl;
+	cout<<"Longitudinal Chromatic Aberration -- finite -- Aperture 1 -- "<<sys.cal_LCAy(l,y,1)<<endl;
 
 
 	cout<<"Coma -- inf -- "<<sys.cal_Coma(-INF,W)<<endl;
