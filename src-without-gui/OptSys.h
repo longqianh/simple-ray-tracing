@@ -1,6 +1,7 @@
 #pragma once
 #include "Ray.h"
 #include "Lens.h"
+#include <vector>
 #ifndef PI
 #define PI 3.14159265358979323846264338
 #endif
@@ -27,7 +28,18 @@ public:
 	double * ns;
 	double * nds; // F、C系统所依附的主系统参数
 
-	OptSys(){}
+	OptSys(){
+		nsf=0;
+		a=0;
+		f=0;
+		lH=0;
+		lp=0;
+		sf=nullptr;
+		dists=nullptr;
+		rs=nullptr;
+		ns=nullptr;
+		nds=nullptr;
+	}
 	OptSys(int a,int nsf,double *dists,double * rs,double *ns,double *nds=nullptr){
 		
 		if(nds!=nullptr){
@@ -73,14 +85,23 @@ public:
 		if(nds!=nullptr){
 			delete [] nds;
 		}
+		// delete [] SAs;
 	}
 
+
+	double get_a() const {return a;}
+	double get_nsf() const {return nsf;}
+	Surface * get_sf() const {return sf;}
 
 	double get_f() const { return f; }
 
 	double get_lH() const { return lH; }
 
-	// double get_lH0() const { return lH0; }
+	double * get_dists() const {return dists; }
+	double * get_rs() const {return rs;}
+	double * get_ns() const {return ns;}
+	// double * get_nfs()const {return nfs;}
+	// double * get_ncs()const {return ncs;}
 
 	double get_lp() const { return lp; }
 
@@ -91,6 +112,8 @@ public:
 	void show_sflist();
 
 	void set_lH0();
+
+	void set_sys(int a,int nsf,double *dists,double * rs,double *ns,double *nds=nullptr);
 
 	Ray ray_tracing(FPR rayin, double ku=1,double kw=0,string info="First Paraxial Ray-tracing"); // 可以去掉kw
 	Ray ray_tracing(SPR rayin, double ku=1, double kw=1,string info="Second Paraxial Ray-tracing");
@@ -108,16 +131,63 @@ public:
 
 	double cal_LCAy(double *nfs,double *ncs,double l,double y_or_W, double kw=1); // Longitudinal Chromatic Aberration
 
-	double* cal_Distortion(double l,double y_or_W,double ku=1,double kw=1);
+	double* cal_DT(double l,double y_or_W,double ku=1,double kw=1);
 
 	double cal_Coma(double l,double y_or_W,double ku=1,double kw=1);
 
 	double* cal_FCs(double l,double y_or_W, double ku=1,double kw=1); // Field Curvature and Astigmatism
 
-	// void cal_allres(double l,double y_or_W, vector<double> &res );
+	void cal_allres(vector<double> &res, double l,double y_or_W, double * nfs,double *ncs);
+
+	// 获得绘像差图所需的数据
+	double * get_SAs(double l, double interval = 0.01); //球差曲线～随孔径变化的球差
+	double * get_LCAxs(double *nfs,double*ncs,double l,double interval = 0.01); // 位置色差曲线～随孔径变化的位置色差
+	double * get_LCAys(double *nfs,double*ncs,double l,double y_or_W,double interval = 0.01); // 倍率色差曲线～随视场变化的倍率色差
+	double * get_DTs(double l,double y_or_W,double interval = 0.01); // 相对畸变曲线～随视场变化的相对畸变
+	double * get_ATMs(double l,double y_or_W,double interval = 0.01); // 像散曲线～随视场变化的像散
+	// double * get_FCs(double l,double y_or_W, double interval = 0.01);
+	// double * get_Comas(double l,y_or_W,double interval=0.01);
+
+
+
 
 };
 
+
+
+
+void OptSys::set_sys(int a,int nsf,double *dists,double * rs,double *ns,double *nds)
+{
+
+	if(nds!=nullptr)
+	{
+		this->nds=new double[nsf];
+	}
+	else{
+		this->nds=nullptr;
+	}
+	
+	this->a=a;
+	this->nsf=nsf;
+	sf=new Surface[nsf];
+	this->dists=new double[nsf];
+	this->rs=new double[nsf];
+	this->ns=new double[nsf];
+	for(int k=0;k<nsf;k++){
+		sf[k].set_d(dists[k]);
+		sf[k].set_rho(rs[k]);
+		sf[k].set_n(ns[k]);
+		this->dists[k]=dists[k];
+		this->rs[k]=rs[k];
+		this->ns[k]=ns[k];
+		if(nds!=nullptr){
+			this->nds[k]=nds[k];
+		}
+
+	}
+
+	this->init_sys();
+}
 
 
 void OptSys::show_sflist(){
@@ -145,11 +215,6 @@ void OptSys::show_sysinfo()
 	cout<<"Effective Focal Length -- "<<f<<endl;
 	cout<<"Main Surface Distance -- "<<lH<<endl;
 	cout<<"Exit Pupil Distance -- "<<lp<<endl;
-	// if(nds!=nullptr)
-	// {
-	// 	cout<<"NDS"<<nds[0]<<endl;
-	// }
-
 }
 
 
@@ -466,6 +531,8 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 
 double OptSys::cal_y0(double l,double y_or_W,double ku,double kw)
 {
+	if(nsf==0)return 0;
+
 	FPR rayin1(l);
 
 	if(l<=-INF)
@@ -509,6 +576,7 @@ double OptSys::cal_y0(double l,double y_or_W,double ku,double kw)
 
 double OptSys::cal_y(double l,double y_or_W,double ku,double kw)
 {
+	if(nsf==0)return 0;
 	
 	FPR rayin1(l);
 	SAR rayin2(l,y_or_W);
@@ -530,10 +598,14 @@ double OptSys::cal_y(double l,double y_or_W,double ku,double kw)
 }
 
 
-double* OptSys::cal_Distortion(double l,double y_or_W,double ku,double kw)
+double* OptSys::cal_DT(double l,double y_or_W,double ku,double kw)
 {
+	if(nsf==0)return 0;
 	// static double d[2]; // 使用静态变量 会出现地址错误
 	double *d=new double[2](); 
+	if(nsf==0){
+		return d;
+	}
 	double y1=cal_y(l,y_or_W,ku,kw);
 	double y0=cal_y0(l,y_or_W,ku,kw);
 	d[0]=y1-y0; // 绝对畸变
@@ -544,6 +616,7 @@ double* OptSys::cal_Distortion(double l,double y_or_W,double ku,double kw)
 
 double OptSys::cal_SA(double l,double ku)
 {
+	if(nsf==0)return 0;
 	FPR rayin1(l);
 	FRR rayin2(l);
 	Ray rayout1,rayout2;
@@ -554,6 +627,7 @@ double OptSys::cal_SA(double l,double ku)
 
 double OptSys::cal_LCAx(double *nfs,double *ncs,double l, double ku)
 {	
+	if(nsf==0)return 0;
 
 	OptSys sys_f(a,nsf,dists,rs,nfs);
 	OptSys sys_c(a,nsf,dists,rs,ncs);
@@ -593,30 +667,28 @@ double OptSys::cal_LCAy(double *nfs,double *ncs,double l,double y_or_W,double kw
 
 double* OptSys::cal_FCs(double l,double y_or_W,double ku,double kw)
 {
+
+	double *FC = new double[3]();
+	if(nsf==0)
+	{
+		return FC;
+	}
+
 	FPR rayin1(l);
 	SAR rayin2(l,y_or_W);
 	Ray rayout1;
 	SAR rayout2;
 	rayout1=ray_tracing(rayin1);
 	rayout2=ray_tracing(rayin2,ku,kw);
-
 	double l0=rayout1.get_l();
 	double U=rayout2.get_U();
 	double t=rayout2.get_t();
 	double s=rayout2.get_s();
 	double X=sf[nsf-1].get_X();
 
-	double *FC = new double[3]();
 	double xt=t*cos(U)+X-l0;
 	double xs=s*cos(U)+X-l0;
 
-	// cout<<cos(U)<<endl;
-	// cout<<"l' -- "<<l2<<endl;
-	// cout<<"U --"<< U<<endl;
-	// cout<<"s -- "<<s <<endl;
-	// cout<<"t --"<< t<<endl;
-
-	
 	FC[0]=xt,FC[1]=xs,FC[2]=xt-xs;
 
 	return FC;
@@ -625,6 +697,9 @@ double* OptSys::cal_FCs(double l,double y_or_W,double ku,double kw)
 
 double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 {	
+	
+	if(nsf==0)return 0;
+	
 	double coma=0;
 	double yp=cal_y(l,y_or_W,ku,kw);
 	double y_up=0,y_dn=0;
@@ -639,8 +714,6 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 	rayout_up=ray_tracing(rayin_up,ku,kw);
 	rayout_dn=ray_tracing(rayin_dn,ku,kw);
 
-	// cout<<yp<<endl;
-
 	
 	y_up=(rayout_up.get_l()-rayout.get_l())*tan(rayout_up.get_U());
 	y_dn=(rayout_dn.get_l()-rayout.get_l())*tan(rayout_dn.get_U());
@@ -649,6 +722,163 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 	// cout<<y_dn<<endl;
 
 	return myabs((y_up+y_dn)/2-yp); // 之前的bug：+写成了- orz
+
+}
+
+
+
+void OptSys::cal_allres(vector<double> &res,double l,double y_or_W,double *nfs,double *ncs )
+{
+	if(nsf==0)
+	{
+		cout<<"Optical System doesn't initialize!"<<endl;
+		exit(0);
+	}
+
+	res.push_back(get_f()); // f'
+	res.push_back(get_lH()); // lH'
+	res.push_back(get_lp()); // lp'
+	Ray rayout;
+	
+	FPR ray1(l);
+	FRR ray2(l);
+
+	rayout=ray_tracing(ray1);
+	res.push_back(rayout.get_l()); // ld0'
+	rayout=ray_tracing(ray2); 
+	res.push_back(rayout.get_l()); // ld'
+	rayout=ray_tracing(ray2,0.7);
+	res.push_back(rayout.get_l()); // lud'
+
+	res.push_back(cal_y0(l,y_or_W)); // yd0'
+
+	res.push_back(cal_y0(l,y_or_W,1,0.7)); // ywd0'
+
+	res.push_back(cal_y(l,y_or_W)); // yd'
+
+	res.push_back(cal_y(l,y_or_W,1,0.7)); // ywd'
+
+	OptSys sys_f(a,nsf,dists,rs,nfs,ns);
+	rayout=sys_f.ray_tracing(ray1);
+	res.push_back(rayout.get_l()); // lf0'
+	rayout=sys_f.ray_tracing(ray2);
+	res.push_back(rayout.get_l()); // lf'
+	rayout=sys_f.ray_tracing(ray2,0.7);
+	res.push_back(rayout.get_l()); // luf'
+
+	res.push_back(sys_f.cal_y0(l,y_or_W)); // yf0'
+
+	res.push_back(sys_f.cal_y0(l,y_or_W,1,0.7)); // ywf0'
+
+	res.push_back(sys_f.cal_y(l,y_or_W)); // yf'
+
+	res.push_back(sys_f.cal_y(l,y_or_W,1,0.7)); // ywf'
+
+	OptSys sys_c(a,nsf,dists,rs,nfs,ns);
+	rayout=sys_c.ray_tracing(ray1);
+	res.push_back(rayout.get_l()); // lc0'
+	rayout=sys_c.ray_tracing(ray2);
+	res.push_back(rayout.get_l()); // lc'
+	rayout=sys_c.ray_tracing(ray2,0.7);
+	res.push_back(rayout.get_l()); // luc'
+
+	res.push_back(sys_c.cal_y0(l,y_or_W)); // yc0'
+
+	res.push_back(sys_c.cal_y0(l,y_or_W,1,0.7)); // ywc0'
+
+	res.push_back(sys_c.cal_y(l,y_or_W)); // yc'
+
+	res.push_back(sys_c.cal_y(l,y_or_W,1,0.7)); // ywc'
+
+	res.push_back(cal_SA(l)); // SA
+	res.push_back(cal_SA(l,0.7)); // SAu
+
+	res.push_back(cal_LCAx(nfs,ncs,l)); // LCAx
+	res.push_back(cal_LCAx(nfs,ncs,l,0.7)); // LCAXu
+	res.push_back(cal_LCAx(nfs,ncs,l,0)); // LCAxu0
+
+	double * FCs=cal_FCs(l,y_or_W,0);
+	res.push_back(FCs[0]); // xt'
+	res.push_back(FCs[1]); // xs'
+	res.push_back(FCs[2]); // xts'
+
+	double *Dt1s=cal_DT(l,y_or_W);
+	double *Dt2s=cal_DT(l,y_or_W,1,0.7);
+
+	res.push_back(Dt1s[0]); // adt (Absolute distortion)
+	res.push_back(Dt2s[0]); // adtw
+	res.push_back(Dt1s[1]); // rdt (Relutive distortion)
+	res.push_back(Dt2s[1]); // rdtw
+
+	res.push_back(cal_Coma(l,y_or_W)); // coma1
+	res.push_back(cal_Coma(l,y_or_W,0.7)); // coma2
+	res.push_back(cal_Coma(l,y_or_W,1,0.7)); // coma3
+	res.push_back(cal_Coma(l,y_or_W,0.7,0.7)); // coma4
+
+}
+
+
+
+double * OptSys::get_SAs(double l, double interval)
+{
+	int n=int(1/interval);
+	double *SAs=new double[n]();
+	for (int i = 1; i < n; i++)
+	{
+		double ku=double(i)/double(n);
+		SAs[i]=cal_SA(l,ku);
+	}
+	return SAs;
+}
+
+
+double * OptSys::get_DTs(double l,double y_or_W,double interval)
+{
+	int n=int(1/interval);
+	double *DTs=new double[n]();
+	for (int i = 1; i < n; i++)
+	{
+		double kw=double(i)/double(n);
+		double *tmp=cal_DT(l,y_or_W,1,kw);
+		DTs[i]=tmp[1];
+	}
+	return DTs;
+}
+
+double * OptSys::get_ATMs(double l,double y_or_W,double interval)
+{
+	int n=int(1/interval);
+	double *ATMs=new double[n]();
+	for (int i = 1; i < n; i++)
+	{
+		double kw=double(i)/double(n);
+		double *tmp=cal_FCs(l,y_or_W,1,kw);
+		ATMs[i]=tmp[2];
+	}
+	return ATMs;
+}
+
+double * OptSys::get_LCAxs(double *nfs,double *ncs,double l,double interval)
+{
+	int n=int(1/interval);
+	double *LCAxs=new double[n]();
+	for (int i = 1; i < n; i++)
+	{
+		double ku=double(i)/double(n);
+		LCAxs[i]=cal_LCAx(nfs,ncs,l,ku);
+	}
+	return LCAxs;
+}
+double * OptSys::get_LCAys(double *nfs,double*ncs,double l,double y_or_W,double interval)
+{
+	int n=int(1/interval);
+	double *LCAys=new double[n]();
+	for (int i = 1; i < n; i++)
+	{
+		double kw=double(i)/double(n);
+		LCAys[i]=cal_LCAy(nfs,ncs,l,y_or_W,kw);
+	}
+	return LCAys;
 
 }
 
@@ -687,91 +917,3 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 // }
 
 
-	
-
-// void OptSys::cal_allres(double *nfs,double *nds, double *ncs,double l,double y_or_W, vector<double> &res )
-// {
-
-// 	OptSys sys(a,nsf,dists,rs,nds);
-// 	res.push_back(sys.get_f()); // f'
-// 	res.push_back(sys.get_lH()); // lH'
-// 	res.push_back(sys.get_lp()); // lp'
-// 	Ray rayout;
-	
-// 	FPR ray1(l);
-// 	FRR ray2(l);
-
-// 	rayout=sys.ray_tracing(ray1);
-// 	res.push_back(rayout.get_l()); // ld0'
-// 	rayout=sys.ray_tracing(ray2); 
-// 	res.push_back(rayout.get_l()); // ld'
-// 	rayout=sys.ray_tracing(ray2,0.7);
-// 	res.push_back(rayout.get_l()); // lud'
-
-// 	res.push_back(sys.cal_y0(l,y_or_W)); // yd0'
-
-// 	res.push_back(sys.cal_y0(l,y_or_W,1,0.7)); // ywd0'
-
-// 	res.push_back(sys.cal_y(l,y_or_W)); // yd'
-
-// 	res.push_back(sys.cal_y(l,y_or_W,1,0.7)); // ywd'
-
-// 	OptSys sys_f(a,nsf,dists,rs,nfs,nds);
-// 	rayout=sys_f.ray_tracing(ray1);
-// 	res.push_back(rayout.get_l()); // lf0'
-// 	rayout=sys_f.ray_tracing(ray2);
-// 	res.push_back(rayout.get_l()); // lf'
-// 	rayout=sys_f.ray_tracing(ray2,0.7);
-// 	res.push_back(rayout.get_l()); // luf'
-
-// 	res.push_back(sys_f.cal_y0(l,y_or_W)); // yf0'
-
-// 	res.push_back(sys_f.cal_y0(l,y_or_W,1,0.7)); // ywf0'
-
-// 	res.push_back(sys_f.cal_y(l,y_or_W)); // yf'
-
-// 	res.push_back(sys_f.cal_y(l,y_or_W,1,0.7)); // ywf'
-
-// 	OptSys sys_c(a,nsf,dists,rs,nfs,nds);
-// 	rayout=sys_c.ray_tracing(ray1);
-// 	res.push_back(rayout.get_l()); // lc0'
-// 	rayout=sys_c.ray_tracing(ray2);
-// 	res.push_back(rayout.get_l()); // lc'
-// 	rayout=sys_c.ray_tracing(ray2,0.7);
-// 	res.push_back(rayout.get_l()); // luc'
-
-// 	res.push_back(sys_c.cal_y0(l,y_or_W)); // yc0'
-
-// 	res.push_back(sys_c.cal_y0(l,y_or_W,1,0.7)); // ywc0'
-
-// 	res.push_back(sys_c.cal_y(l,y_or_W)); // yc'
-
-// 	res.push_back(sys_c.cal_y(l,y_or_W,1,0.7)); // ywc'
-
-// 	res.push_back(sys.cal_SA(l)); // SA
-// 	res.push_back(sys.cal_SA(l,0.7)); // SAu
-
-// 	res.push_back(sys.cal_LCAx(nfs,ncs,l)); // LCAx
-// 	res.push_back(sys.cal_LCAx(nfs,ncs,l,0.7)); // LCAXu
-// 	res.push_back(sys.cal_LCAx(nfs,ncs,l,0)); // LCAxu0
-
-// 	double * FCs=sys.cal_FCs(l,y_or_W,0);
-// 	res.push_back(FCs[0]); // xt'
-// 	res.push_back(FCs[1]); // xs'
-// 	res.push_back(FCs[2]); // xts'
-
-// 	double *Dt1s=sys.cal_Distortion(l,y_or_W);
-// 	double *Dt2s=sys.cal_Distortion(l,y_or_W,1,0.7);
-
-// 	res.push_back(Dt1s[0]); // adt (Absolute distortion)
-// 	res.push_back(Dt2s[0]); // adtw
-// 	res.push_back(Dt1s[1]); // rdt (Relutive distortion)
-// 	res.push_back(Dt2s[1]); // rdtw
-
-// 	res.push_back(sys.cal_Coma(l,y_or_W)); // coma1
-// 	res.push_back(sys.cal_Coma(l,y_or_W,0.7)); // coma2
-// 	res.push_back(sys.cal_Coma(l,y_or_W,1,0.7)); // coma3
-// 	res.push_back(sys.cal_Coma(l,y_or_W,0.7,0.7)); // coma4
-
-
-// }
