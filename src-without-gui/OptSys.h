@@ -29,6 +29,7 @@ public:
 	double * ncs;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	OptSys(){
 		nsf=0;
 		a=0;
@@ -48,6 +49,8 @@ public:
 		{
 			this->nfs=new double[nsf]();
 =======
+=======
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 	OptSys(){}
 	OptSys(int a,int nsf,double *dists,double * rs,double *ns,double *nds=nullptr){
 		
@@ -106,11 +109,15 @@ public:
 	double get_lH() const { return lH; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	double * get_dists() const {return dists; }
 	double * get_rs() const {return rs;}
 	double * get_nds() const {return nds;}
 	double * get_nfs()const {return nfs;}
 	double * get_ncs()const {return ncs;}
+=======
+	// double get_lH0() const { return lH0; }
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 =======
 	// double get_lH0() const { return lH0; }
 >>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
@@ -126,8 +133,11 @@ public:
 	void set_lH0();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	void set_sys(int a,int nsf,double *dists,double * rs,double *nds,double *nfs=nullptr,double *ncs=nullptr);
 
+=======
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 =======
 >>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 	Ray ray_tracing(FPR rayin, double ku=1,double kw=0,string info="First Paraxial Ray-tracing"); // 可以去掉kw
@@ -153,6 +163,7 @@ public:
 	double* cal_FCs(double l,double y_or_W, double ku=1,double kw=1); // Field Curvature and Astigmatism
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	void cal_allres(vector<double> &res, double l,double y_or_W);
 
 	// 获得绘像差图所需的数据
@@ -172,11 +183,15 @@ public:
 =======
 	// void cal_allres(double l,double y_or_W, vector<double> &res );
 >>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
+=======
+	// void cal_allres(double l,double y_or_W, vector<double> &res );
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 
 };
 
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 void OptSys::set_sys(int a,int nsf,double *dists,double * rs,double *nds,double *nfs,double *ncs)
@@ -218,6 +233,8 @@ void OptSys::set_sys(int a,int nsf,double *dists,double * rs,double *nds,double 
 }
 
 
+=======
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 =======
 >>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 void OptSys::show_sflist(){
@@ -669,8 +686,11 @@ double OptSys::cal_SA(double l,double ku)
 double OptSys::cal_LCAx(double l, double ku)
 {	
 <<<<<<< HEAD
+<<<<<<< HEAD
 	if(nsf==0)return 0;
 =======
+=======
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 
 >>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 	OptSys sys_f(a,nsf,dists,rs,nfs);
@@ -771,6 +791,7 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 }
 
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 void OptSys::cal_allres(vector<double> &res,double l,double y_or_W)
@@ -929,6 +950,8 @@ double * OptSys::get_LCAys(double l,double y_or_W,double interval)
 }
 
 
+=======
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 =======
 >>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 // void OptSys::set_lH0()
