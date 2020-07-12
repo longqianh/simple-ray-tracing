@@ -1,6 +1,6 @@
 #pragma once
 #include "Ray.h"
-#include "Lens.h"
+#include "Surface.h"
 #include <vector>
 #ifndef PI
 #define PI 3.14159265358979323846264338
@@ -268,11 +268,13 @@ Ray OptSys::ray_tracing(FPR rayin,double ku,double kw,string info){
 	for(int k=0;k<nsf;k++){
 		double d=sf[k].get_d(); 
 		double rho=sf[k].get_rho();
+
 		
 		if(isINF&&k==0) i=ku*(a/2)*rho; // add ku
 		else i=(rho*l1-1)*u1;				
 		
 		n2=sf[k].get_n();
+
 		u2=(n2-n1)/n2*i+u1;
 
 		l2=(i+u1)/(u2*rho);
@@ -281,6 +283,8 @@ Ray OptSys::ray_tracing(FPR rayin,double ku,double kw,string info){
 		u1=u2;
 	}
 	
+	// cout<<"#"<<u2<<endl;
+	// cout<<"#"<<l2<<endl;
 	rayout.set_U(u2);
 	rayout.set_l(l2);
 
@@ -601,12 +605,12 @@ double OptSys::cal_y(double l,double y_or_W,double ku,double kw,char label)
 	}
 	if(label=='f'||label=='F')
 	{
-		OptSys sys_f(a,nsf,dists,rs,nfs);
+		OptSys sys_f(a,nsf,dists,rs,nfs,nfs,ncs);
 		rayout2=sys_f.ray_tracing(rayin2,ku,kw);
 	}
 	if(label=='c'||label=='C')
 	{
-		OptSys sys_c(a,nsf,dists,rs,ncs);
+		OptSys sys_c(a,nsf,dists,rs,ncs,nfs,ncs);
 		rayout2=sys_c.ray_tracing(rayin2,ku,kw);
 	}
 	// if(nfs==nullptr){
@@ -655,14 +659,18 @@ double OptSys::cal_SA(double l,double ku)
 double OptSys::cal_LCAx(double l, double ku)
 {	
 	if(nsf==0)return 0;
-	OptSys sys_f(a,nsf,dists,rs,nfs);
-	OptSys sys_c(a,nsf,dists,rs,ncs);
+	
+	OptSys sys_f(a,nsf,dists,rs,nfs,nfs,ncs);
+	OptSys sys_c(a,nsf,dists,rs,ncs,nfs,ncs);
 	Ray rayout1,rayout2;
+	// sys_f.show_sflist();
+	// sys_c.show_sflist();
 
 	if(ku==0)
 	{
 		FPR rayin1(l),rayin2(l);		
 		rayout1=sys_f.ray_tracing(rayin1,ku);	
+
 		rayout2=sys_c.ray_tracing(rayin2,ku);
 	}
 
@@ -672,7 +680,7 @@ double OptSys::cal_LCAx(double l, double ku)
 		rayout1=sys_f.ray_tracing(rayin1,ku);	
 		rayout2=sys_c.ray_tracing(rayin2,ku);
 	}
-	
+	rayout1.show_rayinfo();
 	return rayout1.get_l()-rayout2.get_l();
 
 }

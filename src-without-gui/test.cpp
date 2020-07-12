@@ -1,4 +1,4 @@
-
+#include<stdio.h>
 #include "API_funcs.h"
 using namespace std;
 
