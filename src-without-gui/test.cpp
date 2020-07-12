@@ -8,6 +8,8 @@ int main()
 	cal_test();
 
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 	// int nsf=3;
 	// double a=20;
 	// double l=-500;
@@ -40,27 +42,61 @@ int main()
 	// Ray rayout2=sys.ray_tracing(rayin,0.7);
 	// rayout1.show_rayinfo();
 	// rayout2.show_rayinfo();
+=======
+	int nsf=3;
+	double a=20;
+	double l=-500;
+	double dists[]={4,2.5,60};
+	double rs[]={62.5,-43.65,-124.35};
+	double nfs[]={1.5223709191,1.6875154791,1};
+	double nds[]={1.5167969495,1.6727015725,1};
+	double ncs[]={1.5143226707,1.6666104143,1};
+	
+	OptSys sys(a,nsf,dists,rs,nds);
+
+=======
+	int nsf=3;
+	double a=20;
+	double l=-500;
+	double dists[]={4,2.5,60};
+	double rs[]={62.5,-43.65,-124.35};
+	double nfs[]={1.5223709191,1.6875154791,1};
+	double nds[]={1.5167969495,1.6727015725,1};
+	double ncs[]={1.5143226707,1.6666104143,1};
+	
+	OptSys sys(a,nsf,dists,rs,nds);
+
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
+	FPR rayin(-500);
+	Ray rayout1=sys.ray_tracing(rayin);
+	Ray rayout2=sys.ray_tracing(rayin,0.7);
+	rayout1.show_rayinfo();
+	rayout2.show_rayinfo();
+<<<<<<< HEAD
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
+=======
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 	// cout<<sys.cal_SA(l,0.5)<<endl;
-	// double SAs[100]={0};
+	double SAs[100]={0};
 	// double LCAx[100]={0};
-	// for (int ku = 1; ku<100; ku++)
-	// {
-	// 	SAs[ku]=sys.cal_SA(l,ku/100.0);
-	// 	// sys.cal_LCAx(nfs,ncs,l)
-	// }
-	// cout<<"[";
-	// for (int i = 0; i < 100; ++i)
-	// {
-	// 	if(i<99)
-	// 	{
-	// 		cout<<SAs[i]<<",";
-	// 	}
-	// 	else
-	// 		cout<<SAs[i];
+	for (int ku = 1; ku<100; ku++)
+	{
+		SAs[ku]=sys.cal_SA(l,ku/100.0);
+		// sys.cal_LCAx(nfs,ncs,l)
+	}
+	cout<<"[";
+	for (int i = 0; i < 100; ++i)
+	{
+		if(i<99)
+		{
+			cout<<SAs[i]<<",";
+		}
+		else
+			cout<<SAs[i];
 		
-	// }
-	// cout<<"]";
-	// return 0;
+	}
+	cout<<"]";
+	return 0;
 
 }
 
