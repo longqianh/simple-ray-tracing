@@ -86,8 +86,8 @@ void cal_res(double a,int nsf, double *dists,double *rs,double * nfs, double * n
 	res.push_back(FCs[1]); // xs'
 	res.push_back(FCs[2]); // xts'
 
-	double *Dt1s=sys.cal_DT(l,y_or_W);
-	double *Dt2s=sys.cal_DT(l,y_or_W,1,0.7);
+	double *Dt1s=sys.cal_Distortion(l,y_or_W);
+	double *Dt2s=sys.cal_Distortion(l,y_or_W,1,0.7);
 
 	res.push_back(Dt1s[0]); // adt (Absolute distortion)
 	res.push_back(Dt2s[0]); // adtw
@@ -253,22 +253,22 @@ void cal_test()
 	cout<<"Aberrations : "<<endl;
 	
 	double *d1,*d2,*d3,*d4;
-	d1=sys.cal_DT(-INF,3);
-	d2=sys.cal_DT(-INF,3,1,0.7);
-	d3=sys.cal_DT(l,y);
-	d4=sys.cal_DT(l,y,1,0.7);
+	d1=sys.cal_Distortion(-INF,3);
+	d2=sys.cal_Distortion(-INF,3,1,0.7);
+	d3=sys.cal_Distortion(l,y);
+	d4=sys.cal_Distortion(l,y,1,0.7);
 
-	cout<<"Absolute DT -- inf -- "<<d1[0]<<endl;
-	cout<<"Relative DT -- inf -- "<<d1[1]<<endl;
+	cout<<"Absolute Distortion -- inf -- "<<d1[0]<<endl;
+	cout<<"Relative Distortion -- inf -- "<<d1[1]<<endl;
 
-	cout<<"Absolute DT -- inf -- 0.7W -- "<<d2[0]<<endl;
-	cout<<"Relative DT -- inf -- "<<d2[1]<<endl;
+	cout<<"Absolute Distortion -- inf -- 0.7W -- "<<d2[0]<<endl;
+	cout<<"Relative Distortion -- inf -- "<<d2[1]<<endl;
 
-	cout<<"Absolute DT -- finite -- "<<d3[0]<<endl;
-	cout<<"Relative DT -- finite -- "<<d3[1]<<endl;
+	cout<<"Absolute Distortion -- finite -- "<<d3[0]<<endl;
+	cout<<"Relative Distortion -- finite -- "<<d3[1]<<endl;
 
-	cout<<"Absolute DT -- finite -- 0.7W -- "<<d4[0]<<endl;
-	cout<<"Relative DT -- finite -- "<<d4[1]<<endl;
+	cout<<"Absolute Distortion -- finite -- 0.7W -- "<<d4[0]<<endl;
+	cout<<"Relative Distortion -- finite -- "<<d4[1]<<endl;
 
 
 	cout<<"Spheroical Aberration -- inf -- "<<sys.cal_SA(-INF,1)<<endl;

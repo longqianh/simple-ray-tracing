@@ -1,7 +1,6 @@
 #pragma once
 #include "Ray.h"
 #include "Lens.h"
-#include <vector>
 #ifndef PI
 #define PI 3.14159265358979323846264338
 #endif
@@ -29,6 +28,7 @@ public:
 	double * nfs; 
 	double * ncs;
 
+<<<<<<< HEAD
 	OptSys(){
 		nsf=0;
 		a=0;
@@ -47,6 +47,13 @@ public:
 		if(nfs!=nullptr)
 		{
 			this->nfs=new double[nsf]();
+=======
+	OptSys(){}
+	OptSys(int a,int nsf,double *dists,double * rs,double *ns,double *nds=nullptr){
+		
+		if(nds!=nullptr){
+			this->nds=new double[nsf];
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 		}
 		if(ncs!=nullptr)
 		{
@@ -94,19 +101,19 @@ public:
 	}
 
 
-	double get_a() const {return a;}
-	double get_nsf() const {return nsf;}
-	Surface * get_sf() const {return sf;}
-
 	double get_f() const { return f; }
 
 	double get_lH() const { return lH; }
 
+<<<<<<< HEAD
 	double * get_dists() const {return dists; }
 	double * get_rs() const {return rs;}
 	double * get_nds() const {return nds;}
 	double * get_nfs()const {return nfs;}
 	double * get_ncs()const {return ncs;}
+=======
+	// double get_lH0() const { return lH0; }
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 
 	double get_lp() const { return lp; }
 
@@ -118,8 +125,11 @@ public:
 
 	void set_lH0();
 
+<<<<<<< HEAD
 	void set_sys(int a,int nsf,double *dists,double * rs,double *nds,double *nfs=nullptr,double *ncs=nullptr);
 
+=======
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 	Ray ray_tracing(FPR rayin, double ku=1,double kw=0,string info="First Paraxial Ray-tracing"); // 可以去掉kw
 	Ray ray_tracing(SPR rayin, double ku=1, double kw=1,string info="Second Paraxial Ray-tracing");
 	Ray ray_tracing(FRR rayin, double ku=1, double kw=0,string info="First Actual Ray-tracing");
@@ -136,12 +146,13 @@ public:
 
 	double cal_LCAy(double l,double y_or_W, double kw=1); // Longitudinal Chromatic Aberration
 
-	double* cal_DT(double l,double y_or_W,double ku=1,double kw=1);
+	double* cal_Distortion(double l,double y_or_W,double ku=1,double kw=1);
 
 	double cal_Coma(double l,double y_or_W,double ku=1,double kw=1);
 
 	double* cal_FCs(double l,double y_or_W, double ku=1,double kw=1); // Field Curvature and Astigmatism
 
+<<<<<<< HEAD
 	void cal_allres(vector<double> &res, double l,double y_or_W);
 
 	// 获得绘像差图所需的数据
@@ -158,11 +169,15 @@ public:
 	// double * get_Comas(double l,y_or_W,double interval=0.01);
 
 
+=======
+	// void cal_allres(double l,double y_or_W, vector<double> &res );
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 
 };
 
 
 
+<<<<<<< HEAD
 
 void OptSys::set_sys(int a,int nsf,double *dists,double * rs,double *nds,double *nfs,double *ncs)
 {
@@ -203,6 +218,8 @@ void OptSys::set_sys(int a,int nsf,double *dists,double * rs,double *nds,double 
 }
 
 
+=======
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 void OptSys::show_sflist(){
 
 	for(int i=0;i<nsf;i++){
@@ -228,6 +245,11 @@ void OptSys::show_sysinfo()
 	cout<<"Effective Focal Length -- "<<f<<endl;
 	cout<<"Main Surface Distance -- "<<lH<<endl;
 	cout<<"Exit Pupil Distance -- "<<lp<<endl;
+	// if(nds!=nullptr)
+	// {
+	// 	cout<<"NDS"<<nds[0]<<endl;
+	// }
+
 }
 
 
@@ -544,8 +566,6 @@ SAR OptSys::ray_tracing(SAR rayin,double ku,double kw,string info){
 
 double OptSys::cal_y0(double l,double y_or_W,double ku,double kw)
 {
-	if(nsf==0)return 0;
-
 	FPR rayin1(l);
 
 	if(l<=-INF)
@@ -589,7 +609,6 @@ double OptSys::cal_y0(double l,double y_or_W,double ku,double kw)
 
 double OptSys::cal_y(double l,double y_or_W,double ku,double kw,char label)
 {
-	if(nsf==0)return 0;
 	
 	FPR rayin1(l);
 	SAR rayin2(l,y_or_W);
@@ -625,14 +644,10 @@ double OptSys::cal_y(double l,double y_or_W,double ku,double kw,char label)
 }
 
 
-double* OptSys::cal_DT(double l,double y_or_W,double ku,double kw)
+double* OptSys::cal_Distortion(double l,double y_or_W,double ku,double kw)
 {
-	if(nsf==0)return 0;
 	// static double d[2]; // 使用静态变量 会出现地址错误
 	double *d=new double[2](); 
-	if(nsf==0){
-		return d;
-	}
 	double y1=cal_y(l,y_or_W,ku,kw);
 	double y0=cal_y0(l,y_or_W,ku,kw);
 	d[0]=y1-y0; // 绝对畸变
@@ -643,7 +658,6 @@ double* OptSys::cal_DT(double l,double y_or_W,double ku,double kw)
 
 double OptSys::cal_SA(double l,double ku)
 {
-	if(nsf==0)return 0;
 	FPR rayin1(l);
 	FRR rayin2(l);
 	Ray rayout1,rayout2;
@@ -654,7 +668,11 @@ double OptSys::cal_SA(double l,double ku)
 
 double OptSys::cal_LCAx(double l, double ku)
 {	
+<<<<<<< HEAD
 	if(nsf==0)return 0;
+=======
+
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 	OptSys sys_f(a,nsf,dists,rs,nfs);
 	OptSys sys_c(a,nsf,dists,rs,ncs);
 	Ray rayout1,rayout2;
@@ -693,28 +711,30 @@ double OptSys::cal_LCAy(double l,double y_or_W,double kw)
 
 double* OptSys::cal_FCs(double l,double y_or_W,double ku,double kw)
 {
-
-	double *FC = new double[3]();
-	if(nsf==0)
-	{
-		return FC;
-	}
-
 	FPR rayin1(l);
 	SAR rayin2(l,y_or_W);
 	Ray rayout1;
 	SAR rayout2;
 	rayout1=ray_tracing(rayin1);
 	rayout2=ray_tracing(rayin2,ku,kw);
+
 	double l0=rayout1.get_l();
 	double U=rayout2.get_U();
 	double t=rayout2.get_t();
 	double s=rayout2.get_s();
 	double X=sf[nsf-1].get_X();
 
+	double *FC = new double[3]();
 	double xt=t*cos(U)+X-l0;
 	double xs=s*cos(U)+X-l0;
 
+	// cout<<cos(U)<<endl;
+	// cout<<"l' -- "<<l2<<endl;
+	// cout<<"U --"<< U<<endl;
+	// cout<<"s -- "<<s <<endl;
+	// cout<<"t --"<< t<<endl;
+
+	
 	FC[0]=xt,FC[1]=xs,FC[2]=xt-xs;
 
 	return FC;
@@ -723,9 +743,6 @@ double* OptSys::cal_FCs(double l,double y_or_W,double ku,double kw)
 
 double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 {	
-	
-	if(nsf==0)return 0;
-	
 	double coma=0;
 	double yp=cal_y(l,y_or_W,ku,kw);
 	double y_up=0,y_dn=0;
@@ -740,6 +757,8 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 	rayout_up=ray_tracing(rayin_up,ku,kw);
 	rayout_dn=ray_tracing(rayin_dn,ku,kw);
 
+	// cout<<yp<<endl;
+
 	
 	y_up=(rayout_up.get_l()-rayout.get_l())*tan(rayout_up.get_U());
 	y_dn=(rayout_dn.get_l()-rayout.get_l())*tan(rayout_dn.get_U());
@@ -752,6 +771,7 @@ double OptSys::cal_Coma(double l,double y_or_W,double ku,double kw)
 }
 
 
+<<<<<<< HEAD
 
 void OptSys::cal_allres(vector<double> &res,double l,double y_or_W)
 {
@@ -909,6 +929,8 @@ double * OptSys::get_LCAys(double l,double y_or_W,double interval)
 }
 
 
+=======
+>>>>>>> parent of 671102e... 增加获得像差曲线数据的函数
 // void OptSys::set_lH0()
 // {
 // 	double * invrs = new double[nsf];
@@ -943,3 +965,91 @@ double * OptSys::get_LCAys(double l,double y_or_W,double interval)
 // }
 
 
+	
+
+// void OptSys::cal_allres(double *nfs,double *nds, double *ncs,double l,double y_or_W, vector<double> &res )
+// {
+
+// 	OptSys sys(a,nsf,dists,rs,nds);
+// 	res.push_back(sys.get_f()); // f'
+// 	res.push_back(sys.get_lH()); // lH'
+// 	res.push_back(sys.get_lp()); // lp'
+// 	Ray rayout;
+	
+// 	FPR ray1(l);
+// 	FRR ray2(l);
+
+// 	rayout=sys.ray_tracing(ray1);
+// 	res.push_back(rayout.get_l()); // ld0'
+// 	rayout=sys.ray_tracing(ray2); 
+// 	res.push_back(rayout.get_l()); // ld'
+// 	rayout=sys.ray_tracing(ray2,0.7);
+// 	res.push_back(rayout.get_l()); // lud'
+
+// 	res.push_back(sys.cal_y0(l,y_or_W)); // yd0'
+
+// 	res.push_back(sys.cal_y0(l,y_or_W,1,0.7)); // ywd0'
+
+// 	res.push_back(sys.cal_y(l,y_or_W)); // yd'
+
+// 	res.push_back(sys.cal_y(l,y_or_W,1,0.7)); // ywd'
+
+// 	OptSys sys_f(a,nsf,dists,rs,nfs,nds);
+// 	rayout=sys_f.ray_tracing(ray1);
+// 	res.push_back(rayout.get_l()); // lf0'
+// 	rayout=sys_f.ray_tracing(ray2);
+// 	res.push_back(rayout.get_l()); // lf'
+// 	rayout=sys_f.ray_tracing(ray2,0.7);
+// 	res.push_back(rayout.get_l()); // luf'
+
+// 	res.push_back(sys_f.cal_y0(l,y_or_W)); // yf0'
+
+// 	res.push_back(sys_f.cal_y0(l,y_or_W,1,0.7)); // ywf0'
+
+// 	res.push_back(sys_f.cal_y(l,y_or_W)); // yf'
+
+// 	res.push_back(sys_f.cal_y(l,y_or_W,1,0.7)); // ywf'
+
+// 	OptSys sys_c(a,nsf,dists,rs,nfs,nds);
+// 	rayout=sys_c.ray_tracing(ray1);
+// 	res.push_back(rayout.get_l()); // lc0'
+// 	rayout=sys_c.ray_tracing(ray2);
+// 	res.push_back(rayout.get_l()); // lc'
+// 	rayout=sys_c.ray_tracing(ray2,0.7);
+// 	res.push_back(rayout.get_l()); // luc'
+
+// 	res.push_back(sys_c.cal_y0(l,y_or_W)); // yc0'
+
+// 	res.push_back(sys_c.cal_y0(l,y_or_W,1,0.7)); // ywc0'
+
+// 	res.push_back(sys_c.cal_y(l,y_or_W)); // yc'
+
+// 	res.push_back(sys_c.cal_y(l,y_or_W,1,0.7)); // ywc'
+
+// 	res.push_back(sys.cal_SA(l)); // SA
+// 	res.push_back(sys.cal_SA(l,0.7)); // SAu
+
+// 	res.push_back(sys.cal_LCAx(nfs,ncs,l)); // LCAx
+// 	res.push_back(sys.cal_LCAx(nfs,ncs,l,0.7)); // LCAXu
+// 	res.push_back(sys.cal_LCAx(nfs,ncs,l,0)); // LCAxu0
+
+// 	double * FCs=sys.cal_FCs(l,y_or_W,0);
+// 	res.push_back(FCs[0]); // xt'
+// 	res.push_back(FCs[1]); // xs'
+// 	res.push_back(FCs[2]); // xts'
+
+// 	double *Dt1s=sys.cal_Distortion(l,y_or_W);
+// 	double *Dt2s=sys.cal_Distortion(l,y_or_W,1,0.7);
+
+// 	res.push_back(Dt1s[0]); // adt (Absolute distortion)
+// 	res.push_back(Dt2s[0]); // adtw
+// 	res.push_back(Dt1s[1]); // rdt (Relutive distortion)
+// 	res.push_back(Dt2s[1]); // rdtw
+
+// 	res.push_back(sys.cal_Coma(l,y_or_W)); // coma1
+// 	res.push_back(sys.cal_Coma(l,y_or_W,0.7)); // coma2
+// 	res.push_back(sys.cal_Coma(l,y_or_W,1,0.7)); // coma3
+// 	res.push_back(sys.cal_Coma(l,y_or_W,0.7,0.7)); // coma4
+
+
+// }
