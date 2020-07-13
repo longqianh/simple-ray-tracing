@@ -821,7 +821,7 @@ double * OptSys::get_SAs(double l, double interval)
 {
 	int n=int(1/interval);
 	double *SAs=new double[n]();
-	for (int i = 1; i < n; i++)
+	for (int i = 1; i <= n; i++)
 	{
 		double ku=double(i)/double(n);
 		SAs[i]=cal_SA(l,ku);
@@ -834,7 +834,7 @@ double * OptSys::get_DTs(double l,double y_or_W,double interval)
 {
 	int n=int(1/interval);
 	double *DTs=new double[n]();
-	for (int i = 1; i < n; i++)
+	for (int i = 1; i <= n; i++)
 	{
 		double kw=double(i)/double(n);
 		double *tmp=cal_DT(l,y_or_W,1,kw);
@@ -847,7 +847,7 @@ double * OptSys::get_ATMs(double l,double y_or_W,double interval)
 {
 	int n=int(1/interval);
 	double *ATMs=new double[n]();
-	for (int i = 1; i < n; i++)
+	for (int i = 1; i <= n; i++)
 	{
 		double kw=double(i)/double(n);
 		double *tmp=cal_FCs(l,y_or_W,1,kw);
@@ -860,7 +860,7 @@ double * OptSys::get_LCAxs(double *nfs,double *ncs,double l,double interval)
 {
 	int n=int(1/interval);
 	double *LCAxs=new double[n]();
-	for (int i = 1; i < n; i++)
+	for (int i = 1; i <= n; i++)
 	{
 		double ku=double(i)/double(n);
 		LCAxs[i]=cal_LCAx(nfs,ncs,l,ku);
@@ -871,7 +871,7 @@ double * OptSys::get_LCAys(double *nfs,double*ncs,double l,double y_or_W,double 
 {
 	int n=int(1/interval);
 	double *LCAys=new double[n]();
-	for (int i = 1; i < n; i++)
+	for (int i = 1; i <= n; i++)
 	{
 		double kw=double(i)/double(n);
 		LCAys[i]=cal_LCAy(nfs,ncs,l,y_or_W,kw);
