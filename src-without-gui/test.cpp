@@ -233,12 +233,18 @@ int main()
 	double ncs[]={1.5143226707,1.6666104143,1};
 	
 	OptSys sys;
+
 	// // sys.show_sysinfo();
 	sys.set_sys(a,nsf,dists,rs,nds);
-	// sys.show_sysinfo();
-	// vector<double> res;
-	double * ans=sys.get_DTs(l,y);
-	cout<<ans[100];
+	int k=1;//要第几面的
+	cout<<sys.sf[k].get_rho()<<endl;//取出曲率 半径的话取倒数
+	cout<<sys.sf[k].get_d()<<endl; // 取出厚度
+	cout<<sys.get_nsf()<<endl;
+
+	// // sys.show_sysinfo();
+	// // vector<double> res;
+	// double * ans=sys.get_DTs(l,y);
+	// cout<<ans[100];
 	// // sys.cal_allres(res,l,y,nfs,ncs);
 	// cout<<"[";
 	// for(int k=0;k<100;k++){

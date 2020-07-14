@@ -93,7 +93,9 @@ public:
 	}
 
 
+	double get_a() const {return a; }
 
+	int get_nsf() const {return nsf; }
 
 	double get_f() const { return f; }
 
