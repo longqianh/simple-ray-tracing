@@ -219,49 +219,25 @@ void cal_test()
 
 int main()
 {
-	// cal_test();
-
-
-	int nsf=3;
-	double a=20;
-	double l=-500;
-	double y=26;
-	double dists[]={4,2.5,60};
-	double rs[]={62.5,-43.65,-124.35};
-	double nfs[]={1.5223709191,1.6875154791,1};
-	double nds[]={1.5167969495,1.6727015725,1};
-	double ncs[]={1.5143226707,1.6666104143,1};
-	
-	OptSys sys;
-
-	// // sys.show_sysinfo();
-	sys.set_sys(a,nsf,dists,rs,nds);
-	int k=1;//要第几面的
-	cout<<sys.sf[k].get_rho()<<endl;//取出曲率 半径的话取倒数
-	cout<<sys.sf[k].get_d()<<endl; // 取出厚度
-	cout<<sys.get_nsf()<<endl;
-
-	// // sys.show_sysinfo();
-	// // vector<double> res;
-	// double * ans=sys.get_DTs(l,y);
-	// cout<<ans[100];
-	// // sys.cal_allres(res,l,y,nfs,ncs);
-	// cout<<"[";
-	// for(int k=0;k<100;k++){
-	// 	cout<<ans[k]<<',';
-
-	// }
-	// cout<<']';
-
-	// double tmp=sys.cal_SA(l);
-	// cout<<tmp;
-	// FPR rayin(-500);
-	// Ray rayout1=sys.ray_tracing(rayin);
-	// Ray rayout2=sys.ray_tracing(rayin,0.7);
-	// rayout1.show_rayinfo();
-	// rayout2.show_rayinfo();
-
+	cal_test();
 	return 0;
+
+	// int nsf=3;
+	// double a=20;
+	// double l=-500;
+	// double y=26;
+	// double dists[]={4,2.5,60};
+	// double rs[]={62.5,-43.65,-124.35};
+	// double nfs[]={1.5223709191,1.6875154791,1};
+	// double nds[]={1.5167969495,1.6727015725,1};
+	// double ncs[]={1.5143226707,1.6666104143,1};
+	
+	// OptSys sys;
+
+	// sys.show_sysinfo();
+	// sys.set_sys(a,nsf,dists,rs,nds);
+	// sys.show_sysinfo();
+	
 
 }
 

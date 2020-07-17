@@ -27,6 +27,7 @@ private:
 public:
 
 	Surface *sf;
+	// 可以去掉 直接使用sf中的对应参数
 	double * dists;
 	double * rs;
 	double * ns;

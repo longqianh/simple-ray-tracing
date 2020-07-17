@@ -4,9 +4,9 @@
 
 ## 1. 光路追迹计算程序说明
 
-光线的计算程序写了三、四十个小时，在类的设计上花了不少功夫，我认为程序具有可拓展性、易理解性，比如要进行光路追迹，只需要声明光线，便可利用`ray_tracing(ray,ku,kw)` 函数得到输出光线。
+光线的计算程序写了三、四十个小时，在类的设计上花了不少功夫（速成面向对象叭），我认为程序具有可拓展性、易理解性，比如要进行光路追迹，只需要声明光线，便可利用`ray_tracing(ray,ku,kw)` 函数得到输出光线。
 
-
+![optsys](https://tva1.sinaimg.cn/large/007S8ZIlly1ggu4kcq7qij30u00yh0vs.jpg)
 
 ### Ray.h
 
@@ -304,4 +304,6 @@ Astigmatism -- finite -- -0.3977977
 
 
 ## 2. 用户操作界面说明
+
+[请在这里下载。](https://mega.nz/file/hMwjlQRK#IF6oF4FbAvePojzbOTEDEtUSKE0LhQDS1tOyqcPffNM)
 
