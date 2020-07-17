@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Ray_Tracing.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray_TracingDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="aboutdlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ComfirmCamOpen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ComfirmObjOpen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Ray.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SAPicture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="OptSys.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="apifuncs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ButtonTransparent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Ray_Tracing.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Ray_TracingDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="aboutdlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ComfirmCamOpen.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ComfirmObjOpen.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SAPicture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OptSys.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="apifuncs.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ButtonTransparent.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="RayTracing.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\RayTracing.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\Ray_Tracing.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\ZJULOGO.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\icon.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\OPTLOGO.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\background.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\softwarelogo.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\white.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\blue.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\star.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\macaron.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\ICON1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\ICON2.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\calICON.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\cal.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\ICON1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\ICON2.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\calICON.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\ZJULOGO.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\background.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\white.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\blue.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\star.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\macaron.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\calbutton.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\after-blue.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\after-green.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\after-macaron.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\after-star.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\after-white.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
