@@ -1,12 +1,16 @@
 #pragma once
 #include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <string>
+#include <iostream>
 #include "utils.h"
+
 using namespace std;
 #ifndef PI
 #define PI 3.14159265358979323846264338
 #endif
+
+
 #ifndef INF
 #define INF 1e15
 #endif
@@ -48,9 +52,7 @@ public:
 	void set_l(double l){
 		this->l=l;
 	}
-	// void set_i(double i){
-	// 	this->i=i;
-	// }
+
 
 	void set_rayinfo(string rayinfo)
 	{
@@ -59,18 +61,18 @@ public:
 
 	string get_rayinfo() const
 	{
-		return rayinfo;
+		return this->rayinfo;
 	}
 
 	
 	double get_U() const
 	{
-		return U;
+		return this->U;
 	}
 	
 	double get_l() const
 	{
-		return l;
+		return this->l;
 	}
 
 	virtual void show_rayinfo()
@@ -102,12 +104,12 @@ public:
 
 	FPR(double l):Ray(l)
 	{
-		rayinfo="FPR"; 
-		U=0;
+		this->rayinfo="FPR";
+		this->U=0;
 	}
 	FPR(double l,string rayinfo):Ray(l,rayinfo)
 	{
-		U=0;
+		this->U=0;
 	}
 
 	~FPR(){}
@@ -139,22 +141,27 @@ class SPR: public Ray
 {
 private:
 	double L; // 对应的物距
-	double y; // 对应的物高
-	double W; // 物方视场角 弧度
+	// double W; // 物方视场角 弧度
+	// double y; // 对应的物高
+
 
 public:
+	double W; // 物方视场角 弧度
+	double y; // 对应的物高
+
+
 	
 	SPR(double l,double y_or_W):Ray(l)
 	{
 		if(l==-INF||l==INF)
 		{
-			W=-Angle2Arc(y_or_W);// 根据符号规则转化
+			this->W=-Angle2Arc(y_or_W);// 根据符号规则转化
 		}
 		else{
-			y=y_or_W;
+			this->y=y_or_W;
 		}
-		L=l;
-		l=0; // 注：若孔径光阑不在第一面，这里的l需重新设置
+		this->L=l;
+		this->l=0; // 注：若孔径光阑不在第一面，这里的l需重新设置
 	}
 
 	SPR(double l,double y_or_W,string rayinfo):Ray(l)
@@ -163,13 +170,13 @@ public:
 
 		if(l==-INF||l==INF)
 		{
-			W=-Angle2Arc(y_or_W);
+			this->W=-Angle2Arc(y_or_W);
 		}
 		else{
-			y=y_or_W;
+			this->y=y_or_W;
 		}
-		L=l;
-		l=0; 
+		this->L=l;
+		this->l=0;
 	}
 
 	~SPR(){}
@@ -189,17 +196,17 @@ public:
 
 	double get_W() const
 	{
-		return W;
+		return this->W;
 	}
 	double get_L() const
 	{
-		return L;
+		return this->L;
 	
 	}
 
 	double get_y() const
 	{
-		return y;
+		return this->y;
 	}
 
 	void show_rayinfo()
@@ -207,52 +214,56 @@ public:
 		cout<<"Ray Information : "<<rayinfo<<endl;
 		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
 		cout<<"Distance l -- ";
-		if(l<=-INF)
+		if(this->l<=-INF)
 		{
 			cout<<"-INF"<<endl;
 			cout<<"Angle of View W -- "<<W<<endl;
 		}
-		else if(l>=INF)
+		else if(this->l>=INF)
 		{
 			cout<<"INF"<<endl;
 		}
 		else{
-			cout<<l<<endl;
-			cout<<"Object Height y -- "<<y<<endl;
+			cout<< this->l<<endl;
+			cout<<"Object Height y -- "<< this->y<<endl;
 		}
 	}
 };
 
+
 // First Actural Ray or meridian actual ray
-class FAR : public Ray  
+// to overcome the conflict with MFC 
+// changed the FAR to FRR
+
+class FRR : public Ray  
 {
 public:
-	FAR(double l):Ray(l)
+	FRR(double l):Ray(l)
 	{
-		rayinfo="FAR";
+		this->rayinfo="FRR";
 	}
-	FAR(double l,string rayinfo):Ray(l)
+	FRR(double l,string rayinfo):Ray(l)
 	{
 		this->rayinfo=rayinfo;
 	}
 
-	~FAR(){}
+	~FRR(){}
 
 	void show_rayinfo()
 	{
-		cout<<"Ray Information : "<<rayinfo<<endl;
-		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
+		cout<<"Ray Information : "<< this->rayinfo<<endl;
+		cout<<"Aperture Angle U -- "<<Arc2Angle(this->U)<<endl;
 		cout<<"Distance -- ";
-		if(l<=-INF)
+		if(this->l<=-INF)
 		{
 			cout<<"-INF"<<endl;
 		}
-		else if(l>INF)
+		else if(this->l>INF)
 		{
 			cout<<"INF"<<endl;
 		}
 		else{
-			cout<<l<<endl;
+			cout<< this->l<<endl;
 		}
 	}
 
@@ -269,30 +280,33 @@ private:
 	double t,s;
 	string label; // 区分主、上、下光线
 
+protected:
+
+
 public:
 	SAR()
 	{ 
-		rayinfo="SAR";
-		label="cf"; 
-		t=-INF,s=-INF;
+		this->rayinfo="SAR";
+		this->label="cf";
+		this->t=-INF, this->s=-INF;
 	}
 	SAR(double l,double y_or_W):Ray(l)
 	{
 		if(l==-INF||l==INF)
 		{
-			W=-Angle2Arc(y_or_W);
-			L=-INF;
+			this->W=-Angle2Arc(y_or_W);
+			this->L=-INF;
 		}
-		else { y=y_or_W; }
+		else { this->y=y_or_W; }
 
-		L=l;
+		this->L=l;
 
-		rayinfo="SAR";
+		this->rayinfo="SAR";
 		
 		// 默认为主光线，可根据上下光线重新设置
-		label="cf";
-		l=0; 
-		t=-INF,s=-INF;
+		this->label="cf";
+		this->l=0;
+		this->t=-INF, this->s=-INF;
 	}
 
 	SAR(double l,double y_or_W,string label):Ray(l)
@@ -301,13 +315,13 @@ public:
 
 		if(l==-INF||l==INF)
 		{
-			W=-Angle2Arc(y_or_W);
+			this->W=-Angle2Arc(y_or_W);
 		}
-		else { y=y_or_W; }
+		else { this->y=y_or_W; }
 
-		L=l;
+		this->L=l;
 		this->label=label;
-		t=-INF,s=-INF;
+		this->t=-INF, this->s=-INF;
 		
 	}
 
@@ -317,12 +331,12 @@ public:
 
 		if(l==-INF||l==INF)
 		{
-			W=-Angle2Arc(y_or_W);
+			this->W=-Angle2Arc(y_or_W);
 		}
-		else { y=y_or_W; }
+		else { this->y=y_or_W; }
 
-		L=l;
-		t=-INF,s=-INF;
+		this->L=l;
+		this->t=-INF, this->s=-INF;
 		this->label=label;
 		this->rayinfo=rayinfo;
 
@@ -362,58 +376,58 @@ public:
 
 	double get_L() const
 	{
-		return L;
+		return this->L;
 	}
 
 	double get_W() const
 	{
-		return W;
+		return this->W;
 	}
 
 	double get_y() const
 	{
-		return y;
+		return this->y;
 	}
 
 	double get_t() const
 	{
-		return t;
+		return this->t;
 	}
 
 	double get_s() const
 	{
-		return s;
+		return this->s;
 	}
 
 	string get_label() const
 	{
-		return label;
+		return this->label;
 	}
 
 	void show_rayinfo()
 	{
-		cout<<"Ray Information : "<<rayinfo<<endl;
-		cout<<"Ray label -- "<<label<<endl;
-		cout<<"Aperture Angle U -- "<<Arc2Angle(U)<<endl;
+		cout<<"Ray Information : "<< this->rayinfo<<endl;
+		cout<<"Ray label -- "<< this->label<<endl;
+		cout<<"Aperture Angle U -- "<<Arc2Angle(this->U)<<endl;
 		cout<<"Distance l -- ";
-		if(l<=-INF)
+		if(this->l<=-INF)
 		{
 			cout<<"-INF"<<endl;
-			cout<<"Angle of View W -- "<<W<<endl;
+			cout<<"Angle of View W -- "<< this->W<<endl;
 		}
-		else if(l>=INF)
+		else if(this->l>=INF)
 		{
 			cout<<"INF"<<endl;
 		}
 		else{
-			cout<<l<<endl;
-			cout<<"Object Height y -- "<<y<<endl;
+			cout<< this->l<<endl;
+			cout<<"Object Height y -- "<< this->y<<endl;
 		}
 
-		if(label=="cf")
+		if(this->label=="cf")
 		{
-			cout<<"Meridian Distance t -- "<<t<<endl;
-		 	cout<<"Sagittarius Distance s -- "<<s<<endl;
+			cout<<"Meridian Distance t -- "<< this->t<<endl;
+		 	cout<<"Sagittarius Distance s -- "<< this->s<<endl;
 		 }
 
 	}
