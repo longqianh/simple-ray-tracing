@@ -173,6 +173,8 @@ Optsys(a,nsf,dists[],rs[],ns[]);
 
 ### cal_test
 
+![results](results.png)
+
 测试程序。输出如下：
 
 
