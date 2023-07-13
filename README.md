@@ -305,5 +305,5 @@ Astigmatism -- finite -- -0.3977977
 
 ## 2. 用户操作界面说明
 
-[请在这里下载。](https://mega.nz/file/hMwjlQRK#IF6oF4FbAvePojzbOTEDEtUSKE0LhQDS1tOyqcPffNM)
+见 Release/Ray Tracing 帮助文档
 
