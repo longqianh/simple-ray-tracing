@@ -173,10 +173,7 @@ Optsys(a,nsf,dists[],rs[],ns[]);
 
 ### cal_test
 
-![results](results.png)
-
 测试程序。输出如下：
-
 
 
 ```tex
@@ -301,7 +298,7 @@ Astigmatism -- finite -- -0.3977977
 [Finished in 0.9s]
 ```
 
-
+![results](results.png)
 
 
 
